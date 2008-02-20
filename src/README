@@ -1,3 +1,5 @@
 This is where the source code goes for our project.
 
-$Id: README,v 1.1 2008/02/20 22:23:19 laffer1 Exp $
+FlashBack is a file backup system for "Flash drives" and other media.
+
+$Id: README,v 1.2 2008/02/20 22:56:24 laffer1 Exp $
