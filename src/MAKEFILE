@@ -1,0 +1,19 @@
+#Flashback make file
+#
+#
+#	Needs work
+#
+
+CC=g++
+FILES=flashback.cpp
+
+all: debug release
+
+release: flashback.cpp
+	${CC} ${FILES} -o flashback -O3
+
+debug: flashback.cpp
+	${CC} ${FILES} -o flashback_d
+	
+clean:
+	rm -f *.o flashback flashback_d
