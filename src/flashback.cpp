@@ -1,21 +1,13 @@
-#include <iostream>
-using namespace std;
 
-#ifdef Win32
-	#include <windows.h>
+#include "global.h"  /// < Holds Common Global Header Files
 
-int WINAPI WinMain(HINSTANCE  hInst, HINSTANCE hPrev, LPSTR lpCmdLine, int nShow)
-{
-#ifdef Debug
-	cout << "Running in Debug Mode!" << endl;
-	cout << "Windows Version" << endl;
-#endif
-	//Call Flashback Start
-	return 0;
-}
-
-#else
-
+/**
+ *	main
+ *	Main program Entry Point
+ *	@param argc number of input params
+ *	@param args pointer to string array of input param
+ *	@return returns program success
+*/
 int main(int argc, char** args)
 {
 #ifdef Debug
@@ -23,12 +15,7 @@ int main(int argc, char** args)
 #endif
 
 	//Call Flashback Start
+
 	return 0;
 }	
-#endif
-
-
-
-
-
-
+ 

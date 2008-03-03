@@ -1,9 +1,6 @@
 #Flashback make file
 #
 #
-#	Needs work
-#	Maybe add conditions to see if this is windows or nix
-#
 
 CC=g++
 FILES=flashback.cpp
