@@ -1,0 +1,19 @@
+Current To Do List
+3/5/08 due 3/12/08
+
+Project				Who				%Done			Desc							
+----------------	---------		--------		----------------------------
+fbThread			BH				20%				Base Thread object
+fbSocket			LH CT			0%				C Socket Wrapper
+fbXML				CT				0%				XML file wrapper
+fbErrorLogger		BH				0%				Log Errors
+fbSQL				AT				0%				SQLite Wrapper
+fbDiskDetector		BH				40%				Detect New Disks
+fbArchive			JM				0%				File Archive .tar
+fbSchedular			BH				0%				Backup sched
+
+
+
+Cont...
+--------
+main.cpp			BH LH CT JM AT	1%				Main function will be continues updated
