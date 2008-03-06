@@ -12,7 +12,7 @@
 *	Default constructor
 *	@note 3/5/08 Initilize vars to false
 */
-fbThread::fbThread():running(false), stopping(false), paused(false)
+fbThread::fbThread():_running(false), _stopping(false), _paused(false), _hThread(NULL)
 {
 }
 
@@ -22,7 +22,7 @@ fbThread::fbThread():running(false), stopping(false), paused(false)
 */
 fbThread::~fbThread()
 {
-	if(running)
+	if(_running)
 		forceStop();
 }
 
@@ -32,8 +32,17 @@ fbThread::~fbThread()
 */
 void fbThread::start()
 {
-	if(running)
+	if(_running)
 		return;
+#ifdef Win32
+	_hThread = CreateThread(NULL, 0, threadStart, this, 0, NULL);
+	//if(_hThread == NULL)
+	//	ERROR
+#else
+	int ret = pthread_create(&_hThread, NULL, threadStart, this);
+	//if(ret != 0)
+	//	ERROR
+#endif
 }
 
 /**
@@ -42,9 +51,9 @@ void fbThread::start()
 */
 void fbThread::stop()
 {
-	if (!running)
+	if (!_running)
 		return;
-	stopping = true;
+	_stopping = true;
 }
 
 /**
@@ -53,8 +62,21 @@ void fbThread::stop()
 */
 void fbThread::forceStop()
 {
-	if (!running)
+	if (!_running)
 		return;
+#ifdef Win32
+	DWORD ret = TerminateThread(_hThread, 0);
+	//if(ret == -1)
+	//	ERROR
+#else
+	int ret = pthread_cancel(_hThread);
+	//if(ret != 0)
+	//	ERROR	
+#endif
+	_running = false;
+	_stopping = false;
+	_paused = false;
+	_hThread = NULL;
 }
 
 /**
@@ -63,18 +85,33 @@ void fbThread::forceStop()
 */
 void fbThread::pause()
 {
-	if (!running)
+	if (!_running || _paused)
 		return;
+	
+#ifdef Win32
+	DWORD ret = SuspendThread(_hThread);
+	//if(ret == -1)
+	//	error
+#else
+#endif
+	_paused = true;
 }
 
 /**
 *	resume
-*	resume a paused thread
+*	resume a _paused thread
 */
 void fbThread::resume()
 {
-	if (!running || !paused)
+	if (!_running || !_paused)
 		return;
+#ifdef Win32
+	DWORD ret = ResumeThread(_hThread);
+	//if(ret == -1)
+	//	ERROR
+#else
+#endif
+	_paused = false;
 }
 	
 /**
@@ -84,17 +121,17 @@ void fbThread::resume()
 */
 bool fbThread::isRunning()
 {
-	return running;
+	return _running;
 }
 
 /**
-*	isPaused
+*	ispaused
 *	is the thread paused
 *	@return true if thread is paused
 */
 bool fbThread::isPaused()
 {
-	return paused;
+	return _paused;
 }
 
 /**
@@ -104,20 +141,87 @@ bool fbThread::isPaused()
 */
 bool fbThread::isStopping()
 {
-	return stopping;
+	return _stopping;
 }
 
+
+#ifdef Win32
 /**
 *	threadStart
 *	real thread function
 *	@param thread thread to run
 */
-void fbThread::threadStart(void* thread)
+DWORD WINAPI fbThread::threadStart(LPVOID thread)
 {
 	fbThread* t = (fbThread*)thread;
-	t->running = true;
+	t->_running = true;
 	t->run();	/// < cast thread and call run
-	t->running = false;
+	t->_running = false;
+	t->_stopping = false;
+	t->_paused = false;
+	t->_hThread = NULL;
+	return 0;
+}
+#else
+/**
+*	threadStart
+*	real thread function
+*	@param thread thread to run
+*/
+void* fbThread::threadStart(void* thread)
+{
+	fbThread* t = (fbThread*)thread;
+	t->_running = true;
+	t->run();	/// < cast thread and call run
+	t->_running = false;
+	t->_stopping = false;
+	t->_paused = false;
+	t->_hThread = NULL;
+	return 0;
+}
+#endif
+
+/**
+*	sleep
+*	Thread sleeps for given number of seconds
+*	@param sec Number of seconds to sleep for
+*/
+void fbThread::sleep(int sec)
+{
+	if(!_running || _paused)
+		return;
+#ifdef Win32
+	Sleep(sec * 1000);
+#else
+#endif
+}
+
+/**
+*	usleep
+*	Thread sleeps for given number of milliseconds
+*	@param msec Number of milliseconds to sleep for
+*/
+void fbThread::usleep(int msec)
+{
+	if(!_running || _paused)
+		return;
+#ifdef Win32
+	Sleep(msec);
+#else
+#endif
+}
+
+/**
+*	yield
+*	Thread yields allowing other threads to run
+*/
+void fbThread::yield()
+{
+#ifdef Win32
+	Yield();
+#else
+	pthread_yield();
+#endif
 }
 
 /**

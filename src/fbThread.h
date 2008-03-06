@@ -1,5 +1,3 @@
-
-
 #ifndef fbTHREAD_H
 #define fbTHREAD_H
 
@@ -29,16 +27,46 @@ public:
 	bool isPaused();	/// < is the thread paused
 	bool isStopping();	/// < is the thread stopping?
 
+	void sleep(int sec);  	/// < thread sleeps for the given number of seconds
+	void usleep(int msec); 	/// < thread sleeps for the given number of milliseconds
+	void yield();			/// < thread yieids for other threads to run
+	
 private:
-	bool running;		/// < is thread running
-	bool stopping;			/// < did we get a stop?
-	bool paused;		/// < has the thread been paused
+	bool _running;		/// < is thread running
+	bool _stopping;		/// < did we get a stop?
+	bool _paused;		/// < has the thread been paused
 
-	static void threadStart(void* thread);	/// < Real thread func
-
-protected:
-	virtual void run();	/// < Overload this function to run your thread in
+#ifdef Win32
+	HANDLE _hThread;		/// < handle to running thread
+	static DWORD WINAPI threadStart(LPVOID thread);	/// < Real thread func
+#else
+	pthread_t _hThread;		/// < handle to running thread
+	static void* threadStart(void* thread);	/// < Real thread func
+#endif
+	
+	virtual void run();		/// < Overload this function to run your thread in
 };
 
 
 #endif
+
+/*
+//example usage
+
+#include "fbThread.h"
+class foo: public fbThread
+{
+private:
+	void run()
+	{
+		cout << "Thread Starting.." << endl;
+		while(!isStopping())
+		{
+			sleep(1);
+			cout << "Still.. running!" << endl;
+		}
+		cout << "Thread stopping.." << endl;
+	}
+};
+
+*/
