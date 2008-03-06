@@ -34,7 +34,6 @@ private:
 	bool stopping;			/// < did we get a stop?
 	bool paused;		/// < has the thread been paused
 
-	fbThread(const fbThread& thread);	/// < Suppress Copy Construct
 	static void threadStart(void* thread);	/// < Real thread func
 
 protected:

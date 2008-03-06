@@ -108,25 +108,16 @@ bool fbThread::isStopping()
 }
 
 /**
-*	fbThread
-*	Copy constructor
-*	Private, used to suppress C++ for generating it
-*	@param thread Class to copy
-*/
-fbThread::fbThread(const fbThread& thread)
-{
-}
-
-/**
 *	threadStart
 *	real thread function
 *	@param thread thread to run
 */
 void fbThread::threadStart(void* thread)
 {
-	static_cast<fbThread>(thread).running = true;
-	static_cast<fbThread>(thread).run();	/// < cast thread and call run
-	static_cast<fbThread>(thread).running = false;
+	fbThread* t = (fbThread*)thread;
+	t->running = true;
+	t->run();	/// < cast thread and call run
+	t->running = false;
 }
 
 /**
