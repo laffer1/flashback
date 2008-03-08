@@ -12,7 +12,7 @@ fbDiskDetector		BH				40%				Detect New Disks
 fbArchive			JM				0%				File Archive .tar
 fbSchedular			BH				0%				Backup sched
 
-
+Integrate sockets with fbSocket	LH				0%
 
 Cont...
 --------
