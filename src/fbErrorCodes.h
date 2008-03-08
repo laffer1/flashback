@@ -11,7 +11,7 @@
 */
 enum ERROR_CODES
 {
-	UKNOWN = -1,
+	UNKNOWN = -1,
 	OK = 0,
 	NONE = 1,
 
