@@ -4,7 +4,7 @@
 
 CC=g++
 CFLAGS=	-pthread
-FILES=flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp fbSocket.cpp
+FILES=flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp fbSocket.cpp sockets/tcp.c
 DEBUG=-DDebug
 #nix
 BIND=bin/flashback_d
