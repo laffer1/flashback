@@ -1,0 +1,25 @@
+Course: cs224
+Assignment: Documentation Project TCP/UDP Sockets
+Date: April 21, 2005
+Name: Lucas Holt & Rupali Y Mahajan
+email: lucas.holt@wmich.edu & rupmaha@yahoo.com
+Description: 
+    Documentation on TCP and UDP sockets along with a
+    TCP/UDP library to simplify using them.  Examples
+    of tcp/udp clients and servers are provided.
+
+    This was developed and run on a GNU/Linux 2.6.10 kernel (Gentoo)
+
+Files:
+README - this file
+Makefile - our build makefile works with gmake
+bool.h - boolean data type for c89 compilers 
+tcp.h - tcp library header file
+udp.h - udp library header file
+tcp.c - tcp implementation (library)
+udp.c - udp implementation (library)
+daytimes.c - daytime server TCP
+daytimec.c - daytime client TCP
+echoc.c - echo client UDP
+echos.c - echo server UDP
+
