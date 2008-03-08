@@ -3,7 +3,8 @@
 #
 
 CC=g++
-FILES=flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp
+CFLAGS=	-pthread
+FILES=flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp fbSocket.cpp
 DEBUG=-DDebug
 #nix
 BIND=bin/flashback_d
@@ -16,13 +17,13 @@ BINRw=bin\flashback.exe
 #nix
 all: debug release
 
-release: flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp
+release: ${FILES}
 	mkdir -p bin
-	${CC} ${FILES} -O3 -o ${BINR}
+	${CC} ${CFLAGS} ${FILES} -O2 -o ${BINR}
 
-debug: flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp
+debug: ${FILES}
 	mkdir -p bin
-	${CC} ${FILES} ${DEBUG} -o ${BIND}
+	${CC} ${CFLAGS} ${FILES} ${DEBUG} -o ${BIND}
 	
 clean:
 	rm -f ${BIND} ${BINR}
@@ -31,11 +32,11 @@ clean:
 #windows
 win32: win32debug win32release
 	
-win32release: flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp
+win32release: ${FILES}
 	gmkdir -p bin
 	${CC} ${FILES} ${WIN32} -O3 -o ${BINRw}
 
-win32debug: flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp
+win32debug: ${FILES}
 	gmkdir -p bin
 	${CC} ${FILES} ${WIN32} ${DEBUG} -o ${BINDw}
 
