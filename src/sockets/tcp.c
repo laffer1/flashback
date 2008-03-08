@@ -142,7 +142,7 @@ socketdesc opentcp( bool server, char * address, int port )
     bcopy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
 
     /* for servers, we need to bind and listen for later use */
-    if ( server == TRUE )
+    if ( server == true )
     {
         /* bind the socket for use */
         if (bind( cons[ncons].sockfd, 
@@ -236,7 +236,7 @@ char * readntcp( socketdesc sd, int size )
     if ( (buf = (char *) malloc( (size+1) * sizeof(char) ) ) == NULL )
         return NULL;
 
-    if ( cons[sd].server == FALSE )
+    if ( cons[sd].server == false )
     {
         if ((bytes = read(cons[sd].sockfd, buf, size)) < 1)
             return NULL;
@@ -300,7 +300,7 @@ char * readtcp( socketdesc sd )
 */
 int tcpclientfd( socketdesc sd )
 {
-    if ( cons[sd].server == FALSE )
+    if ( cons[sd].server == false )
         return cons[sd].sockfd;
     else
         return ETCPGENERIC;
@@ -384,7 +384,7 @@ int writetcp( socketdesc sd, char * str )
 */
 int writentcp( socketdesc sd, char * str, int len )
 {
-    if (cons[sd].server == FALSE)
+    if (cons[sd].server == false)
         return write( cons[sd].sockfd, str, len );
     else
         return ETCPGENERIC;
