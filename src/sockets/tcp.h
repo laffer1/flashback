@@ -12,7 +12,7 @@ file describes function prototypes for the TCP protocol implementation.
 #ifndef TCPH
 #define TCPH
 
-#include "bool.h"
+/* assumes C++ bool type */
 
 /* library errors */
 #define ETCPACCEPTFAIL -7
