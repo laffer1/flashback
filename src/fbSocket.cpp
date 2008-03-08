@@ -1,4 +1,4 @@
-/* $Id: fbSocket.cpp,v 1.6 2008/03/08 05:49:19 laffer1 Exp $ */
+/* $Id: fbSocket.cpp,v 1.7 2008/03/08 06:15:56 laffer1 Exp $ */
 
 #include <cassert>
 #include "fbSocket.h"
@@ -16,7 +16,7 @@ fbSocket::fbSocket( /*const fbErrorLogger &err,*/ char *addr, int port )
     setBindPort( port );
 
     inittcp(); /* setup socket library */
-    
+
     if (sd = opentcp( true, getBindAddress(), getBindPort() ) < 0 )
     {
         //log.print(ERR, UNKNOWN, "Could not bind to TCP port");
@@ -51,9 +51,8 @@ void fbSocket::setBindPort( int port )
     bindPort = port;
 }
 
-fbClient fbSocket::nextClient()
-{
-    fbClient = new fbClient();
-    sockfd = tcpserverclient( sd );
-    return fbClient;
+fbClient * fbSocket::nextClient()
+{ 
+    return  new fbClient( tcpserverclient( sd ) );
 }
+

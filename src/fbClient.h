@@ -1,11 +1,10 @@
-/* $Id: fbClient.h,v 1.1 2008/03/08 05:49:19 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.2 2008/03/08 06:15:55 laffer1 Exp $ */
 
 #ifndef FBCLIENT_H
 #define FBCLIENT_H
 
 #include "global.h"
 #include "sockets/tcp.h"
-#include "fbClient.h"
 
 /**
  * fbClient
@@ -22,7 +21,7 @@ public:
 
 protected:
     //fbErrorLogger log;
-   int clientfd;
+   FILE *clientfp;
 };
 
 #endif
