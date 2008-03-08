@@ -17,5 +17,9 @@
 		#include <fnctl.h>
 	#endif
 
+	
+	#include "fbErrorLevel.h"
+	#include "fbErrorCodes.h"
+	#include "fbErrorLogger.h"
 
 #endif
