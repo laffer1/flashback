@@ -14,7 +14,6 @@
 		#include <windows.h>
 	#else
 		#include <pthread.h>
-		#include <fnctl.h>
 	#endif
 
 	
