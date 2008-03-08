@@ -1,3 +1,5 @@
+/* $Id: fbCriticalSection.cpp,v 1.2 2008/03/08 05:29:28 laffer1 Exp $ */
+
 /**
 *	fbCriticalSection
 *	Creates a CS lock to prevent threads 

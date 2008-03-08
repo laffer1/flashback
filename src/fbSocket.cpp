@@ -1,3 +1,5 @@
+/* $Id: fbSocket.cpp,v 1.5 2008/03/08 05:29:28 laffer1 Exp $ */
+
 #include <cassert>
 #include "fbSocket.h"
 

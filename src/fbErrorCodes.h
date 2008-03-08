@@ -1,4 +1,4 @@
-
+/* $Id: fbErrorCodes.h,v 1.3 2008/03/08 05:29:28 laffer1 Exp $ */
 
 #ifndef fbERRORCODES_H
 #define fbERRORCODES_H

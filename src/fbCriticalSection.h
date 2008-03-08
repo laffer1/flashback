@@ -1,3 +1,5 @@
+/* $Id: fbCriticalSection.h,v 1.2 2008/03/08 05:29:28 laffer1 Exp $ */
+
 #ifndef fbCRITICALSECTION_H
 #define fbCRITICALSECTION_H
 

@@ -1,3 +1,4 @@
+/* $Id: fbSocket.h,v 1.6 2008/03/08 05:29:28 laffer1 Exp $ */
 #ifndef FBSOCKET_H
 #define FBSOCKET_H
 
@@ -5,7 +6,10 @@
 #include "sockets/tcp.h"
 
 /**
+ * fbSocket
  * Server Socket interface
+ * @author Lucas Holt
+ * @date March 7, 2008
  */
 class fbSocket
 {

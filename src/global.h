@@ -1,3 +1,5 @@
+/* $Id: global.h,v 1.5 2008/03/08 05:29:28 laffer1 Exp $ */
+
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
