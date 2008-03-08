@@ -30,11 +30,13 @@ int main(int argc, char** args)
 			fclose(stdout);
 			fclose(stdin);
 			fclose(stderr);
-	
+
+#ifndef WIN32	
 			// TODO: make this Windows friendly	
 			setsid(); // become session leader
 			chdir("/"); // change wrkdir to root
 			umask(0); // clear file mode creation mask
+#endif
 			break;
 	}
 #endif
