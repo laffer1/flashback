@@ -1,9 +1,10 @@
-/* $Id: fbSocket.h,v 1.6 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: fbSocket.h,v 1.7 2008/03/08 05:49:19 laffer1 Exp $ */
 #ifndef FBSOCKET_H
 #define FBSOCKET_H
 
 #include "global.h"
 #include "sockets/tcp.h"
+#include "fbClient.h"
 
 /**
  * fbSocket
@@ -22,6 +23,8 @@ public:
 
     int getBindPort();
     void setBindPort( int port );
+
+    fbClient nextClient();
 
 protected:
     //fbErrorLogger log;
