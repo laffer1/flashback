@@ -10,7 +10,7 @@
 class fbSocket
 {
 public:
-    fbSocket( const fbErrorLogger &err, char *addr, int port );   /// Default Constructor
+    fbSocket( /*const fbErrorLogger &err, */ char *addr, int port );   /// Default Constructor
     ~fbSocket();  /// Destructor
 
     char *getBindAddress();
@@ -20,7 +20,7 @@ public:
     void setBindPort( int port );
 
 protected:
-    fbErrorLogger log;
+    //fbErrorLogger log;
     int bindPort;
     char bindAddress[16]; /* ipv4 only */
     socketdesc sd;

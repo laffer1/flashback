@@ -14,8 +14,8 @@
 		#include <windows.h>
 	#else
 		#include <pthread.h>
+		#include <sys/stat.h>
 	#endif
-
 	
 	#include "fbErrorLevel.h"
 	#include "fbErrorCodes.h"

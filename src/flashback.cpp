@@ -35,7 +35,8 @@ int main(int argc, char** args)
 			setsid(); // become session leader
 			chdir("/"); // change wrkdir to root
 			umask(0); // clear file mode creation mask
-			break;	
+			break;
+	}
 #endif
 
 	//Call Flashback Start

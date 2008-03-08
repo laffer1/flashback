@@ -1,7 +1,7 @@
 #include <cassert>
 #include "fbSocket.h"
 
-fbSocket::fbSocket( const fbErrorLogger &err, char *addr, int port )
+fbSocket::fbSocket( /*const fbErrorLogger &err,*/ char *addr, int port )
 {
     //log = err;
     setBindAddress( addr );
