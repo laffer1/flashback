@@ -1,3 +1,4 @@
+/* $Id */
 
 #ifndef fbLOCK_H
 #define fbLOCK_H
