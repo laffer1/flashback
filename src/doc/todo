@@ -1,4 +1,4 @@
-$Id: todo,v 1.4 2008/03/09 02:19:23 wyverex Exp $
+$Id: todo,v 1.5 2008/03/09 08:44:53 laffer1 Exp $
 
 Current To Do List
 3/5/08 due 3/12/08
@@ -17,6 +17,7 @@ fbArchive			JM				0%				File Archive .tar
 fbSchedular			BH				0%				Backup sched
 
 Integrate sockets with fbSocket	LH				0%
+http://tangentsoft.net/wskfaq/articles/bsd-compatibility.html
 
 Cont...
 --------
