@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.1 2008/03/08 06:15:55 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.2 2008/03/09 07:26:12 laffer1 Exp $ */
 
 #include "fbClient.h"
 
@@ -16,7 +16,7 @@ fbClient::fbClient( int sock )
        /* handle this ? */
    }
 
-    if ( ( clientfp == fdopen( sock, "r+" ) ) == NULL )
+    if ( ( clientfp = fdopen( sock, "r+" ) ) == NULL )
     {
         /* log/handle */
     }
