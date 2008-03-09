@@ -1,4 +1,4 @@
-/* $Id: flashback.cpp,v 1.8 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: flashback.cpp,v 1.9 2008/03/09 16:43:39 wyverex Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
 
@@ -14,6 +14,8 @@ int main(int argc, char** args)
 #ifdef Debug
 	cout << "Running in Debug Mode!" << endl;
 #else
+#ifndef WIN32	
+			// TODO: make this Windows friendly	
 	switch( fork() )
 	{
 		// DIDNT WORK
@@ -32,14 +34,14 @@ int main(int argc, char** args)
 			fclose(stdin);
 			fclose(stderr);
 
-#ifndef WIN32	
-			// TODO: make this Windows friendly	
+
 			setsid(); // become session leader
 			chdir("/"); // change wrkdir to root
 			umask(0); // clear file mode creation mask
-#endif
+
 			break;
 	}
+#endif
 #endif
 
 	//Call Flashback Start
