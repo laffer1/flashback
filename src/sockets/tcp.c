@@ -200,8 +200,11 @@ socketdesc opentcp( bool server, char * address, int port )
 void closetcp( socketdesc sd )
 {
     /* disconnect socket */
+#ifdef Win32
+    closesocket(cons[sd].sockfd);
+#else 
     (void) close(cons[sd].sockfd);
-
+#endif
     /* as a hint this is dead.  Maybe we can recycle them? */
     cons[sd].sockfd = -1; 
 
