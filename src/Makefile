@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.13 2008/03/09 08:49:47 laffer1 Exp $
+# $Id: Makefile,v 1.14 2008/03/09 16:42:29 wyverex Exp $
 #
 #Flashback make file
 #
@@ -15,6 +15,7 @@ BINR=bin/flashback
 WIN32=-DWin32
 BINDw=bin\flashback_d.exe
 BINRw=bin\flashback.exe
+LIBw=-lws2_32
 
 #nix
 all: debug release
@@ -36,11 +37,11 @@ win32: win32debug win32release
 	
 win32release: ${FILES}
 	gmkdir -p bin
-	${CC} ${FILES} ${WIN32} -O3 -o ${BINRw}
+	${CC} ${FILES} ${WIN32} ${LIBw} -O3 -o ${BINRw}
 
 win32debug: ${FILES}
 	gmkdir -p bin
-	${CC} ${FILES} ${WIN32} ${DEBUG} -o ${BINDw}
+	${CC} ${FILES} ${WIN32} ${DEBUG} ${LIBw} -o ${BINDw}
 
 win32clean:
 	rm -f ${BINDw} ${BINRw}
