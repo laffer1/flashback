@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 2008/03/08 06:15:55 laffer1 Exp $
+# $Id: Makefile,v 1.11 2008/03/09 02:19:23 wyverex Exp $
 #
 #Flashback make file
 #
@@ -6,7 +6,7 @@
 
 CC=g++
 CFLAGS=	-pthread
-FILES=flashback.cpp fbThread.cpp fbCriticalSection.cpp fbErrorLogger.cpp fbSocket.cpp fbClient.cpp sockets/tcp.c
+FILES=flashback.cpp fbThread.cpp fbCriticalSection.cpp fbLock.cpp fbErrorLogger.cpp fbSocket.cpp fbClient.cpp sockets/tcp.c
 DEBUG=-DDebug
 #nix
 BIND=bin/flashback_d
