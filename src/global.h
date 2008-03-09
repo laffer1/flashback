@@ -1,4 +1,4 @@
-/* $Id: global.h,v 1.5 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: global.h,v 1.6 2008/03/09 01:58:39 wyverex Exp $ */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -18,9 +18,5 @@
 		#include <pthread.h>
 		#include <sys/stat.h>
 	#endif
-	
-	#include "fbErrorLevel.h"
-	#include "fbErrorCodes.h"
-	#include "fbErrorLogger.h"
 
 #endif

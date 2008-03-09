@@ -1,4 +1,4 @@
-/* $Id: fbCriticalSection.cpp,v 1.2 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: fbCriticalSection.cpp,v 1.3 2008/03/09 01:58:39 wyverex Exp $ */
 
 /**
 *	fbCriticalSection
@@ -57,12 +57,13 @@ void fbCriticalSection::lock()
 */
 void fbCriticalSection::unlock()
 {
-	_locked = false;	/// < mark unlocked
+
 #ifdef Win32
 	LeaveCriticalSection(&hCriticalSection);
 #else
 	 pthread_mutex_unlock(&hMutex);
 #endif	
+	_locked = false;	/// < mark unlocked
 }
 
 /**

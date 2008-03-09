@@ -1,9 +1,13 @@
-/* $Id: fbErrorLogger.h,v 1.2 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: fbErrorLogger.h,v 1.3 2008/03/09 01:58:39 wyverex Exp $ */
 
 #ifndef fbERRORLOGGER_H
 #define fbERRORLOGGER_H
 
 #include "global.h"
+#include "fbErrorLevel.h"
+#include "fbErrorCodes.h"
+#include "fbCriticalSection.h"
+
 
 /**
 *	fbErrorLogger
@@ -23,9 +27,10 @@ public:
 	
 private:
 	ostream* out;
+	fbCriticalSection cs;
 	
-	void errorlevel(ERROR_LEVEL lvl, string& level);
-	void errordesc(ERROR_CODES code, string& desc);
+	static void errorlevel(ERROR_LEVEL lvl, string& level);
+	static void errordesc(ERROR_CODES code, string& desc);
 };
 
 #endif

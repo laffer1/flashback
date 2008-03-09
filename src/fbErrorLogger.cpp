@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.2 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.3 2008/03/09 01:58:39 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -8,42 +8,78 @@
 */
 
 #include "fbErrorLogger.h"
-#include "fbCriticalSection.h"
+#include "fbLock.h"
 
-fbErrorLogger::fbErrorLogger(ostream& stream):out(&stream)
+/**
+*	fbErrorLogger
+*	Stream error Logger
+*	@param stream stream for error logger to output too
+*	@note Stream copied into out stream
+*/
+fbErrorLogger::fbErrorLogger(ostream& stream):out(&stream), cs()
 {
+
 }
 
+/**
+*	~fbErrorLogger
+*	Destructor
+*/
 fbErrorLogger::~fbErrorLogger()
 {
+	out = NULL;	/// < Null stream pointer
 }
 
+/**
+*	print
+*	Prints a message to the stream
+*	@param lvl Level of Error message
+*	@param code Current Error Code
+*	@param str Additional error string
+*	@note This func takes char*
+*/
 void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, char* str)
 {
-	static fbCriticalSection cs;
 	string desc, level;
 	
-	cs.lock();
-	errorlevel(lvl, level);
-	errordesc(code, desc);
-	*out << level.c_str() << " " << static_cast<int>(code) << ": " 
-		 << desc.c_str() << " - " << str <<  endl;
-	cs.unlock();
+	{
+		fbLock lock(cs);	/// <lock critical section so text wont write over each other
+		errorlevel(lvl, level);		/// < get error level string
+		errordesc(code, desc);		/// < get error description
+		/// print error message
+		*out << level.c_str() << " " << static_cast<int>(code) << ": " 
+			 << desc.c_str() << "  " << str <<  endl;
+	}
 }
 
+/**
+*	print
+*	Prints a message to the stream
+*	@param lvl Level of Error message
+*	@param code Current Error Code
+*	@param str Additional error string
+*	@note This func takes string
+*/
 void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, string& str)
 {
-	static fbCriticalSection cs;
 	string desc, level;
 	
-	cs.lock();
-	errorlevel(lvl, level);
-	errordesc(code, desc);
-	*out << level.c_str() << " " << static_cast<int>(code) << ": " 
-		 << desc.c_str() << " - " << str.c_str() <<  endl;
-	cs.unlock();
+	{
+		fbLock lock(cs);	/// <lock critical section so text wont write over each other
+		errorlevel(lvl, level);		/// < get error level string
+		errordesc(code, desc);		/// < get error description
+		/// print error message
+		*out << level.c_str() << " " << static_cast<int>(code) << ": " 
+			<< desc.c_str() << " - " << str.c_str() <<  endl;
+	}
 }
 
+/**
+*	errorlevel
+*	Gets the error level as a string
+*	@param lvl Level to turn to string
+*	@param level String output
+*/
 void fbErrorLogger::errorlevel(ERROR_LEVEL lvl, string& level)
 {
 	switch(lvl)
@@ -65,6 +101,12 @@ void fbErrorLogger::errorlevel(ERROR_LEVEL lvl, string& level)
 	}	
 }
 
+/**
+*	errordesc
+*	Gets the error code as a string
+*	@param  code Code to turn into string
+*	@param desc Error string output
+*/
 void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 {
 	switch(code)
