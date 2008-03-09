@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.4 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: fbThread.cpp,v 1.5 2008/03/09 02:36:51 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -188,13 +188,14 @@ void* fbThread::threadStart(void* thread)
 *	Thread sleeps for given number of seconds
 *	@param sec Number of seconds to sleep for
 */
-void fbThread::sleep(int sec)
+void fbThread::_sleep(int sec)
 {
 	if(!_running || _paused)
 		return;
 #ifdef Win32
 	Sleep(sec * 1000);
 #else
+	sleep(sec);
 #endif
 }
 
@@ -203,13 +204,14 @@ void fbThread::sleep(int sec)
 *	Thread sleeps for given number of milliseconds
 *	@param msec Number of milliseconds to sleep for
 */
-void fbThread::usleep(int msec)
+void fbThread::_usleep(int msec)
 {
 	if(!_running || _paused)
 		return;
 #ifdef Win32
 	Sleep(msec);
 #else
+	usleep(msec);
 #endif
 }
 
@@ -217,7 +219,7 @@ void fbThread::usleep(int msec)
 *	yield
 *	Thread yields allowing other threads to run
 */
-void fbThread::yield()
+void fbThread::_yield()
 {
 #ifdef Win32
 	Yield();
@@ -233,3 +235,4 @@ void fbThread::yield()
 void fbThread::run()
 {
 }
+

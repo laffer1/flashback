@@ -1,4 +1,4 @@
-/* $Id: fbThread.h,v 1.4 2008/03/08 05:29:28 laffer1 Exp $ */
+/* $Id: fbThread.h,v 1.5 2008/03/09 02:36:51 wyverex Exp $ */
 
 #ifndef fbTHREAD_H
 #define fbTHREAD_H
@@ -29,9 +29,9 @@ public:
 	bool isPaused();	/// < is the thread paused
 	bool isStopping();	/// < is the thread stopping?
 
-	void sleep(int sec);  	/// < thread sleeps for the given number of seconds
-	void usleep(int msec); 	/// < thread sleeps for the given number of milliseconds
-	void yield();			/// < thread yieids for other threads to run
+	void _sleep(int sec);  	/// < thread sleeps for the given number of seconds
+	void _usleep(int msec); /// < thread sleeps for the given number of milliseconds
+	void _yield();		/// < thread yieids for other threads to run
 	
 private:
 	bool _running;		/// < is thread running
