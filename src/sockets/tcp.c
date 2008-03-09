@@ -31,6 +31,7 @@ bugs:
 
 #ifdef Win32
 #include <winsock2.h>
+#define socklen_t int
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -131,7 +132,11 @@ socketdesc opentcp( bool server, char * address, int port )
     }
 
     /* clear socket param struct */
-    bzero(&(cons[ncons].sa), sizeof cons[ncons].sa);  
+#ifdef Win32
+	ZeroMemory(&(cons[ncons].sa), sizeof cons[ncons].sa); 
+#else
+    bzero(&(cons[ncons].sa), sizeof cons[ncons].sa); 
+#endif
 
     /* setup some defaults for a TCP ip4 connection with a BIG ENDIAN safe
        port number */
@@ -140,12 +145,21 @@ socketdesc opentcp( bool server, char * address, int port )
 
     /* lookup the hostname or DNS name (or set the ip address) */
     if ((he = gethostbyname(cons[ncons].address)) == NULL) {
+#ifdef Win32
+		//not sure what herror is doing?
+		WSAGetLastError();  /// < gets the last error code as int
+#else
         herror(cons[ncons].address);
+#endif
         return ETCPBADADDRESS;
     }
 
     /* copy the ip found or listed in BIG ENDIAN SAFE byte order */
+#ifdef Win32
+	memcpy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
+#else
     bcopy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
+#endif
 
     /* for servers, we need to bind and listen for later use */
     if ( server == true )
