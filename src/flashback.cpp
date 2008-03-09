@@ -1,6 +1,95 @@
-/* $Id: flashback.cpp,v 1.10 2008/03/09 18:02:12 laffer1 Exp $ */
+/* $Id: flashback.cpp,v 1.11 2008/03/09 19:05:41 laffer1 Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
+
+
+#ifdef Win32
+
+#define SVCNAME TEXT("FlashBack")
+
+VOID SvcInstall(void);
+VOID WINAPI SvcMain( DWORD, LPTSTR * );
+VOID SvcReportEvent( LPTSTR );
+
+//
+// Purpose: 
+//   Entry point for the process
+//
+// Parameters:
+//   None
+// 
+// Return value:
+//   None
+//
+void __cdecl _tmain(int argc, TCHAR *argv[]) 
+{ 
+    // If command-line parameter is "install", install the service. 
+    // Otherwise, the service is probably being started by the SCM.
+
+    if( lstrcmpi( argv[1], TEXT("install")) == 0 )
+    {
+        SvcInstall();
+        return;
+    }
+
+    // TO_DO: Add any additional services for the process to this table.
+    SERVICE_TABLE_ENTRY DispatchTable[] = 
+    { 
+        { SVCNAME, (LPSERVICE_MAIN_FUNCTION) SvcMain }, 
+        { NULL, NULL } 
+    }; 
+ 
+    // This call returns when the service has stopped. 
+    // The process should simply terminate when the call returns.
+
+    if (!StartServiceCtrlDispatcher( DispatchTable )) 
+    { 
+        SvcReportEvent(TEXT("StartServiceCtrlDispatcher")); 
+    } 
+}
+
+//
+// Purpose: 
+//   Logs messages to the event log
+//
+// Parameters:
+//   szFunction - name of function that failed
+// 
+// Return value:
+//   None
+//
+// Remarks:
+//   The service must have an entry in the Application event log.
+//
+VOID SvcReportEvent(LPTSTR szFunction) 
+{ 
+    HANDLE hEventSource;
+    LPCTSTR lpszStrings[2];
+    TCHAR Buffer[80];
+
+    hEventSource = RegisterEventSource(NULL, SVCNAME);
+
+    if( NULL != hEventSource )
+    {
+        StringCchPrintf(Buffer, 80, TEXT("%s failed with %d"), szFunction, GetLastError());
+
+        lpszStrings[0] = SVCNAME;
+        lpszStrings[1] = Buffer;
+
+        ReportEvent(hEventSource,        // event log handle
+                    EVENTLOG_ERROR_TYPE, // event type
+                    0,                   // event category
+                    SVC_ERROR,           // event identifier
+                    NULL,                // no security identifier
+                    2,                   // size of lpszStrings array
+                    0,                   // no binary data
+                    lpszStrings,         // array of strings
+                    NULL);               // no binary data
+
+        DeregisterEventSource(hEventSource);
+    }
+} 
+#else
 
 /**
  *	main
@@ -14,7 +103,6 @@ int main(int argc, char** args)
 #ifdef Debug
 	cout << "Running in Debug Mode!" << endl;
 #else
-#ifndef WIN32
 	/* In UNIX programming, a daemon MUST let go of the terminal it is 
            running on.  Otherwise, when you log out, the process dies.
            The solution is to fork a copy of yourself and then disconnect
@@ -49,11 +137,11 @@ int main(int argc, char** args)
 			break;
 	}
 #endif
-#endif
 
 	//Call Flashback Start
 	
 
 	return 0;
 }	
- 
+
+#endif 
