@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.3 2008/03/09 01:58:39 wyverex Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.4 2008/03/09 17:15:29 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -41,6 +41,11 @@ fbErrorLogger::~fbErrorLogger()
 void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, char* str)
 {
 	string desc, level;
+
+#ifndef Debug
+	if(lvl == DEBUG)	/// < if not in debug mode then no debug messages
+		return;
+#endif
 	
 	{
 		fbLock lock(cs);	/// <lock critical section so text wont write over each other
@@ -63,6 +68,11 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, char* str)
 void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, string& str)
 {
 	string desc, level;
+	
+#ifndef Debug
+	if(lvl == DEBUG)	/// < if not in debug mode then no debug messages
+		return;
+#endif
 	
 	{
 		fbLock lock(cs);	/// <lock critical section so text wont write over each other
