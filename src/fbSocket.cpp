@@ -1,4 +1,4 @@
-/* $Id: fbSocket.cpp,v 1.7 2008/03/08 06:15:56 laffer1 Exp $ */
+/* $Id: fbSocket.cpp,v 1.8 2008/03/09 08:49:47 laffer1 Exp $ */
 
 #include <cassert>
 #include "fbSocket.h"
@@ -53,6 +53,6 @@ void fbSocket::setBindPort( int port )
 
 fbClient * fbSocket::nextClient()
 { 
-    return  new fbClient( tcpserverclient( sd ) );
+    return new fbClient( tcpserverclient( sd ) );
 }
 

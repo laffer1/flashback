@@ -1,4 +1,4 @@
-/* $Id: fbThread.h,v 1.5 2008/03/09 02:36:51 wyverex Exp $ */
+/* $Id: fbThread.h,v 1.6 2008/03/09 08:49:47 laffer1 Exp $ */
 
 #ifndef fbTHREAD_H
 #define fbTHREAD_H
@@ -16,7 +16,7 @@ class fbThread
 {
 public:
 	fbThread();			/// < Default Constructor	
-	~fbThread();		/// < Destructor
+	virtual ~fbThread();		/// < Destructor
 
 	void start();		/// < starts the thread
 	void stop();		/// < tell thread to stop

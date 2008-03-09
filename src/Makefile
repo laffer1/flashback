@@ -1,11 +1,11 @@
-# $Id: Makefile,v 1.12 2008/03/09 07:29:29 laffer1 Exp $
+# $Id: Makefile,v 1.13 2008/03/09 08:49:47 laffer1 Exp $
 #
 #Flashback make file
 #
 #
 
 CC=g++
-CFLAGS=	-pthread
+CFLAGS=	-pthread -Wall
 FILES=flashback.cpp fbThread.cpp fbCriticalSection.cpp fbLock.cpp fbErrorLogger.cpp fbSocket.cpp fbClient.cpp sockets/tcp.c
 DEBUG=-DDebug
 #nix
