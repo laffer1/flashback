@@ -31,7 +31,12 @@ bugs:
 #include <string.h>
 #include <strings.h> /* bzero */
 #include <errno.h>
+
+#ifdef Win32
+#include <winsock.h>
+#else
 #include <netdb.h>
+#endif
 
 #include "tcp.h"
 
