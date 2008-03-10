@@ -1,7 +1,7 @@
-/* $Id: flashback.cpp,v 1.12 2008/03/09 19:07:28 laffer1 Exp $ */
+/* $Id: flashback.cpp,v 1.13 2008/03/10 19:34:08 wyverex Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
-
+void core();	     /// < flashback core running function 
 
 #ifdef Win32
 
@@ -139,8 +139,8 @@ int main(int argc, char** args)
 #endif
 
 	//Call Flashback Start
+	core();
 	
-
 	return 0;
 }	
 

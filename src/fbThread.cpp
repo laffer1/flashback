@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.6 2008/03/10 19:00:24 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.7 2008/03/10 19:34:08 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -50,9 +50,13 @@ void fbThread::start()
 	if(_hThread == NULL)
 		Error.print(ERR, THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
 #else
+	string msg = "pthread_create Failed: ";
 	int ret = pthread_create(&_hThread, NULL, threadStart, this);
 	if(ret != 0)
-		Error.print(ERR, THREADCREATEFAIL, "pthread_create Failed");  //needs ret value, need string builder
+	{
+		msg += "" + ret;
+		Error.print(ERR, THREADCREATEFAIL, msg);  //needs ret value, need string builder
+	}
 #endif
 }
 
@@ -80,9 +84,10 @@ void fbThread::forceStop()
 	if(ret == -1)
 		Error.print(ERR, THREADTERMINATEFAILED, "TerminateThread Failed");
 #else
+	string msg = "pthread_cancle Failed";
 	int ret = pthread_cancel(_hThread);
 	if(ret != 0)
-		Error.print(ERR, THREADTERMINATEFAILED, "pthread_cancel Failed");
+		Error.print(ERR, THREADTERMINATEFAILED, msg);
 #endif
 	_running = false;
 	_stopping = false;
