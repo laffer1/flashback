@@ -433,11 +433,12 @@ int writentcp( socketdesc sd, char * str, int len )
 int tcpputs( socketdesc sd, char * str )
 {
     int written = 0;  /* number of bytes written */
+    char end[] = "\n"; /* gcc42 is stupid. */
 
     if ((written = writetcp( sd, str )) == ETCPGENERIC)
         return ETCPGENERIC;
     else
-      written = written + writetcp( sd, "\n" );
+      written = written + writetcp( sd, end );
 
     return written;
 }
