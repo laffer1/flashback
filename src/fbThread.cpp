@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.7 2008/03/10 19:34:08 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.8 2008/03/10 19:38:04 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -84,10 +84,13 @@ void fbThread::forceStop()
 	if(ret == -1)
 		Error.print(ERR, THREADTERMINATEFAILED, "TerminateThread Failed");
 #else
-	string msg = "pthread_cancle Failed";
+	string msg = "pthread_cancel Failed: ";
 	int ret = pthread_cancel(_hThread);
 	if(ret != 0)
+	{
+		msg += "" ret;
 		Error.print(ERR, THREADTERMINATEFAILED, msg);
+	}
 #endif
 	_running = false;
 	_stopping = false;
