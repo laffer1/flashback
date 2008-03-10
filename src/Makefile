@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.17 2008/03/10 20:26:26 wyverex Exp $
+# $Id: Makefile,v 1.18 2008/03/10 22:14:20 laffer1 Exp $
 #
 #Flashback make file
 #
@@ -30,7 +30,7 @@ debug: ${FILES}
 	${CC} ${CFLAGS} ${FILES} ${DEBUG} -o ${BIND}
 	
 clean:
-	rm -f ${BIND} ${BINR}
+	rm -f ${BIND} ${BINR} *.o
 	rmdir bin
 	
 #windows
@@ -45,6 +45,6 @@ win32debug: ${FILES}
 	${CC} ${FILES} ${WIN32} ${DEBUG} ${LIBw} -o ${BINDw}
 
 win32clean:
-	rm -f ${BINDw} ${BINRw}
+	rm -f ${BINDw} ${BINRw} *.o
 	rmdir bin
 	
