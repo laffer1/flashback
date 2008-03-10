@@ -1,9 +1,10 @@
-/* $Id: fbClient.h,v 1.2 2008/03/08 06:15:55 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.3 2008/03/10 17:48:57 laffer1 Exp $ */
 
 #ifndef FBCLIENT_H
 #define FBCLIENT_H
 
 #include "global.h"
+#include "fbErrorLogger.h"
 #include "sockets/tcp.h"
 
 /**
@@ -16,11 +17,11 @@
 class fbClient
 {
 public:
-    fbClient( /*const fbErrorLogger &err, */ int sock );   /// Default Constructor
+    fbClient( fbErrorLogger &err, int sock );   /// Default Constructor
     ~fbClient();  /// Destructor
 
 protected:
-    //fbErrorLogger log;
+   fbErrorLogger *log;
    FILE *clientfp;
 };
 

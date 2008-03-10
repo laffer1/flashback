@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.2 2008/03/09 07:26:12 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.3 2008/03/10 17:48:57 laffer1 Exp $ */
 
 #include "fbClient.h"
 
@@ -8,8 +8,10 @@
  * @date March 8, 2008
  */
 
-fbClient::fbClient( int sock )
+fbClient::fbClient( fbErrorLogger &err, int sock )
 {
+    log = &err;
+
     if ( sock == ETCPACCEPTFAIL )
     { 
         /* log this */
