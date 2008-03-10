@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.5 2008/03/09 02:36:51 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.6 2008/03/10 19:00:24 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -14,7 +14,16 @@
 *	Default constructor
 *	@note 3/5/08 Initilize vars to false
 */
-fbThread::fbThread():_running(false), _stopping(false), _paused(false), _hThread(NULL)
+fbThread::fbThread():_running(false), _stopping(false), _paused(false), _hThread(NULL), Error(cout)
+{
+}
+
+/**
+*	fbThread
+*	Default constructor
+*	@note 3/5/08 Initilize vars to false
+*/
+fbThread::fbThread(fbErrorLogger& errlog):_running(false), _stopping(false), _paused(false), _hThread(NULL), Error(errlog)
 {
 }
 
@@ -38,12 +47,12 @@ void fbThread::start()
 		return;
 #ifdef Win32
 	_hThread = CreateThread(NULL, 0, threadStart, this, 0, NULL);
-	//if(_hThread == NULL)
-	//	ERROR
+	if(_hThread == NULL)
+		Error.print(ERR, THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
 #else
 	int ret = pthread_create(&_hThread, NULL, threadStart, this);
-	//if(ret != 0)
-	//	ERROR
+	if(ret != 0)
+		Error.print(ERR, THREADCREATEFAIL, "pthread_create Failed");  //needs ret value, need string builder
 #endif
 }
 
@@ -68,12 +77,12 @@ void fbThread::forceStop()
 		return;
 #ifdef Win32
 	DWORD ret = TerminateThread(_hThread, 0);
-	//if(ret == -1)
-	//	ERROR
+	if(ret == -1)
+		Error.print(ERR, THREADTERMINATEFAILED, "TerminateThread Failed");
 #else
 	int ret = pthread_cancel(_hThread);
-	//if(ret != 0)
-	//	ERROR	
+	if(ret != 0)
+		Error.print(ERR, THREADTERMINATEFAILED, "pthread_cancel Failed");
 #endif
 	_running = false;
 	_stopping = false;
@@ -92,8 +101,8 @@ void fbThread::pause()
 	
 #ifdef Win32
 	DWORD ret = SuspendThread(_hThread);
-	//if(ret == -1)
-	//	error
+	if(ret == -1)
+		Error.print(ERR, THREADSUSPENDFAILED, "SuspendThread Failed");
 #else
 #endif
 	_paused = true;
@@ -109,8 +118,8 @@ void fbThread::resume()
 		return;
 #ifdef Win32
 	DWORD ret = ResumeThread(_hThread);
-	//if(ret == -1)
-	//	ERROR
+	if(ret == -1)
+		Error.print(ERR, THREADRESUMEFAILED, "ResumeThread Failed");
 #else
 #endif
 	_paused = false;

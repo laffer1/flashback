@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.4 2008/03/09 17:15:29 wyverex Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.5 2008/03/10 19:00:24 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -126,6 +126,18 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 			break;
 		case(NONE):
 			desc = "";
+			break;
+		case(THREADCREATEFAIL):
+			desc = "Unable to create a Thread";
+			break;
+		case(THREADTERMINATEFAILED):
+			desc = "Unable to Terminate a Thread";
+			break;
+		case(THREADSUSPENDFAILED):
+			desc = "Unable to Suspend a Thread";
+			break;
+		case(THREADRESUMEFAILED):
+			desc = "Unable to Resume a Thread";
 			break;
 		default:
 			desc = "Unkown Error";
