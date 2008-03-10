@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.9 2008/03/10 19:39:49 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.10 2008/03/10 19:45:42 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -14,7 +14,7 @@
 *	Default constructor
 *	@note 3/5/08 Initilize vars to false
 */
-fbThread::fbThread():_running(false), _stopping(false), _paused(false), _hThread(NULL), Error(cout)
+fbThread::fbThread():_running(false), _stopping(false), _paused(false), Error(cout), _hThread(NULL)
 {
 }
 
@@ -23,7 +23,7 @@ fbThread::fbThread():_running(false), _stopping(false), _paused(false), _hThread
 *	Default constructor
 *	@note 3/5/08 Initilize vars to false
 */
-fbThread::fbThread(fbErrorLogger& errlog):_running(false), _stopping(false), _paused(false), _hThread(NULL), Error(errlog)
+fbThread::fbThread(fbErrorLogger& errlog):_running(false), _stopping(false), _paused(false), Error(errlog), _hThread(NULL)
 {
 }
 
