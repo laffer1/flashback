@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.19 2008/03/10 22:47:48 laffer1 Exp $
+# $Id: Makefile,v 1.20 2008/03/11 00:14:15 laffer1 Exp $
 #
 #Flashback make file
 #
@@ -6,19 +6,24 @@
 
 CC=g++
 CFLAGS= -pthread -Wall
-FILES=flashback.cpp fbCore.cpp fbThread.cpp fbCriticalSection.cpp fbLock.cpp fbErrorLogger.cpp fbSocket.cpp \
-	fbClient.cpp sockets/tcp.c fbDiskDetector.cpp fbScheduler.cpp
-#nix
-BIND=bin/flashback_d
-BINR=bin/flashback
-#windows
-WIN32=-DWin32
-BINDw=bin\flashback_d.exe
-BINRw=bin\flashback.exe
-LIBw=-lws2_32
+BINNAME=bin/flashback
+LIBS=
 
 .if defined(DEBUG)
-CFLAGS += -D Debug
+CFLAGS += -D Debug -g
+BINNAME=bin/flashback_d
+.else
+CFLAGS += -O2
+.endif
+
+.if defined(WIN32)
+CFLAGS += -D Win32
+.if defined(DEBUG)
+BINNAME=bin\flashback_d.exe
+.else
+BINNAME=bin\flashback.exe
+.endif
+LIBS=-lws2_32
 .endif
 
 #nix
@@ -30,26 +35,18 @@ debug: clean
 	make -D DEBUG release
 	
 clean:
-	rm -f ${BIND} ${BINR} *.o
+	rm -f bin/flashback bin/flashback_d bin/flashback.exe bin/flashback_d.exe *.o
 	
 #windows
-win32: win32debug win32release
-	
-win32release: ${FILES}
-	gmkdir -p bin
-	${CC} ${FILES} ${WIN32} ${LIBw} -O3 -o ${BINRw}
+win32:
+	make -D WIN32 flashback
 
-win32debug: ${FILES}
-	gmkdir -p bin
-	${CC} ${FILES} ${WIN32} ${DEBUG} ${LIBw} -o ${BINDw}
-
-win32clean:
-	rm -f ${BINDw} ${BINRw} *.o
-	rmdir bin
+win32debug: clean
+	make -D WIN32 -D DEBUG flashback
 
 flashback: flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o fbClient.o tcp.o fbDiskDetector.o fbScheduler.o
 	mkdir -p bin
-	${CC} ${CFLAGS} flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o fbClient.o tcp.o fbDiskDetector.o fbScheduler.o -o ${BINR}
+	${CC} ${CFLAGS} flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o fbClient.o tcp.o fbDiskDetector.o fbScheduler.o ${LIBS} -o ${BINNAME}
 
 flashback.o: flashback.cpp global.h
 	${CC} ${CFLAGS} -c flashback.cpp
