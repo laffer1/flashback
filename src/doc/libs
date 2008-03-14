@@ -1,7 +1,12 @@
-$Id: libs,v 1.3 2008/03/08 05:29:28 laffer1 Exp $
+$Id: libs,v 1.4 2008/03/14 21:49:00 wyverex Exp $
 
 libarchive
 version 2.4.12
 windows
 http://gnuwin32.sourceforge.net/packages/libarchive.htm
+
 Luke's sockets library (included)
+
+SQLite3
+libsql3-dev
+
