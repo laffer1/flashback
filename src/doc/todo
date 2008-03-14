@@ -1,25 +1,35 @@
-$Id: todo,v 1.6 2008/03/10 20:08:24 wyverex Exp $
+$Id: todo,v 1.7 2008/03/14 21:45:06 wyverex Exp $
 
 Current To Do List
-3/5/08 due 3/12/08
+3/14/08 thru 3/18/08
 
-Project				Who				%Done			Desc							
+Project			Who			%Done			Desc							
 ----------------	---------		--------		----------------------------
-fbThread			BH				70%				Base Thread object
-fbCriticalSection	BH				70%	
-fbLock				BH				90%
-fbSocket			LH CT			0%				C Socket Wrapper
-fbXML				CT				0%				XML file wrapper
-fbErrorLogger		BH				0%				Log Errors
-fbSQL				AT				0%				SQLite Wrapper
-fbDiskDetector		BH				40%				Detect New Disks
-fbArchive			JM				0%				File Archive .tar
-fbSchedular			BH				0%				Backup sched
+fbThread		BH			70%			Base Thread object, more testing needed
+fbCriticalSection	BH			70%			a thread mutex, test
+fbLock			BH			90%			quick mutex lock, test
+fbSocket		LH 			0%			C Socket Wrapper
+fbLocalSettings 	CT BH			0%			loads local setings, ie DB paths
+fbErrorLogger		BH			0%			Log Errors
+fbDiskDetector		BH			0%			Detect New Disks - not used in first version!!
+fbArchive		JM			0%			File Archive .tar
+fbSchedular		BH			0%			Backup sched, will do most of the work
+fbSQL			BH			70%			SQLite3 wrapper, needs testing
+fbWeb			LH			0%			Web interface, does secound most of work
 
-Integrate sockets with fbSocket	LH				0%
+Database objects
+----------------------------------------------------------------------------------------------------
+fbSettings					0%			general settings database
+fbSchedule					0%			DB for scheduled jobs, and missed jobs
+fbRepository					0%			DB for stored backups, so we can restore
+
+
+Integrate sockets 
+with fbSocket		LH			0%
 http://tangentsoft.net/wskfaq/articles/bsd-compatibility.html
 
 Cont...
 --------
-flashback.cpp			BH LH CT JM AT	5%				Main function will be continues updated
-fbCore.cpp			BH LH CT JM AT  2%				Main calls core, core runs everything
+flashback.cpp		BH LH CT JM AT		15%			Main function will be continues updated
+fbCore.cpp		BH LH CT JM AT  	2%			Main calls core, core runs everything
+
