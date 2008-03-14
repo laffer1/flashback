@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.2 2008/03/14 20:11:36 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.3 2008/03/14 20:32:26 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
@@ -11,29 +11,34 @@
 //requires libsqlite3-dev
 #include <sqlite3.h>
 
-typedef int callback(void*,int, char**, char**); 
+/**
+*  fbSQL 
+*  Thread safe Wrapper for SQLite3
+*  @author Byron Heads
+*  @date March 14, 2008
+*/
 
 class fbSQL
 {
 public:
- 	fbSQL(fbErrorLogger& errlog);
-	~fbSQL();
+ 	fbSQL(fbErrorLogger& errlog);  /// < constructor
+	~fbSQL();  /// < destructor
 
-	void connect(char* database);
-	void connect(string database);
-	void close();
+	void connect(char* database);   /// < connect to file
+	void connect(string database);  /// < connect to file 
+	void close();  /// < close open file
 
-	bool isConnected();
+	bool isConnected();  /// < are we connected
 
-	int exec(char* command,int(*callback)(void*,int,char**,char**));
-	int exec(string command,int(*callback)(void*,int,char**,char**));	
+	int exec(char* command,int(*callback)(void*,int,char**,char**));  /// <exec quarry
+	int exec(string command,int(*callback)(void*,int,char**,char**)); /// < execute quarry
 
 
 private:
-	fbErrorLogger Error;
-	fbCriticalSection cs;
-	sqlite3* db;
-	bool open;
+	fbErrorLogger Error;	/// < error logger
+	fbCriticalSection cs;   /// < critical section
+	sqlite3* db;		/// < database
+	bool open;		/// < open bool
 };
 
 #endif
