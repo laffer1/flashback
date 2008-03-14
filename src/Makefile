@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.21 2008/03/14 19:18:09 wyverex Exp $
+# $Id: Makefile,v 1.22 2008/03/14 19:50:09 wyverex Exp $
 #
 #Flashback make file
 #
@@ -7,8 +7,8 @@
 CC=g++
 CFLAGS= -pthread -Wall
 BINNAME=bin/flashback
-LIBS=
-OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o fbClient.o fbDiskDetector.o fbScheduler.o tcp.o
+LIBS=-lsqlite3
+OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o
 
 ifdef debug
 CFLAGS += -DDebug -g
@@ -57,4 +57,5 @@ flashback: ${OBJECTS}
 
 %.o: sockets/%.c
 	${CC} ${CFLAGS} -c -o $@ $<
+
 

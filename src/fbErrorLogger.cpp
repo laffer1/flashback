@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.6 2008/03/10 19:34:08 wyverex Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.7 2008/03/14 19:50:09 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -141,6 +141,9 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 			break;
 		case(THREADRESUMEFAILED):
 			desc = "Unable to Resume a Thread";
+			break;
+		case(FAILEDTOOPENDB):
+			desc = "Failed to open Database";
 			break;
 		default:
 			desc = "Unkown Error";

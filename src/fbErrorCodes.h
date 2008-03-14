@@ -1,4 +1,4 @@
-/* $Id: fbErrorCodes.h,v 1.4 2008/03/10 19:01:54 wyverex Exp $ */
+/* $Id: fbErrorCodes.h,v 1.5 2008/03/14 19:50:09 wyverex Exp $ */
 
 #ifndef fbERRORCODES_H
 #define fbERRORCODES_H
@@ -20,6 +20,7 @@ enum ERROR_CODES
 	THREADSUSPENDFAILED = 4,
 	THREADRESUMEFAILED = 5,
 
+	FAILEDTOOPENDB,
 
 	OTHER = 1000	
 };
