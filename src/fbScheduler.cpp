@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.1 2008/03/10 20:26:26 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.2 2008/03/14 19:18:09 wyverex Exp $ */
 
 
 
@@ -36,6 +36,8 @@ void fbScheduler::shutdown()
 void fbScheduler::run()
 {
 	while(!isStopping())
+	{
 		_sleep(60*15);
+	}
 }
 

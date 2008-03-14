@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.10 2008/03/10 19:45:42 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.11 2008/03/14 19:18:09 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -112,6 +112,7 @@ void fbThread::pause()
 	if(ret == -1)
 		Error.print(ERR, THREADSUSPENDFAILED, "SuspendThread Failed");
 #else
+	return;
 #endif
 	_paused = true;
 }
@@ -129,6 +130,7 @@ void fbThread::resume()
 	if(ret == -1)
 		Error.print(ERR, THREADRESUMEFAILED, "ResumeThread Failed");
 #else
+	return;
 #endif
 	_paused = false;
 }
