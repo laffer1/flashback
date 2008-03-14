@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.1 2008/03/14 19:50:09 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.2 2008/03/14 20:11:36 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
@@ -10,6 +10,8 @@
 
 //requires libsqlite3-dev
 #include <sqlite3.h>
+
+typedef int callback(void*,int, char**, char**); 
 
 class fbSQL
 {
@@ -23,14 +25,15 @@ public:
 
 	bool isConnected();
 
-	
+	int exec(char* command,int(*callback)(void*,int,char**,char**));
+	int exec(string command,int(*callback)(void*,int,char**,char**));	
+
+
 private:
 	fbErrorLogger Error;
 	fbCriticalSection cs;
 	sqlite3* db;
 	bool open;
-
-
 };
 
 #endif

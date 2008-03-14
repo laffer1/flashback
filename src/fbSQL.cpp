@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.1 2008/03/14 19:50:09 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.2 2008/03/14 20:11:36 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -48,5 +48,30 @@ void fbSQL::close()
 bool fbSQL::isConnected()
 {
 	return open;
+}
+
+int fbSQL::exec(char* command,int(*callback)(void*,int,char**,char**))
+{
+	int ret = 0;
+	char* errmsg;
+	string err = "sqlite3 error code: ";
+
+	fbLock lock(cs);
+
+	ret = sqlite3_exec(db, command, callback, 0 , &errmsg);
+
+	if(ret != SQLITE_OK)
+	{
+		err += ret;
+		Error.print(WARN, SQLEXECERROR, err);
+		sqlite3_free(errmsg);
+	}
+
+	return ret;
+}
+
+int fbSQL::exec(string command,int(*callback)(void*,int,char**,char**) )
+{
+	return exec(command.c_str(), callback);
 }
 

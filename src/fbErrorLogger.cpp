@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.7 2008/03/14 19:50:09 wyverex Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.8 2008/03/14 20:11:36 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -144,6 +144,9 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 			break;
 		case(FAILEDTOOPENDB):
 			desc = "Failed to open Database";
+			break;
+		case(SQLEXECERROR):
+			desc = "SQLITE3_EXEC ERROR";
 			break;
 		default:
 			desc = "Unkown Error";

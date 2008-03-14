@@ -1,4 +1,4 @@
-/* $Id: fbErrorCodes.h,v 1.5 2008/03/14 19:50:09 wyverex Exp $ */
+/* $Id: fbErrorCodes.h,v 1.6 2008/03/14 20:11:36 wyverex Exp $ */
 
 #ifndef fbERRORCODES_H
 #define fbERRORCODES_H
@@ -21,6 +21,7 @@ enum ERROR_CODES
 	THREADRESUMEFAILED = 5,
 
 	FAILEDTOOPENDB,
+	SQLEXECERROR,
 
 	OTHER = 1000	
 };
