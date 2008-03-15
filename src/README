@@ -1,5 +1,11 @@
-This is where the source code goes for our project.
-
 FlashBack is a file backup system for "Flash drives" and other media.
 
-$Id: README,v 1.2 2008/02/20 22:56:24 laffer1 Exp $
+This code is licensed under a 2 clause BSD license, however it 
+currently uses code under other licenses.
+
+sqlite is public domain.
+date/Date.c is under GPLv2+.  
+
+This effectively means this code compiled falls under the GPL. :(
+
+$Id: README,v 1.3 2008/03/15 16:56:49 laffer1 Exp $
