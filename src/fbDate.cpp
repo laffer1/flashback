@@ -1,4 +1,16 @@
+/* $Id: fbDate.cpp,v 1.2 2008/03/15 20:57:27 wyverex Exp $ */
+
+/**
+ *  fbDate
+ *  Julian Date Object, used to track backup schedules
+ *  @author Byron Heads
+ *  @date March 15, 2008
+ */
+
+
 #include "fbDate.h"
+
+
 
 fbDate::fbDate(void): julian(0), year(0), mon(0), day(0)
 {
@@ -115,3 +127,5 @@ void fbDate::outMDY()
 {
 	cout << mon << "/" << day << "/" << year << endl;
 }
+
+
