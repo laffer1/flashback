@@ -1,4 +1,4 @@
-/* $Id: fbDate.h,v 1.2 2008/03/15 20:57:27 wyverex Exp $ */
+/* $Id: fbDate.h,v 1.3 2008/03/15 21:18:32 wyverex Exp $ */
 
 #ifndef fbDATE_H
 #define fbDATE_H
@@ -54,6 +54,14 @@ public:
 	void addWeek(const int num = 1){*this += 7 * num;};  /// < add a week or more
 	void addMonth(const int num = 1);   /// < add a month or more
 	
+	//compare julian dates
+	bool operator==(const fbDate& right) {return julian == right.julian;};
+	bool operator>=(const fbDate& right) {return julian >= right.julian;};
+	bool operator<=(const fbDate& right) {return julian <= right.julian;};
+	bool operator>(const fbDate& right) {return julian > right.julian;};
+	bool operator<(const fbDate& right) {return julian < right.julian;};
+
+
 	//output --- !!!!! needs to be added!
 	void outMDY();  //old debugger test, dont use! maybe remove this before submit
 

@@ -1,4 +1,4 @@
-/* $Id: fbDate.cpp,v 1.2 2008/03/15 20:57:27 wyverex Exp $ */
+/* $Id: fbDate.cpp,v 1.3 2008/03/15 21:18:32 wyverex Exp $ */
 
 /**
  *  fbDate
@@ -54,8 +54,10 @@ void fbDate::setJulian(const int _month, const int _day, const int _year)
 void fbDate::setJulianLocal()
 {
 	time_t raw(NULL);
+	time(&raw);
 	tm time = *localtime(&raw);
 	time.tm_year += 1900;
+ 	time.tm_mon++;
 	setJulian(time);
 }
 	
