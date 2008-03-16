@@ -3,8 +3,8 @@ flashback.db
  scheduler             Pk                  description      When         when       repeat(0=no)       repeat interval  path to backup
 CREATE TABLE jobs (id INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);
  
- settings                 setting name      string cal     int val     double val
-CREATE TABLE settings(name TEXT PRIMARY KEY, valc TEXT, vali INTEGER, vald DOUBLE);
+ settings                 setting name      string val     int val     double val
+CREATE TABLE settings(name TEXT PRIMARY KEY, sval TEXT, ival INTEGER, fval DOUBLE);
 
  repository
 CREATE TABLE backups(id INTEGER PRIMARY KEY, disk TEXT, bkdate INTEGER, bktime INTEGER, where TEXT);
