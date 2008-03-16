@@ -1,4 +1,4 @@
-/* $Id% */
+/* $Id: fbTime.h,v 1.2 2008/03/16 01:58:56 wyverex Exp $ */
 
 
 #ifndef fbTIME_H
