@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.2 2008/03/16 00:50:07 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.3 2008/03/16 01:07:34 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -25,20 +25,25 @@
  */
 
 #include "fbHttpServer.h"
+#include "fbSocket.h"
 
 fbHttpServer:: fbHttpServer( fbErrorLogger &err )
 {
+    log = &err;
     keeprunning = false;  // until we start it.
+    servsock = NULL;  // until we want to start it.
 }
 
 fbHttpServer::~fbHttpServer()
 {
-
+    if (servsock != NULL)
+        delete servsock;
 }
 
 void fbHttpServer::start()
 {
-
+    string bindhost = "127.0.0.1";
+    servsock = new fbSocket( *log, (char *) bindhost.c_str(), 8080 ); // TODO: Use the settings object to set these.
 }
 
 void fbHttpServer::stop()

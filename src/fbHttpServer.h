@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.h,v 1.2 2008/03/16 00:50:07 laffer1 Exp $ */
+/* $Id: fbHttpServer.h,v 1.3 2008/03/16 01:07:34 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -48,6 +48,7 @@ public:
 protected:
     fbErrorLogger *log;
     bool keeprunning;
+    fbSocket *servsock;
 };
 
 #endif
