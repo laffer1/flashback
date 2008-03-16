@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.h,v 1.1 2008/03/16 00:47:10 laffer1 Exp $ */
+/* $Id: fbHttpServer.h,v 1.2 2008/03/16 00:50:07 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -27,12 +27,12 @@
 #ifndef FBHTTPSERVER_H
 #define FBHTTPSERVER_H
 
+#include "fbSocket.h"
 #include "fbClient.h"
 
 /**
- * fbClient
- * Client connted via socket for use with HTTP.
-* Stores HTTP Request and state of this www user.
+ * fbHttpServer
+ * HTTP Server
  * @author Lucas Holt
  * @date March 15, 2008
  */
@@ -46,6 +46,7 @@ public:
     void stop();  /// Stop HTTP server
 
 protected:
+    fbErrorLogger *log;
     bool keeprunning;
 };
 

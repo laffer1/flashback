@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.1 2008/03/16 00:47:10 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.2 2008/03/16 00:50:07 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -23,6 +23,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
+#include "fbHttpServer.h"
 
 fbHttpServer:: fbHttpServer( fbErrorLogger &err )
 {
