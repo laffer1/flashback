@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.4 2008/03/15 17:10:36 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.5 2008/03/16 00:36:04 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -31,6 +31,30 @@
 #include "fbErrorLogger.h"
 #include "sockets/tcp.h"
 
+enum HTTP_VERSION 
+{
+  HTTP_09, 
+  HTTP_10, 
+  HTTP_11
+};  /// The HTTP Version must be either 0.9, 1.0 or 1.1
+
+enum HTTP_TYPE 
+{
+    GET,
+    POST,
+    HEAD,
+    NOTSUPPORTED
+/* TODO: add the rest */
+};  /// We're only supporting GET, POST and possibly HEAD
+
+enum HTTP_PROTOCOL 
+{
+    HTTP,
+    HTTPS
+};  /// Encrypted SSL traffic or regular HTTP speak  
+
+#define MAX_REQUEST 2048
+
 /**
  * fbClient
  * Client connted via socket for use with HTTP.
@@ -44,9 +68,18 @@ public:
     fbClient( fbErrorLogger &err, int sock );   /// Default Constructor
     ~fbClient();  /// Destructor
 
+    void parseHeaders();  /// Parse the HTTP headers on the client connection.
+    int begins_with( char * str1, char * str2 );
+
 protected:
    fbErrorLogger *log;
    FILE *clientfp;
+  /* HTTP request stuff */
+  enum HTTP_VERSION httpver;
+  enum HTTP_TYPE httptype;
+  enum HTTP_PROTOCOL httpproto;
+  string *host;
+  string *path;;
 };
 
 #endif

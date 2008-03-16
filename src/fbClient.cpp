@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.4 2008/03/15 17:10:36 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.5 2008/03/16 00:36:04 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -52,5 +52,78 @@ fbClient::fbClient( fbErrorLogger &err, int sock )
 fbClient::~fbClient()
 {
     fclose(clientfp);
+
+    if ( host != NULL );
+        delete host;;
+    if ( path != NULL );
+        delete path;
 }
 
+void fbClient::parseHeaders()
+{
+    char reqstr[MAX_REQUEST];
+    char *tmp;
+    char *tmp2;
+    
+    tmp2 = reqstr;
+
+    // To grab the first line  GET / HTTP/1.0 ... etc
+    fgets( reqstr, MAX_REQUEST, clientfp ); 
+
+    tmp = strsep( &tmp2, " \t" );  // SP in HTTP spec
+
+    if ( tmp != NULL )
+    {
+        if ( strcmp( tmp, "GET" ) == 0 ) 
+            httptype = GET;
+       else if ( strcmp( tmp, "POST" ) == 0 )
+           httptype = POST;
+       else if ( strcmp( tmp, "HEAD" ) == 0 )
+           httptype = HEAD;
+       else
+           httptype = NOTSUPPORTED;
+    }
+
+    // url
+    tmp = strsep( &tmp2, " \t" );
+
+    if ( tmp != NULL )
+    {
+         if ( begins_with( tmp, "http://" ) == 1 )
+         {
+          
+         }
+         else if ( begins_with( tmp, "https://" ) == 1 )
+         {
+
+          }
+         else // relative url
+         {
+              path = new string(tmp);
+              host = new string("*"); // host was not defined here, probably a host header
+          }
+    }   
+
+    // TODO: figure out HTTP version.  Not important for now.
+}
+
+int fbClient::begins_with( char * str1, char * str2 )
+{
+    int str2len;
+    int str1len;
+    int i;
+
+    str2len = strlen( str2 );
+    str1len = strlen( str1 );
+
+    if ( str1len < str2len )
+        return -1;  // error
+   else if ( str1len == 0 )
+        return -1; // error
+    else
+        for ( i = 0; i < str2len; i++ )
+            if ( str1[i] != str2[i] )
+                return 0; // doesn't match
+
+    return 1; // matches
+}
