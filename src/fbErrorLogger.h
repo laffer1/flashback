@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.h,v 1.4 2008/03/10 19:34:08 wyverex Exp $ */
+/* $Id: fbErrorLogger.h,v 1.5 2008/03/19 02:50:41 wyverex Exp $ */
 
 #ifndef fbERRORLOGGER_H
 #define fbERRORLOGGER_H
@@ -21,6 +21,7 @@ class fbErrorLogger
 public:
 	fbErrorLogger(ostream& stream);
 	fbErrorLogger(ostream* stream);
+	fbErrorLogger(fbErrorLogger& errlog);
 	~fbErrorLogger();
 
 	void print(ERROR_LEVEL lvl, ERROR_CODES code, char* str);

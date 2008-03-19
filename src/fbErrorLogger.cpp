@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.8 2008/03/14 20:11:36 wyverex Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.9 2008/03/19 02:50:41 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -21,6 +21,10 @@ fbErrorLogger::fbErrorLogger(ostream& stream):out(&stream), cs()
 }
 
 fbErrorLogger::fbErrorLogger(ostream* stream):out(stream), cs()
+{
+}
+
+fbErrorLogger::fbErrorLogger(fbErrorLogger& errlog):out(errlog.out), cs()
 {
 }
 
