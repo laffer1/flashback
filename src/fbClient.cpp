@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.5 2008/03/16 00:36:04 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.6 2008/03/20 18:46:13 wyverex Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -33,15 +33,15 @@
  * @date March 8, 2008
  */
 
-fbClient::fbClient( fbErrorLogger &err, int sock )
+fbClient::fbClient(fbData* _data, int sock ):data(_data)
 {
-    log = &err;
-
     if ( sock == ETCPACCEPTFAIL )
     { 
         /* log this */
+		//data->err(ERRORCODE, "Message");
        /* handle this ? */
-   }
+	   //data->warn(ERRORCODE, "Message");
+    }
 
     if ( ( clientfp = fdopen( sock, "r+" ) ) == NULL )
     {

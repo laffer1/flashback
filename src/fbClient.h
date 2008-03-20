@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.5 2008/03/16 00:36:04 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.6 2008/03/20 18:46:13 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -28,7 +28,7 @@
 #define FBCLIENT_H
 
 #include "global.h"
-#include "fbErrorLogger.h"
+#include "fbData.h"
 #include "sockets/tcp.h"
 
 enum HTTP_VERSION 
@@ -65,14 +65,14 @@ enum HTTP_PROTOCOL
 class fbClient
 {
 public:
-    fbClient( fbErrorLogger &err, int sock );   /// Default Constructor
+    fbClient(fbData* _data, int sock );   /// Default Constructor
     ~fbClient();  /// Destructor
 
     void parseHeaders();  /// Parse the HTTP headers on the client connection.
     int begins_with( char * str1, char * str2 );
 
 protected:
-   fbErrorLogger *log;
+   fbData* data;
    FILE *clientfp;
   /* HTTP request stuff */
   enum HTTP_VERSION httpver;

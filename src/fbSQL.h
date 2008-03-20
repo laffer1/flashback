@@ -1,11 +1,11 @@
-/* $Id: fbSQL.h,v 1.3 2008/03/14 20:32:26 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.4 2008/03/20 18:46:13 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
 #define fbSQL_H
 
 #include "global.h"
-#include "fbErrorLogger.h"
+#include "fbData.h"
 #include "fbLock.h"
 
 //requires libsqlite3-dev
@@ -21,7 +21,7 @@
 class fbSQL
 {
 public:
- 	fbSQL(fbErrorLogger& errlog);  /// < constructor
+ 	fbSQL(fbData* _data);  /// < constructor
 	~fbSQL();  /// < destructor
 
 	void connect(char* database);   /// < connect to file
@@ -35,7 +35,7 @@ public:
 
 
 private:
-	fbErrorLogger Error;	/// < error logger
+	fbData* data;	/// < error logger
 	fbCriticalSection cs;   /// < critical section
 	sqlite3* db;		/// < database
 	bool open;		/// < open bool

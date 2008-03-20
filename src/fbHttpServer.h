@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.h,v 1.3 2008/03/16 01:07:34 laffer1 Exp $ */
+/* $Id: fbHttpServer.h,v 1.4 2008/03/20 18:46:13 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -39,14 +39,14 @@
 class fbHttpServer
 {
 public:
-    fbHttpServer( fbErrorLogger &err );   /// default constructor
+    fbHttpServer(fbData* _data);   /// default constructor
     ~fbHttpServer();  /// default destructor
 
     void start();  /// Start HTTP server
     void stop();  /// Stop HTTP server
 
 protected:
-    fbErrorLogger *log;
+    fbData* data;
     bool keeprunning;
     fbSocket *servsock;
 };

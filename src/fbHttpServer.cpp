@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.3 2008/03/16 01:07:34 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.4 2008/03/20 18:46:13 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -27,11 +27,8 @@
 #include "fbHttpServer.h"
 #include "fbSocket.h"
 
-fbHttpServer:: fbHttpServer( fbErrorLogger &err )
+fbHttpServer:: fbHttpServer(fbData* _data): data(_data), keeprunning(false), servsock(NULL)
 {
-    log = &err;
-    keeprunning = false;  // until we start it.
-    servsock = NULL;  // until we want to start it.
 }
 
 fbHttpServer::~fbHttpServer()
@@ -48,6 +45,7 @@ void fbHttpServer::start()
 
 void fbHttpServer::stop()
 {
+	//wheres this change at?
     keeprunning = false; // stop it gracefully
 }
 

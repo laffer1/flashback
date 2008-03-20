@@ -1,10 +1,10 @@
-/* $Id: fbDatabase.h,v 1.1 2008/03/16 17:05:46 wyverex Exp $ */
+/* $Id: fbDatabase.h,v 1.2 2008/03/20 18:46:13 wyverex Exp $ */
 
 #ifndef fbDATABASE_H
 #define fbDATABASE_H
 
 #include "global.h"
-#include "fbErrorLogger.h"
+#include "fbData.h"
 #include "fbLock.h"
 #include "fbSQL.h"
 #include "fbDate.h"
@@ -28,8 +28,8 @@
 class fbDatabase
 {
 public:
-	fbDatabase(fbErrorLogger errlog, string path);
-	fbDatabase(fbErrorLogger errlog, char* path);
+	fbDatabase(fbData* _data, string path);
+	fbDatabase(fbData* _data, const char* path);
 	~fbDatabase();
 
 	///if the database doesn't exist yet, we should make it
@@ -38,7 +38,9 @@ public:
 
 	///Schedule functions
 	void createSchedule(string desc, fbDate date, fbTime time, Repeat_type repeat, int rint, string path);
-	void createSchedule(char* desc, fbDate date, fbTime time, Repeat_type repeat, int rint, char* path);
+	void createSchedule(const char* desc, fbDate date, fbTime time, Repeat_type repeat, int rint,const char* path);
+	void createSchedule(string desc, fbDate date, fbTime time, Repeat_type repeat, int rint, const char* path);
+	void createSchedule(const char* desc, fbDate date, fbTime time, Repeat_type repeat, int rint, string  path);
 
 	void updateSchedule(int id);  /// < runs repeat condition code... removes row or updates date/time values
 
@@ -49,26 +51,26 @@ public:
 	/// Settings functions
 	//ints
 	int getsetting_i(string name);
-	int getsetting_i(char* name);
+	int getsetting_i(const char* name);
 	void setsetting_i(string name, int val);
-	void setsetting_i(char* name, int val);
+	void setsetting_i(const char* name, int val);
 	//floats
 	float getsetting_f(string name);
-	float getsetting_f(char* name);
+	float getsetting_f(const char* name);
 	void  setsetting_f(string name, float val);
-	void  setsetting_f(char* name, float val);
+	void  setsetting_f(const char* name, float val);
 	//strings
 	void getsetting_s(string name, string& val);
 	void getsetting_s(string name, char* val, int length);
 	void setsetting_s(string name, string val);
 	void setsetting_s(string name, char* val, int length);
-	void getsetting_s(char* name, string& val);
-	void getsetting_s(char* name, char* val);
-	void setsetting_s(char* name, string val);
-	void setsetting_s(char* name, char* val);
+	void getsetting_s(const char* name, string& val);
+	void getsetting_s(const char* name, char* val);
+	void setsetting_s(const char* name, string val);
+	void setsetting_s(const char* name, char* val);
 
 private:
-	fbErrorLogger Error;
+	fbData* data
 	fbCriticalSection cs;
 	fbSQL db;
 

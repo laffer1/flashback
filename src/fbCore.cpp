@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.4 2008/03/20 18:25:25 wyverex Exp $ */
+/* $Id: fbCore.cpp,v 1.5 2008/03/20 18:46:13 wyverex Exp $ */
 
 /**
 *  fbCore.cpp
@@ -28,8 +28,8 @@ void core()
 	
 
 	//Scheduler
-	//fbScheduler scheduler(Error);
-	//scheduler.startup();
+	fbScheduler scheduler(&data);
+	scheduler.startup();
 
 	//DiskDetector
 	fbDiskDetector diskdetect(&data);
@@ -37,14 +37,14 @@ void core()
 
 
 	// Shutdown Detector
-	//while(1)
+	/*while(1)
 	{
 #ifdef Win32
 		Sleep(1000 * 60);
 #else
 		sleep(60);
 #endif
-	}
+	}*/
 	
 
 	//shutdown 
@@ -52,7 +52,7 @@ void core()
 
 
 	//scheduler
-	//scheduler.shutdown();
+	scheduler.shutdown();
 
 	//diskdetector
 	diskdetect.shutdown();	

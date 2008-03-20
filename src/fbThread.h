@@ -1,4 +1,4 @@
-/* $Id: fbThread.h,v 1.7 2008/03/10 19:00:24 wyverex Exp $ */
+/* $Id: fbThread.h,v 1.8 2008/03/20 18:46:13 wyverex Exp $ */
 
 #ifndef fbTHREAD_H
 #define fbTHREAD_H
@@ -16,8 +16,7 @@
 class fbThread
 {
 public:
-	fbThread();			 /// < Default Constructor	
-	fbThread(fbErrorLogger& errlog); /// < Overloaded Constructor, ErrorLogger
+	fbThread(fbData* _data); /// < Overloaded Constructor, ErrorLogger
 	virtual ~fbThread();		 /// < Destructor
 
 	void start();		/// < starts the thread
@@ -39,7 +38,7 @@ private:
 	bool _running;		/// < is thread running
 	bool _stopping;		/// < did we get a stop?
 	bool _paused;		/// < has the thread been paused
-	fbErrorLogger Error;	/// < Threads Error Logger
+	fbData* data;	/// < Threads Error Logger
 
 #ifdef Win32
 	HANDLE _hThread;		/// < handle to running thread

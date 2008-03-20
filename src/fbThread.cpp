@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.11 2008/03/14 19:18:09 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.12 2008/03/20 18:46:13 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -14,16 +14,7 @@
 *	Default constructor
 *	@note 3/5/08 Initilize vars to false
 */
-fbThread::fbThread():_running(false), _stopping(false), _paused(false), Error(cout), _hThread(NULL)
-{
-}
-
-/**
-*	fbThread
-*	Default constructor
-*	@note 3/5/08 Initilize vars to false
-*/
-fbThread::fbThread(fbErrorLogger& errlog):_running(false), _stopping(false), _paused(false), Error(errlog), _hThread(NULL)
+fbThread::fbThread(fbData* _data):_running(false), _stopping(false), _paused(false), data(_data), _hThread(NULL)
 {
 }
 
@@ -48,14 +39,13 @@ void fbThread::start()
 #ifdef Win32
 	_hThread = CreateThread(NULL, 0, threadStart, this, 0, NULL);
 	if(_hThread == NULL)
-		Error.print(ERR, THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
+		data->err(THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
 #else
 	string msg = "pthread_create Failed: ";
-	int ret = pthread_create(&_hThread, NULL, threadStart, this);
-	if(ret != 0)
+	if(!pthread_create(&_hThread, NULL, threadStart, this))
 	{
 		msg += "" + ret;
-		Error.print(ERR, THREADCREATEFAIL, msg);  //needs ret value, need string builder
+		data->err(THREADCREATEFAIL, msg);  //needs ret value, need string builder
 	}
 #endif
 }
@@ -80,16 +70,14 @@ void fbThread::forceStop()
 	if (!_running)
 		return;
 #ifdef Win32
-	DWORD ret = TerminateThread(_hThread, 0);
-	if(ret == -1)
-		Error.print(ERR, THREADTERMINATEFAILED, "TerminateThread Failed");
+	if(TerminateThread(_hThread, 0) == -1)
+		data->err(THREADTERMINATEFAILED, "TerminateThread Failed");
 #else
 	string msg = "pthread_cancel Failed: ";
-	int ret = pthread_cancel(_hThread);
-	if(ret != 0)
+	if(!pthread_cancel(_hThread))
 	{
 		msg += "" + ret;
-		Error.print(ERR, THREADTERMINATEFAILED, msg);
+		data->err(THREADTERMINATEFAILED, msg);
 	}
 #endif
 	_running = false;
@@ -108,9 +96,8 @@ void fbThread::pause()
 		return;
 	
 #ifdef Win32
-	DWORD ret = SuspendThread(_hThread);
-	if(ret == -1)
-		Error.print(ERR, THREADSUSPENDFAILED, "SuspendThread Failed");
+	if(SuspendThread(_hThread) == -1)
+		data->err(THREADSUSPENDFAILED, "SuspendThread Failed");
 #else
 	return;
 #endif
@@ -126,9 +113,8 @@ void fbThread::resume()
 	if (!_running || !_paused)
 		return;
 #ifdef Win32
-	DWORD ret = ResumeThread(_hThread);
-	if(ret == -1)
-		Error.print(ERR, THREADRESUMEFAILED, "ResumeThread Failed");
+	if(ResumeThread(_hThread) == -1)
+		data->err(THREADRESUMEFAILED, "ResumeThread Failed");
 #else
 	return;
 #endif
