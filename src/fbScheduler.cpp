@@ -1,11 +1,11 @@
-/* $Id: fbScheduler.cpp,v 1.3 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.4 2008/03/20 19:07:49 wyverex Exp $ */
 
 
 
 #include "fbScheduler.h"
 
 
-fbScheduler::fbScheduler(fbErrorLogger& errlog):running(false), data(_data)
+fbScheduler::fbScheduler(fbData* _data):fbThread(_data), running(false), data(_data)
 {
 }
 

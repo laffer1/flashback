@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.2 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.3 2008/03/20 19:07:48 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -10,12 +10,12 @@
 */
 
 
-fbDatabase::fbDatabase(fbData* _data, string path):data(_data), cs(), db(errlog)
+fbDatabase::fbDatabase(fbErrorLogger* log, string path):errlog(log), cs(), db(errlog)
 {
 	db.connect(path);
 }
 
-fbDatabase::fbDatabase(fbData* _data, const char* path):data(_data), cs(), db(errlog)
+fbDatabase::fbDatabase(fbErrorLogger* log, const char* path):errlog(log), cs(), db(errlog)
 {
 	db.connect(path);
 }

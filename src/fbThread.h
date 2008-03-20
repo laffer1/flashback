@@ -1,10 +1,10 @@
-/* $Id: fbThread.h,v 1.8 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbThread.h,v 1.9 2008/03/20 19:07:49 wyverex Exp $ */
 
 #ifndef fbTHREAD_H
 #define fbTHREAD_H
 
 #include "global.h"
-#include "fbErrorLogger.h"
+#include "fbData.h"
 
 /**
 *	fbThread

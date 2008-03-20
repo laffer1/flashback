@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.6 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbClient.cpp,v 1.7 2008/03/20 19:07:48 wyverex Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -107,7 +107,7 @@ void fbClient::parseHeaders()
     // TODO: figure out HTTP version.  Not important for now.
 }
 
-int fbClient::begins_with( char * str1, char * str2 )
+int fbClient::begins_with( char * str1,const char * str2 )
 {
     int str2len;
     int str1len;

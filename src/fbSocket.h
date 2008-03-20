@@ -1,4 +1,4 @@
-/* $Id: fbSocket.h,v 1.11 2008/03/15 17:10:36 laffer1 Exp $ */
+/* $Id: fbSocket.h,v 1.12 2008/03/20 19:07:49 wyverex Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -30,7 +30,7 @@
 
 #include "global.h"
 #include "sockets/tcp.h"
-#include "fbErrorLogger.h"
+#include "fbData.h"
 #include "fbClient.h"
 
 /**
@@ -42,7 +42,7 @@
 class fbSocket
 {
 public:
-    fbSocket( fbErrorLogger &err, char *addr, int port );   /// Default Constructor
+    fbSocket(fbData* _data, char *addr, int port );   /// Default Constructor
     ~fbSocket();  /// Destructor
 
     char *getBindAddress();
@@ -54,7 +54,7 @@ public:
     fbClient *nextClient();
 
 protected:
-    fbErrorLogger *log;
+    fbData* data;
     int bindPort;
     char bindAddress[16]; /* ipv4 only */
     socketdesc sd;

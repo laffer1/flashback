@@ -1,10 +1,10 @@
-/* $Id: fbDatabase.h,v 1.2 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbDatabase.h,v 1.3 2008/03/20 19:07:49 wyverex Exp $ */
 
 #ifndef fbDATABASE_H
 #define fbDATABASE_H
 
 #include "global.h"
-#include "fbData.h"
+#include "fbErrorLogger.h"
 #include "fbLock.h"
 #include "fbSQL.h"
 #include "fbDate.h"
@@ -28,8 +28,8 @@
 class fbDatabase
 {
 public:
-	fbDatabase(fbData* _data, string path);
-	fbDatabase(fbData* _data, const char* path);
+	fbDatabase(fbErrorLogger* log, string path);
+	fbDatabase(fbErrorLogger* log, const char* path);
 	~fbDatabase();
 
 	///if the database doesn't exist yet, we should make it
@@ -70,7 +70,7 @@ public:
 	void setsetting_s(const char* name, char* val);
 
 private:
-	fbData* data
+	fbErrorLogger* errlog;
 	fbCriticalSection cs;
 	fbSQL db;
 

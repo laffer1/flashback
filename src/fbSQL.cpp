@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.4 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.5 2008/03/20 19:07:49 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -17,7 +17,7 @@
 *  constructor
 *  @param errlog Pointer to main error logger
 */
-fbSQL::fbSQL(fbData* _data): data(_data), cs(), db(NULL), open(false)
+fbSQL::fbSQL(fbErrorLogger* log): errlog(log), cs(), db(NULL), open(false)
 {
 }
 
@@ -47,7 +47,7 @@ void fbSQL::connect(char* database)
 		if(ret)
 		{	//open failed report error
 			err = database;
-			data->err(FAILEDTOOPENDB, err);
+			//data->err(FAILEDTOOPENDB, err);
 			return;
 		}
 	}
@@ -113,7 +113,7 @@ int fbSQL::exec(char* command,int(*callback)(void*,int,char**,char**))
 	if(ret != SQLITE_OK)
 	{	//error, report warning
 		err += ret;
-		data->warn(SQLEXECERROR, err);
+		//data->warn(SQLEXECERROR, err);
 		sqlite3_free(errmsg);
 	}
 

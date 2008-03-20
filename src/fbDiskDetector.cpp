@@ -11,7 +11,7 @@
 #include "fbDiskDetector.h"
 
 
-fbDiskDetector::fbDiskDetector(fbData* _data):running(false), data(_data)
+fbDiskDetector::fbDiskDetector(fbData* _data):fbThread(_data), running(false), data(_data)
 {
 }
 

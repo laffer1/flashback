@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.4 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.5 2008/03/20 19:07:49 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -40,7 +40,7 @@ fbHttpServer::~fbHttpServer()
 void fbHttpServer::start()
 {
     string bindhost = "127.0.0.1";
-    servsock = new fbSocket( *log, (char *) bindhost.c_str(), 8080 ); // TODO: Use the settings object to set these.
+    servsock = new fbSocket(data, (char *) bindhost.c_str(), 8080 ); // TODO: Use the settings object to set these.
 }
 
 void fbHttpServer::stop()

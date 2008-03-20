@@ -1,4 +1,4 @@
-/* $Id: fbSocket.cpp,v 1.11 2008/03/15 17:10:36 laffer1 Exp $ */
+/* $Id: fbSocket.cpp,v 1.12 2008/03/20 19:07:49 wyverex Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -34,9 +34,8 @@
  * @date March 7, 2008
  */
 
-fbSocket::fbSocket( fbErrorLogger &err, char *addr, int port )
+fbSocket::fbSocket(fbData* _data, char *addr, int port ):data(_data)
 {
-    log = &err;
     setBindAddress( addr );
     setBindPort( port );
 
@@ -78,6 +77,6 @@ void fbSocket::setBindPort( int port )
 
 fbClient * fbSocket::nextClient()
 { 
-    return new fbClient( *log, tcpserverclient( sd ) );
+    return new fbClient(data, tcpserverclient( sd ) );
 }
 

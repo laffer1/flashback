@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.12 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.13 2008/03/20 19:07:49 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -41,11 +41,9 @@ void fbThread::start()
 	if(_hThread == NULL)
 		data->err(THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
 #else
-	string msg = "pthread_create Failed: ";
 	if(!pthread_create(&_hThread, NULL, threadStart, this))
 	{
-		msg += "" + ret;
-		data->err(THREADCREATEFAIL, msg);  //needs ret value, need string builder
+		data->err(THREADCREATEFAIL, "pthread_create Failed");
 	}
 #endif
 }
@@ -73,11 +71,9 @@ void fbThread::forceStop()
 	if(TerminateThread(_hThread, 0) == -1)
 		data->err(THREADTERMINATEFAILED, "TerminateThread Failed");
 #else
-	string msg = "pthread_cancel Failed: ";
 	if(!pthread_cancel(_hThread))
 	{
-		msg += "" + ret;
-		data->err(THREADTERMINATEFAILED, msg);
+		data->err(THREADTERMINATEFAILED, "pthread_cancel Failed");
 	}
 #endif
 	_running = false;

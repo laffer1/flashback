@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.6 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbClient.h,v 1.7 2008/03/20 19:07:48 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -69,7 +69,7 @@ public:
     ~fbClient();  /// Destructor
 
     void parseHeaders();  /// Parse the HTTP headers on the client connection.
-    int begins_with( char * str1, char * str2 );
+    int begins_with( char * str1, const char * str2 );
 
 protected:
    fbData* data;
