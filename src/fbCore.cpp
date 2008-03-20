@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.3 2008/03/10 20:26:26 wyverex Exp $ */
+/* $Id: fbCore.cpp,v 1.4 2008/03/20 18:25:25 wyverex Exp $ */
 
 /**
 *  fbCore.cpp
@@ -9,7 +9,7 @@
 
 
 #include "global.h"
-#include "fbErrorLogger.h"
+#include "fbData.h"
 #include "fbDiskDetector.h"
 #include "fbScheduler.h"
 
@@ -21,26 +21,23 @@
 void core()
 {
 	//Local Settings Object
-
-	fbErrorLogger Error(new ofstream("temp.log"));
-		
-
-
-
-
-
+	fbData data;
+	
+	data.debug(NONE, "Running Debug Mode");  //should only show in debug mode!
+	data.msg(NONE, "Flashback Started");
+	
 
 	//Scheduler
-	fbScheduler scheduler(Error);
-	scheduler.startup();
+	//fbScheduler scheduler(Error);
+	//scheduler.startup();
 
 	//DiskDetector
-	fbDiskDetector diskdetect(Error);
+	fbDiskDetector diskdetect(&data);
 	diskdetect.startup();
 
 
 	// Shutdown Detector
-	while(1)
+	//while(1)
 	{
 #ifdef Win32
 		Sleep(1000 * 60);
@@ -55,7 +52,7 @@ void core()
 
 
 	//scheduler
-	scheduler.shutdown();
+	//scheduler.shutdown();
 
 	//diskdetector
 	diskdetect.shutdown();	

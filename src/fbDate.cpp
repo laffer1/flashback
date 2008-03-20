@@ -1,4 +1,4 @@
-/* $Id: fbDate.cpp,v 1.3 2008/03/15 21:18:32 wyverex Exp $ */
+/* $Id: fbDate.cpp,v 1.4 2008/03/20 18:25:25 wyverex Exp $ */
 
 /**
  *  fbDate
@@ -122,12 +122,17 @@ void fbDate::update()
 	day = (int)((double)d + 1.5);
 }
 
-
-
-
-void fbDate::outMDY()
+void fbDate::mdy(string& d)
 {
-	cout << mon << "/" << day << "/" << year << endl;
+	ostringstream s;	
+	s << d << mon << '/' << (day < 10 ? "0" : "" )<< day << '/' << year;
+	d = s.str();
 }
 
+void fbDate::my(string& d)
+{
+	ostringstream s;	
+	s << d << mon << '/' << year;
+	d = s.str();
+}
 

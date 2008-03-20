@@ -1,4 +1,4 @@
-/* $Id: fbTime.cpp,v 1.1 2008/03/16 01:56:11 wyverex Exp $ */
+/* $Id: fbTime.cpp,v 1.2 2008/03/20 18:25:25 wyverex Exp $ */
 
 
 /**
@@ -99,5 +99,21 @@ void fbTime::update()
 	hour = ticks / 3600;
 	sec = ticks % 60;
 	min = (ticks - (hour * 3600) - sec) / 60;
+}
+
+
+
+void fbTime::hms(string& t)
+{
+	ostringstream s;	
+	s << t << (hour < 10 ? "0" : "" ) << hour << ':' << (min < 10 ? "0" : "" ) << min << ':' << sec;
+	t = s.str();
+}	
+
+void fbTime::hm(string& t)
+{
+	ostringstream s;	
+	s << t << (hour < 10 ? "0" : "" ) << hour << ':' << (min < 10 ? "0" : "" ) << min;
+	t = s.str();
 }
 

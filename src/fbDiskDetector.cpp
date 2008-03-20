@@ -11,7 +11,7 @@
 #include "fbDiskDetector.h"
 
 
-fbDiskDetector::fbDiskDetector(fbErrorLogger& errlog):running(false), Error(errlog)
+fbDiskDetector::fbDiskDetector(fbData* _data):running(false), data(_data)
 {
 }
 
@@ -27,6 +27,7 @@ void fbDiskDetector::startup()
 		return;
 
 	running = true;
+	data->msg(NONE, "Diskdetector Started.");
 	start();
 }
 
@@ -36,12 +37,13 @@ void fbDiskDetector::shutdown()
 		return;
 
 	stop();
+		data->msg(NONE, "Diskdetector Stopped.");
 	running = false;
 }
 
 void fbDiskDetector::run()
 {
 	while(!isStopping())
-		_sleep(60*5);
+		_sleep(60);
 }
 

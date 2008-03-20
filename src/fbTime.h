@@ -1,4 +1,4 @@
-/* $Id: fbTime.h,v 1.2 2008/03/16 01:58:56 wyverex Exp $ */
+/* $Id: fbTime.h,v 1.3 2008/03/20 18:25:25 wyverex Exp $ */
 
 
 #ifndef fbTIME_H
@@ -61,6 +61,10 @@ public:
 	void addSec(const int s = 1){*this += s;};
 	void addMin(const int m = 1){*this += (m*60);};
 	void addHour(const int h = 1){*this += (h*3600);};
+
+	//output
+	void hms(string& t);
+	void hm(string& t);
 
 private:
 	long ticks;

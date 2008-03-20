@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.27 2008/03/16 17:05:45 wyverex Exp $
+# $Id: Makefile,v 1.28 2008/03/20 18:25:25 wyverex Exp $
 #
 #Flashback make file
 #
@@ -10,7 +10,7 @@ BINNAME=bin/flashback
 LIBS=-lsqlite3
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
-	fbSocket.o fbTime.o fbDatabase.o
+	fbSocket.o fbTime.o fbDatabase.o fbData.o
 
 ifdef debug
 CFLAGS += -DDebug -g

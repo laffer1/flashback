@@ -1,4 +1,4 @@
-/* $Id: fbDate.h,v 1.3 2008/03/15 21:18:32 wyverex Exp $ */
+/* $Id: fbDate.h,v 1.4 2008/03/20 18:25:25 wyverex Exp $ */
 
 #ifndef fbDATE_H
 #define fbDATE_H
@@ -63,8 +63,8 @@ public:
 
 
 	//output --- !!!!! needs to be added!
-	void outMDY();  //old debugger test, dont use! maybe remove this before submit
-
+	void mdy(string& d);
+	void my(string& d);
 
 private:
 	long long julian;	/// < the julian day

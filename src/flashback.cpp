@@ -1,4 +1,4 @@
-/* $Id: flashback.cpp,v 1.13 2008/03/10 19:34:08 wyverex Exp $ */
+/* $Id: flashback.cpp,v 1.14 2008/03/20 18:25:25 wyverex Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
@@ -129,18 +129,16 @@ int main(int argc, char** args)
 			fclose(stdin);
 			fclose(stderr);
 
-			/* safety features */
+			// safety features *
 			setsid(); // become session leader
 			chdir("/"); // change wrkdir to root
 			umask(0); // clear file mode creation mask
 
+			//Call Flashback Start
+			core();
 			break;
 	}
 #endif
-
-	//Call Flashback Start
-	core();
-	
 	return 0;
 }	
 

@@ -1,10 +1,11 @@
-/* $Id: global.h,v 1.7 2008/03/09 19:01:17 laffer1 Exp $ */
+/* $Id: global.h,v 1.8 2008/03/20 18:25:25 wyverex Exp $ */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
 	#include <iostream>
 	#include <string>
+	#include <sstream>
 	#include <cstring>
 	#include <cmath>
 	#include <cstdlib>
