@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.h,v 1.4 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbHttpServer.h,v 1.5 2008/03/21 00:12:11 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -36,19 +36,21 @@
  * @author Lucas Holt
  * @date March 15, 2008
  */
-class fbHttpServer
+class fbHttpServer: public fbThread
 {
 public:
     fbHttpServer(fbData* _data);   /// default constructor
     ~fbHttpServer();  /// default destructor
 
-    void start();  /// Start HTTP server
-    void stop();  /// Stop HTTP server
+    void startup();  /// Start HTTP server
+    void shutdown();  /// Stop HTTP server
 
 protected:
     fbData* data;
-    bool keeprunning;
     fbSocket *servsock;
+    bool running;
+
+    void run();
 };
 
 #endif
