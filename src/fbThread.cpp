@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.13 2008/03/20 19:07:49 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.14 2008/03/21 03:55:13 laffer1 Exp $ */
 
 /**
 *	fbThread.cpp
@@ -41,7 +41,7 @@ void fbThread::start()
 	if(_hThread == NULL)
 		data->err(THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
 #else
-	if(!pthread_create(&_hThread, NULL, threadStart, this))
+	if(pthread_create(&_hThread, NULL, threadStart, this))
 	{
 		data->err(THREADCREATEFAIL, "pthread_create Failed");
 	}
