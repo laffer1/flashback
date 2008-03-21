@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.5 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbCore.cpp,v 1.6 2008/03/21 00:52:22 laffer1 Exp $ */
 
 /**
 *  fbCore.cpp
@@ -12,6 +12,7 @@
 #include "fbData.h"
 #include "fbDiskDetector.h"
 #include "fbScheduler.h"
+#include "fbHttpServer.h"
 
 /**
 * core
@@ -35,6 +36,9 @@ void core()
 	fbDiskDetector diskdetect(&data);
 	diskdetect.startup();
 
+	fbHttpServer http(&data);
+	http.startup();
+
 
 	// Shutdown Detector
 	/*while(1)
@@ -49,7 +53,7 @@ void core()
 
 	//shutdown 
 
-
+        http.shutdown();
 
 	//scheduler
 	scheduler.shutdown();
