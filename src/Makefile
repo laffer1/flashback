@@ -1,25 +1,25 @@
-# $Id: Makefile,v 1.30 2008/03/21 03:50:05 laffer1 Exp $
+# $Id: Makefile,v 1.31 2008/03/21 05:44:37 laffer1 Exp $
 #
 #Flashback make file
 #
 #
 
 CC=g++
-CFLAGS= -pthread -Wall -g -DDEBUG
+CFLAGS= -pthread -Wall
 BINNAME=bin/flashback
 LIBS=-lsqlite3
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
 	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o
 
-ifdef debug
+ifdef DEBUG
 CFLAGS += -DDebug -g
 BINNAME=bin/flashback_d
 else
-#CFLAGS += -O2
+CFLAGS += -O2
 endif
 
-ifdef win32
+ifdef WIN32
 CFLAGS += -DWin32
 ifdef DEBUG
 BINNAME=bin\flashback_d.exe
@@ -34,14 +34,15 @@ all: clean release
 
 release: flashback
 
-debug: clean flashback
+debug:
+	gmake flashback DEBUG=yes
 	
 clean:
 	rm -f bin/flashback bin/flashback_d bin/flashback.exe bin/flashback_d.exe *.o
 	
 #windows
 win32:
-	make -D WIN32 flashback
+	gmake flashback WIN32=yes
 
 win32debug: clean flashback
 	
