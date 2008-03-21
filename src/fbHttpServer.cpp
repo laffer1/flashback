@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.9 2008/03/21 02:36:59 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.10 2008/03/21 05:07:40 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -69,7 +69,7 @@ void fbHttpServer::run()
     {
 	client = servsock->nextClient();
         client->parseHeaders();
-        resp = new fbHttpResponse( data, client ); /* TODO: Fix leak */
+        resp = new fbHttpResponse( data, client ); /*  This class calles delete on itself */
         resp->startup();
     }
 }

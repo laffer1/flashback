@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.5 2008/03/21 04:06:05 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.6 2008/03/21 05:07:40 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -53,6 +53,8 @@ void fbHttpResponse::shutdown()
 
     stop();
     running = false; // stop it gracefully
+
+    delete this;
 }
 
 void fbHttpResponse::run()
@@ -85,6 +87,8 @@ void fbHttpResponse::index()
 void fbHttpResponse::notfound()
 {
     string r;  // response for client
+    char *path;
+    path = client->getPath();
 
     status( "404", "Not Found" );
    // TODO: Date  header
@@ -97,9 +101,16 @@ void fbHttpResponse::notfound()
     r.append("\r\n"); // extra to start response as required per spec
     r.append( "<html>\n<head>\n\t<title>404 Not Found</title>\n</head>\n");
     r.append("<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on the server.</p>\n");
-    r.append("</body>\n</html>\n");
+    r.append("<p>Invalid path: ");
+    r.append(path);
+    r.append("</p>\n<hr><p>");
+    r.append(SERVERID);
+    r.append("</p>\n</body>\n</html>\n");
 
     client->write(r);
+
+    if (path != NULL)
+        free( path );
 }
 
 // ok so it's invalid for .9... 

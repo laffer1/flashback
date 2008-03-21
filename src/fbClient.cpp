@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.12 2008/03/21 04:06:05 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.13 2008/03/21 05:07:40 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -142,7 +142,8 @@ char * fbClient::getPath()
 
 void fbClient::write( string val  )
 {
-    fprintf( clientfp, "%s", val.c_str() );
+    if (val != NULL)
+        fprintf( clientfp, "%s", val.c_str() );
 }
 
 void fbClient::close()

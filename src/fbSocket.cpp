@@ -1,4 +1,4 @@
-/* $Id: fbSocket.cpp,v 1.12 2008/03/20 19:07:49 wyverex Exp $ */
+/* $Id: fbSocket.cpp,v 1.13 2008/03/21 05:07:40 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -77,6 +77,6 @@ void fbSocket::setBindPort( int port )
 
 fbClient * fbSocket::nextClient()
 { 
-    return new fbClient(data, tcpserverclient( sd ) );
+    return new fbClient(data, tcpserverclient( sd ) ); /* has to be deleted by the caller */
 }
 
