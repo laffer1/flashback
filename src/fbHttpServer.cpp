@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.6 2008/03/21 00:12:11 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.7 2008/03/21 00:32:30 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -62,9 +62,11 @@ void fbHttpServer::shutdown()
 
 void fbHttpServer::run()
 {
+    fbClient *client;
+
     while(!isStopping())
     {
-        _sleep(60*15);
+	client = servsock.nextClient();
     }
 }
 
