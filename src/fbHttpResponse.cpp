@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.4 2008/03/21 03:23:32 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.5 2008/03/21 04:06:05 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -71,6 +71,8 @@ void fbHttpResponse::run()
     // we're mallocing this elsewhere.
     if ( path != NULL )
        free( path );
+
+    delete client;
 
    shutdown();  // clean up 
 }

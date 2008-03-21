@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.11 2008/03/21 03:23:32 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.12 2008/03/21 04:06:05 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -51,7 +51,8 @@ fbClient::fbClient(fbData* _data, int sock ):data(_data)
 
 fbClient::~fbClient()
 {
-    fclose(clientfp);
+    if (clientfp != NULL)
+        close();
 
     if ( host != NULL );
         delete host;;
@@ -142,5 +143,10 @@ char * fbClient::getPath()
 void fbClient::write( string val  )
 {
     fprintf( clientfp, "%s", val.c_str() );
+}
+
+void fbClient::close()
+{
+    fclose( clientfp );
 }
 
