@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.7 2008/03/21 00:32:30 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.8 2008/03/21 00:45:04 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -27,7 +27,7 @@
 #include "fbHttpServer.h"
 #include "fbSocket.h"
 
-fbHttpServer:: fbHttpServer(fbData* _data): data(_data), running(false), servsock(NULL)
+fbHttpServer:: fbHttpServer(fbData* _data):fbThread(_data), data(_data), servsock(NULL), running(false)
 {
 }
 
@@ -66,7 +66,7 @@ void fbHttpServer::run()
 
     while(!isStopping())
     {
-	client = servsock.nextClient();
+	client = servsock->nextClient();
     }
 }
 
