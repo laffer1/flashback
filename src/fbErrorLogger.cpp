@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.11 2008/03/21 03:50:05 laffer1 Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.12 2008/03/21 05:48:19 laffer1 Exp $ */
 
 /**
 *	fbErrorLogger
@@ -51,7 +51,7 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, const char* str)
 	string desc, level, date;
 
 #ifndef Debug
-	if(lvl == DEBUG)	/// < if not in debug mode then no debug messages
+	if(lvl == DBUG)	/// < if not in debug mode then no debug messages
 		return;
 #endif
 	
@@ -82,7 +82,7 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, string& str)
 	string desc, level, date;
 	
 #ifndef Debug
-	if(lvl == DEBUG)	/// < if not in debug mode then no debug messages
+	if(lvl == DBUG)	/// < if not in debug mode then no debug messages
 		return;
 #endif
 	
