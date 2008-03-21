@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.7 2008/03/20 19:07:48 wyverex Exp $ */
+/* $Id: fbClient.cpp,v 1.8 2008/03/21 02:36:59 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -126,4 +126,15 @@ int fbClient::begins_with( char * str1,const char * str2 )
                 return 0; // doesn't match
 
     return 1; // matches
+}
+
+
+char * fbClient::getHost()
+{
+    return strdup(host);
+}
+
+char * fbClient::getPath()
+{
+    return strdup(path);
 }

@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.h,v 1.6 2008/03/21 00:45:04 wyverex Exp $ */
+/* $Id: fbHttpServer.h,v 1.7 2008/03/21 02:36:59 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -47,7 +47,7 @@ public:
     void shutdown();  /// Stop HTTP server
 
 protected:
-    fbData* data;
+    fbData *data;
     fbSocket *servsock;
     bool running;
 

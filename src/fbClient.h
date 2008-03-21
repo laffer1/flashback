@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.7 2008/03/20 19:07:48 wyverex Exp $ */
+/* $Id: fbClient.h,v 1.8 2008/03/21 02:36:59 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -71,15 +71,18 @@ public:
     void parseHeaders();  /// Parse the HTTP headers on the client connection.
     int begins_with( char * str1, const char * str2 );
 
+    char * getPath();
+    char * getHost();
+
 protected:
-   fbData* data;
-   FILE *clientfp;
-  /* HTTP request stuff */
-  enum HTTP_VERSION httpver;
-  enum HTTP_TYPE httptype;
-  enum HTTP_PROTOCOL httpproto;
-  string *host;
-  string *path;;
+     fbData* data;
+     FILE *clientfp;
+    /* HTTP request stuff */
+    enum HTTP_VERSION httpver;
+    enum HTTP_TYPE httptype;
+    enum HTTP_PROTOCOL httpproto;
+    string *host;
+    string *path;;
 };
 
 #endif
