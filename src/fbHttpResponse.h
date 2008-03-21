@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.3 2008/03/21 02:45:51 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.4 2008/03/21 03:23:32 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -30,13 +30,16 @@
 #include "fbClient.h"
 #include "fbThread.h"
 
+#define SERVERID "FlashBack/1.0"
+
+using namespace std;
+
 /**
  * fbHttpResponse
  * Generate and transmit the webserver response to the client.
  * @author Lucas Holt
  * @date March 20, 2008
  */
-
 class fbHttpResponse: public fbThread
 {
 public:
@@ -54,6 +57,8 @@ protected:
     void run();     /// heavy lifting
     void index();  /// print index page for website.
     void notfound();
+    void header( string name, string value );
+    void status( string code, string msg );
 };
 
 #endif

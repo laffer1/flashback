@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.9 2008/03/21 02:45:51 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.10 2008/03/21 03:23:32 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -73,6 +73,7 @@ public:
 
     char * getPath();
     char * getHost();
+    void write( string val );
 
 protected:
      fbData* data;

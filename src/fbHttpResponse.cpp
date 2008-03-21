@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.3 2008/03/21 02:45:51 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.4 2008/03/21 03:23:32 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -57,16 +57,20 @@ void fbHttpResponse::shutdown()
 
 void fbHttpResponse::run()
 {
-   // we should probably check this during the request  while(!isStopping())
-   char *path;
-   path = client->getPath();
+     // we should probably check this during the request  while(!isStopping())
+     char *path;
+     path = client->getPath();
 
-   if ( strcmp(path, "/") == 0 )
-      index();
-  else if ( strcmp(path, "/index") == 0 )
-      index();
-  else
-      notfound();
+     if ( strcmp(path, "/") == 0 )
+        index();
+    else if ( strcmp(path, "/index") == 0 )
+        index();
+    else
+        notfound();
+
+    // we're mallocing this elsewhere.
+    if ( path != NULL )
+       free( path );
 
    shutdown();  // clean up 
 }
@@ -78,6 +82,43 @@ void fbHttpResponse::index()
 
 void fbHttpResponse::notfound()
 {
+    string r;  // response for client
 
+    status( "404", "Not Found" );
+   // TODO: Date  header
+    header( "Server", SERVERID );
+    header( "Connection", "close");
+    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    header( "Content-Language", "en-US" );
+    // TODO: Expires header
+
+    r.append("\r\n"); // extra to start response as required per spec
+    r.append( "<html>\n<head>\n\t<title>404 Not Found</title>\n</head>\n");
+    r.append("<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on the server.</p>\n");
+    r.append("</body>\n</html>\n");
+
+    client->write(r);
+}
+
+// ok so it's invalid for .9... 
+void fbHttpResponse::status( string code, string msg )
+{
+    string r;
+    r.append( "HTTP/1.0 " );
+    r.append( code );
+    r.append( " " );
+    r.append( msg );
+    r.append("\r\n");
+    client->write(r);
+}
+
+void fbHttpResponse::header( string name, string value )
+{
+    string r;
+    r.append(name);
+    r.append(": ");
+    r.append(value);
+    r.append("\r\n");
+    client->write(r);
 }
 
