@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.6 2008/03/21 00:52:22 laffer1 Exp $ */
+/* $Id: fbCore.cpp,v 1.7 2008/03/21 03:50:05 laffer1 Exp $ */
 
 /**
 *  fbCore.cpp
@@ -41,14 +41,14 @@ void core()
 
 
 	// Shutdown Detector
-	/*while(1)
+	while(1)
 	{
 #ifdef Win32
 		Sleep(1000 * 60);
 #else
 		sleep(60);
 #endif
-	}*/
+	}
 	
 
 	//shutdown 

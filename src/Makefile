@@ -1,11 +1,11 @@
-# $Id: Makefile,v 1.29 2008/03/21 00:58:12 laffer1 Exp $
+# $Id: Makefile,v 1.30 2008/03/21 03:50:05 laffer1 Exp $
 #
 #Flashback make file
 #
 #
 
 CC=g++
-CFLAGS= -pthread -Wall
+CFLAGS= -pthread -Wall -g -DDEBUG
 BINNAME=bin/flashback
 LIBS=-lsqlite3
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
@@ -16,7 +16,7 @@ ifdef debug
 CFLAGS += -DDebug -g
 BINNAME=bin/flashback_d
 else
-CFLAGS += -O2
+#CFLAGS += -O2
 endif
 
 ifdef win32

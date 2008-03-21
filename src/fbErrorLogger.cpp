@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.10 2008/03/20 18:25:25 wyverex Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.11 2008/03/21 03:50:05 laffer1 Exp $ */
 
 /**
 *	fbErrorLogger
@@ -120,7 +120,7 @@ void fbErrorLogger::errorlevel(ERROR_LEVEL lvl, string& level)
 {
 	switch(lvl)
 	{
-		case(DEBUG):
+		case(DBUG):
 			level = "Debug";
 			break;
 		case(INFO):
