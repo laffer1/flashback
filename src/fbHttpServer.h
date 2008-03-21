@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.h,v 1.7 2008/03/21 02:36:59 laffer1 Exp $ */
+/* $Id: fbHttpServer.h,v 1.8 2008/03/21 02:45:51 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -29,6 +29,7 @@
 
 #include "fbSocket.h"
 #include "fbClient.h"
+#include "fbHttpResponse.h"
 #include "fbThread.h"
 
 /**

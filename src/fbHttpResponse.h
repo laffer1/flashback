@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.2 2008/03/21 02:36:59 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.3 2008/03/21 02:45:51 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -39,6 +39,7 @@
 
 class fbHttpResponse: public fbThread
 {
+public:
     fbHttpResponse(fbData* _data, fbClient * _client);   /// default constructor
     ~fbHttpResponse();  /// default destructor
 

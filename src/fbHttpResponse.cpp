@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.2 2008/03/21 02:36:59 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.3 2008/03/21 02:45:51 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -25,13 +25,14 @@
  */
 
 #include "fbHttpServer.h"
+#include "fbHttpResponse.h"
 #include "fbSocket.h"
 
-fbHttpServer:: fbHttpResponse(fbData* _data):fbThread(_data), data(_data),  running(false)
+fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client), running(false)
 {
 }
 
-fbHttpServer::~fbHttpResponse()
+fbHttpResponse::~fbHttpResponse()
 {
     if (running)
         shutdown();

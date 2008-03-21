@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.8 2008/03/21 02:36:59 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.9 2008/03/21 02:45:51 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -86,3 +86,4 @@ protected:
 };
 
 #endif
+
