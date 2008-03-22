@@ -1,11 +1,11 @@
-/* $Id: fbData.cpp,v 1.2 2008/03/21 03:50:05 laffer1 Exp $ */
+/* $Id: fbData.cpp,v 1.3 2008/03/22 19:22:53 ctubbsii Exp $ */
 
 #include "fbData.h"
 
 fbData::fbData():errlog(NULL), db(NULL)/*, config(NULL)*/
 {
 	errlog = new fbErrorLogger(new ofstream("/var/log/flashback", ios::out | ios::binary | ios::app));
-	//config = new fbConfig(..);
+	config = new fbConfig(*errlog);
 	//db = new fbDatabase(config->get_s(DB));
 }
 
@@ -13,11 +13,11 @@ fbData::~fbData()
 {
 	if(errlog) delete errlog;
 	if(db) delete db;
-	//if(config) delete config
+	if(config) delete config;
 
 	errlog = NULL;
 	db = NULL;
-	//config = NULL;
+	config = NULL;
 }
 
 

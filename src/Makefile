@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.31 2008/03/21 05:44:37 laffer1 Exp $
+# $Id: Makefile,v 1.32 2008/03/22 19:22:53 ctubbsii Exp $
 #
 #Flashback make file
 #
@@ -10,7 +10,7 @@ BINNAME=bin/flashback
 LIBS=-lsqlite3
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
-	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o
+	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o fbConfig.o
 
 ifdef DEBUG
 CFLAGS += -DDebug -g
@@ -36,16 +36,16 @@ release: flashback
 
 debug:
 	gmake flashback DEBUG=yes
-	
+
 clean:
 	rm -f bin/flashback bin/flashback_d bin/flashback.exe bin/flashback_d.exe *.o
-	
+
 #windows
 win32:
 	gmake flashback WIN32=yes
 
 win32debug: clean flashback
-	
+
 
 #real part of the make
 flashback: ${OBJECTS}

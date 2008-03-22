@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.2 2008/03/21 00:35:59 wyverex Exp $ */
+/* $Id: fbData.h,v 1.3 2008/03/22 19:22:53 ctubbsii Exp $ */
 
 
 
@@ -8,7 +8,7 @@
 #include "global.h"
 #include "fbErrorLogger.h"
 #include "fbDatabase.h"
-//#include "fbConfig.h"
+#include "fbConfig.h"
 
 class fbData
 {
@@ -29,7 +29,7 @@ public:
 private:
 	fbErrorLogger* errlog;
 	fbDatabase*    db;
-	//fbConfig*    config;
+	fbConfig*    config;
 
 };
 #endif
