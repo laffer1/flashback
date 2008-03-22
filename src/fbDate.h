@@ -1,4 +1,4 @@
-/* $Id: fbDate.h,v 1.4 2008/03/20 18:25:25 wyverex Exp $ */
+/* $Id: fbDate.h,v 1.5 2008/03/22 23:48:07 laffer1 Exp $ */
 
 #ifndef fbDATE_H
 #define fbDATE_H
@@ -20,13 +20,13 @@ public:
 	fbDate(fbDate& date);  /// < copies julian
 	fbDate(tm& time);      /// < convert from tm structure
 	fbDate(const int _month, const int _day, const int _year);   /// < manual input
-	fbDate(long long _julian);   /// < julian values... from file anyone?
+	fbDate(unsigned long _julian);   /// < julian values... from file anyone?
 
 	~fbDate(void);  /// < clean up.. not sure we have anything here yet?
 
-	long long getJulian() const {return julian;};  /// < get the julian value, for saving?
+	unsigned long getJulian() const {return julian;};  /// < get the julian value, for saving?
 
-	void setJulian(const long long _julian) {julian = _julian; update();};  /// < set from julian
+	void setJulian(const unsigned long _julian) {julian = _julian; update();};  /// < set from julian
 	void setJulian(const int _month, const int _day, const int _year);  /// < set from manule date
 	void setJulian(tm& time){setJulian(time.tm_mon, time.tm_mday, time.tm_year);};  /// < set from tm struct
 	void setJulianLocal();  /// < sets to local date
@@ -67,7 +67,7 @@ public:
 	void my(string& d);
 
 private:
-	long long julian;	/// < the julian day
+	unsigned long julian;	/// < the julian day
 	int year;		/// < the date year
 	int mon; 		/// < the date month
 	int day;		/// < the date's day
