@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.32 2008/03/22 19:22:53 ctubbsii Exp $
+# $Id: Makefile,v 1.33 2008/03/22 20:19:44 wyverex Exp $
 #
 #Flashback make file
 #
@@ -44,7 +44,8 @@ clean:
 win32:
 	gmake flashback WIN32=yes
 
-win32debug: clean flashback
+win32debug:
+	gmake flashback WIN32=yes DEBUG=yes
 
 
 #real part of the make

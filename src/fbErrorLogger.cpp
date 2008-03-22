@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.12 2008/03/21 05:48:19 laffer1 Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.13 2008/03/22 20:19:44 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -168,6 +168,15 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 		case(FAILEDTOOPENDB):
 			desc = "Failed to open Database";
 			break;
+		case(CONFIGFAILEDTOLOAD):
+			desc = "Failed to load config file";
+			break;
+		case (CONFIGUNKOWNVALUE):
+			desc = "Unknown config settings";
+			break;
+		case(CONFIGINCOMPLETE):
+			desc = "Incomplete Config File";
+			break;
 		case(SQLEXECERROR):
 			desc = "SQLITE3_EXEC ERROR";
 			break;
@@ -175,3 +184,41 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 			desc = "Unkown Error";
 	}
 }
+
+void fbErrorLogger::err(ERROR_CODES code, const char* str)
+{
+	print(ERR, code, str);
+}
+void fbErrorLogger::err(ERROR_CODES code, string& str)
+{
+	print(ERR, code, str);
+}
+
+void fbErrorLogger::warn(ERROR_CODES code, const char* str)
+{
+	print(WARN, code, str);
+}
+void fbErrorLogger::warn(ERROR_CODES code, string& str)
+{
+	print(WARN, code, str);
+}
+
+void fbErrorLogger::msg(ERROR_CODES code, const char* str)
+{
+	print(INFO, code, str);
+}
+void fbErrorLogger::msg(ERROR_CODES code, string& str)
+{
+	print(INFO, code, str);
+}
+
+void fbErrorLogger::debug(ERROR_CODES code, const char* str)
+{
+	print(DBUG, code, str);
+}
+void fbErrorLogger::debug(ERROR_CODES code, string& str)
+{
+	print(DBUG, code, str);
+}
+
+

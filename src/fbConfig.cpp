@@ -1,25 +1,27 @@
-/* $Id: fbConfig.cpp,v 1.2 2008/03/22 19:24:48 ctubbsii Exp $ */
+/* $Id: fbConfig.cpp,v 1.3 2008/03/22 20:19:44 wyverex Exp $ */
 
 #include "fbConfig.h"
 
-fbConfig::fbConfig(const fbErrorLogger &err)
+fbConfig::fbConfig(fbErrorLogger* err):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(false)
 {
     loadDefaults(); // assume defaults
     if (load() == -1)
     {
         // INFO: can't load settings from default config file, using defaults
+	errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
         dirty = true;
     }
     else
         dirty = false;
 }
 
-fbConfig::fbConfig(const fbErrorLogger &err, const char* filename)
+fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(false)
 {
     loadDefaults(); // assume defaults
     if (load(filename) == -1)
     {
         // INFO: can't load settings from explicit config file, using defaults
+	errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
     }
     dirty = true; // save to default config file regardless
 }
@@ -36,10 +38,10 @@ fbConfig::~fbConfig()
 
 void fbConfig::loadDefaults()
 {
-    addr = FBCONFIG_DEFAULT_ADDR;
+    addr = strdup(FBCONFIG_DEFAULT_ADDR);
     port = FBCONFIG_DEFAULT_PORT;
-    webroot = FBCONFIG_DEFAULT_WEBROOT;
-    dbpath = FBCONFIG_DEFAULT_DBPATH;
+    webroot = strdup(FBCONFIG_DEFAULT_WEBROOT);
+    dbpath = strdup(FBCONFIG_DEFAULT_DBPATH);
 }
 
 int fbConfig::load()
@@ -49,9 +51,9 @@ int fbConfig::load()
 
 int fbConfig::load(const char *filename)
 {
-    uint32_t i = 0;
     string s;
     ifstream myfile;
+
     myfile.open(filename, ios::in);
     if (myfile.fail())
     {
@@ -60,27 +62,29 @@ int fbConfig::load(const char *filename)
     }
     while (!myfile.eof() && !myfile.fail())
     {
+	string::size_type i;
         getline(myfile, s, '\n');
         if (myfile.fail()) break;
-        if ((i = s.find("WebServerAddr=",0)) != string::npos)
+
+        if ((i = s.find("WebServerAddr=",0) != string::npos))
         {
-            setWebServerAddr(s.substr(i+14).c_str());
+            setWebServerAddr(s.substr((int)i+14).c_str());
         }
-        else if ((i = s.find("WebServerPort=",0)) != string::npos)
-        {
-            setWebServerPort(s.substr(i+14).c_str());
+	else if ((i = s.find("WebServerPort=",0) != string::npos))
+       	{
+       	   setWebServerPort(s.substr((int)i+14).c_str());
         }
-        else if ((i = s.find("WebServerRootPath=",0)) != string::npos)
+        else if ((i = s.find("WebServerRootPath=",0) != string::npos))
         {
-            setWebServerRootPath(s.substr(i+18).c_str());
+            setWebServerRootPath(s.substr((int)i+18).c_str());
         }
-        else if ((i = s.find("DBPath=",0)) != string::npos)
+        else if ((i = s.find("DBPath=",0) != string::npos))
         {
-            setDBPath(s.substr(i+7).c_str());
+            setDBPath(s.substr((int)i+7).c_str());
         }
         else
         {
-            /* WARNING: config file contains unrecognized line */
+            errlog->warn(CONFIGUNKOWNVALUE, s);
         }
     }
 
@@ -88,11 +92,13 @@ int fbConfig::load(const char *filename)
     {
         myfile.close();
         // ERROR: error loading from config file
+	errlog->err(CONFIGFAILEDTOLOAD, "Cannot load from file");
         return -1;
     }
 
     myfile.close();
     // INFO: successfully loaded some settings. remaining settings from defaults
+    errlog->warn(CONFIGINCOMPLETE, "remaining settings from defaults");
     return 0;
 }
 
@@ -111,6 +117,7 @@ int fbConfig::save(const char *filename)
     if (myfile.fail())
     {
         // ERROR: error opening config file to save
+	errlog->err(CONFIGFAILEDTOSAVE, "error opening config file to save");
         return -1;
     }
     myfile << "WebServerAddr=" << addr << endl
@@ -120,6 +127,7 @@ int fbConfig::save(const char *filename)
     if (myfile.fail())
     {
         // ERROR: problem writing to config file
+	errlog->err(CONFIGFAILEDTOSAVE, "problem writing to config file");
         myfile.close();
         return -1;
     }

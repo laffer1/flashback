@@ -1,4 +1,4 @@
-/* $Id: fbConfig.h,v 1.1 2008/03/22 19:22:53 ctubbsii Exp $ */
+/* $Id: fbConfig.h,v 1.2 2008/03/22 20:19:44 wyverex Exp $ */
 
 #ifndef FBCONFIG_H
 #define FBCONFIG_H
@@ -23,8 +23,8 @@
 class fbConfig
 {
 public:
-	fbConfig(const fbErrorLogger &err);
-	fbConfig(const fbErrorLogger &err, const char* filename);
+	fbConfig(fbErrorLogger* err);
+	fbConfig(fbErrorLogger* err, const char* filename);
 	~fbConfig();
 
     void loadDefaults();
@@ -50,6 +50,7 @@ private:
     int port;
     char* webroot;
     char* dbpath;
+    fbErrorLogger* errlog;
 
     bool dirty;
 };
