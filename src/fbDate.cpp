@@ -1,4 +1,4 @@
-/* $Id: fbDate.cpp,v 1.4 2008/03/20 18:25:25 wyverex Exp $ */
+/* $Id: fbDate.cpp,v 1.5 2008/03/22 23:48:21 laffer1 Exp $ */
 
 /**
  *  fbDate
@@ -32,7 +32,7 @@ fbDate::fbDate(const int _month, const int _day, const int _year): julian(0), ye
 	setJulian(_month, _day, _year);
 }
 
-fbDate::fbDate(long long _julian): julian(_julian), year(0), mon(0), day(0)
+fbDate::fbDate(unsigned long _julian): julian(_julian), year(0), mon(0), day(0)
 {
 	update();
 }
@@ -44,9 +44,9 @@ fbDate::~fbDate(void)
 void fbDate::setJulian(const int _month, const int _day, const int _year)
 {
 	//http://en.wikipedia.org/wiki/Julian_day
-	long long a = (14 - _month) / 12;
-	long long y = _year + 4800 - a;
-	long long m = _month + (12 * a) - 3;
+	unsigned long a = (14 - _month) / 12;
+	unsigned long y = _year + 4800 - a;
+	unsigned long m = _month + (12 * a) - 3;
 	julian = _day + (153 * m + 2 ) / 5 + 365 * y + ( y / 4) - (y / 100) + ( y /400) - 32045;
 	update();
 }
@@ -105,18 +105,18 @@ void fbDate::addMonth(const int num)
 void fbDate::update()
 {
 	//http://en.wikipedia.org/wiki/Julian_day
-	long long j= julian + 32044;
-	long long g = j / 146097;
-	long long dg = j % 146097;
-	long long c = (dg / 36524 + 1) * 3 / 4;
-	long long dc = dg - c * 36524;
-	long long b = dc / 1461;
-	long long db = dc % 1461;
-	long long a = (db / 365 +1)* 3 / 4;
-	long long da = db - a *365;
-	long long y = g * 400 + c * 100 + b * 4 + a;
-	long long m = (da * 5 +308) / 153 -2;
-	long long d = da - (m+4) * 153 / 5 + 122;
+	unsigned long j= julian + 32044;
+	unsigned long g = j / 146097;
+	unsigned long dg = j % 146097;
+	unsigned long c = (dg / 36524 + 1) * 3 / 4;
+	unsigned long dc = dg - c * 36524;
+	unsigned long b = dc / 1461;
+	unsigned long db = dc % 1461;
+	unsigned long a = (db / 365 +1)* 3 / 4;
+	unsigned long da = db - a *365;
+	unsigned long y = g * 400 + c * 100 + b * 4 + a;
+	unsigned long m = (da * 5 +308) / 153 -2;
+	unsigned long d = da - (m+4) * 153 / 5 + 122;
 	year = (int)(y - 4800 + (m+2) / 12);
 	mon = (int)((m+2) % 12 +1);
 	day = (int)((double)d + 1.5);
