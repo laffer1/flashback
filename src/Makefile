@@ -1,11 +1,11 @@
-# $Id: Makefile,v 1.33 2008/03/22 20:19:44 wyverex Exp $
+# $Id: Makefile,v 1.34 2008/03/22 23:48:41 laffer1 Exp $
 #
 #Flashback make file
 #
 #
 
 CC=g++
-CFLAGS= -pthread -Wall
+CFLAGS= -pthread -Wall -pedantic
 BINNAME=bin/flashback
 LIBS=-lsqlite3
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
