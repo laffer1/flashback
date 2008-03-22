@@ -1,4 +1,4 @@
-/* $Id: fbConfig.cpp,v 1.4 2008/03/22 22:03:15 ctubbsii Exp $ */
+/* $Id: fbConfig.cpp,v 1.5 2008/03/22 23:10:18 laffer1 Exp $ */
 
 #include "fbConfig.h"
 
@@ -38,10 +38,12 @@ fbConfig::~fbConfig()
     /* we can try to save here, but don't want to rely on it */
     /* also, should we save to the default file or to the one that was opened? */
     if (dirty) save();
-    delete [] addr;
-    delete [] webroot;
-    delete [] dbpath;
-    addr = webroot = dbpath = NULL;
+    if (addr != NULL)
+    	free(addr);
+    if (webroot != NULL)
+        free(webroot);
+    if (dbpath != NULL)
+        free(dbpath);
 }
 
 void fbConfig::loadDefaults()
