@@ -1,4 +1,4 @@
-$Id: todo,v 1.7 2008/03/14 21:45:06 wyverex Exp $
+$Id: todo,v 1.8 2008/03/22 23:59:38 laffer1 Exp $
 
 Current To Do List
 3/14/08 thru 3/18/08
@@ -24,8 +24,11 @@ fbSchedule					0%			DB for scheduled jobs, and missed jobs
 fbRepository					0%			DB for stored backups, so we can restore
 
 
+# HTTP
 Integrate sockets 
-with fbSocket		LH			0%
+fbSocket		LH			80%
+fbHttpServer		LH			30%
+fbClient		LH			60%
 http://tangentsoft.net/wskfaq/articles/bsd-compatibility.html
 
 Cont...
