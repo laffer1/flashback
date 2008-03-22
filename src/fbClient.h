@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.11 2008/03/21 04:06:05 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.12 2008/03/22 23:22:56 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -84,7 +84,7 @@ protected:
     enum HTTP_TYPE httptype;
     enum HTTP_PROTOCOL httpproto;
     string *host;
-    string *path;;
+    string *path;
 };
 
 #endif
