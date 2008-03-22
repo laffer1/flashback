@@ -1,4 +1,4 @@
-/* $Id: fbConfig.h,v 1.2 2008/03/22 20:19:44 wyverex Exp $ */
+/* $Id: fbConfig.h,v 1.3 2008/03/22 20:30:12 wyverex Exp $ */
 
 #ifndef FBCONFIG_H
 #define FBCONFIG_H
@@ -9,9 +9,14 @@
 #define FBCONFIG_DEFAULT_ADDR "127.0.0.1"
 #define FBCONFIG_DEFAULT_PORT 8080
 #define FBCONFIG_DEFAULT_WEBROOT "/var/flashback/webroot"
-#define FBCONFIG_DEFAULT_DBPATH "/etc/dbpath"
+#define FBCONFIG_DEFAULT_DBPATH "/var/flashback/flashback.db"
 
-#define FBCONFIG_DEFAULT_CONFIGFILE "config.txt"
+
+#ifdef WIN32
+	#define FBCONFIG_DEFAULT_CONFIGFILE "flashback.txt"
+#else
+	#define FBCONFIG_DEFAULT_CONFIGFILE "/etc/flashback"
+#endif
 
 /**
  * fbConfig
