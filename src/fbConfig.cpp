@@ -1,27 +1,34 @@
-/* $Id: fbConfig.cpp,v 1.3 2008/03/22 20:19:44 wyverex Exp $ */
+/* $Id: fbConfig.cpp,v 1.4 2008/03/22 22:03:15 ctubbsii Exp $ */
 
 #include "fbConfig.h"
 
-fbConfig::fbConfig(fbErrorLogger* err):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(false)
+/**
+ * fbConfig
+ *
+ * Provides an interface for loading and saving configuration data.
+ * @author Christopher Tubbs
+ * @date March 18, 2008
+ */
+fbConfig::fbConfig(fbErrorLogger* err):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(true)
 {
     loadDefaults(); // assume defaults
     if (load() == -1)
     {
-        // INFO: can't load settings from default config file, using defaults
-	errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
+    // INFO: can't load settings from default config file, using defaults
+        errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
         dirty = true;
     }
     else
         dirty = false;
 }
 
-fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(false)
+fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(true)
 {
     loadDefaults(); // assume defaults
     if (load(filename) == -1)
     {
         // INFO: can't load settings from explicit config file, using defaults
-	errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
+        errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
     }
     dirty = true; // save to default config file regardless
 }
@@ -34,6 +41,7 @@ fbConfig::~fbConfig()
     delete [] addr;
     delete [] webroot;
     delete [] dbpath;
+    addr = webroot = dbpath = NULL;
 }
 
 void fbConfig::loadDefaults()
@@ -62,7 +70,7 @@ int fbConfig::load(const char *filename)
     }
     while (!myfile.eof() && !myfile.fail())
     {
-	string::size_type i;
+        string::size_type i;
         getline(myfile, s, '\n');
         if (myfile.fail()) break;
 
@@ -70,9 +78,9 @@ int fbConfig::load(const char *filename)
         {
             setWebServerAddr(s.substr((int)i+14).c_str());
         }
-	else if ((i = s.find("WebServerPort=",0) != string::npos))
-       	{
-       	   setWebServerPort(s.substr((int)i+14).c_str());
+        else if ((i = s.find("WebServerPort=",0) != string::npos))
+        {
+            setWebServerPort(s.substr((int)i+14).c_str());
         }
         else if ((i = s.find("WebServerRootPath=",0) != string::npos))
         {
@@ -92,7 +100,7 @@ int fbConfig::load(const char *filename)
     {
         myfile.close();
         // ERROR: error loading from config file
-	errlog->err(CONFIGFAILEDTOLOAD, "Cannot load from file");
+        errlog->err(CONFIGFAILEDTOLOAD, "Cannot load from file");
         return -1;
     }
 
@@ -117,7 +125,7 @@ int fbConfig::save(const char *filename)
     if (myfile.fail())
     {
         // ERROR: error opening config file to save
-	errlog->err(CONFIGFAILEDTOSAVE, "error opening config file to save");
+        errlog->err(CONFIGFAILEDTOSAVE, "error opening config file to save");
         return -1;
     }
     myfile << "WebServerAddr=" << addr << endl
@@ -127,7 +135,7 @@ int fbConfig::save(const char *filename)
     if (myfile.fail())
     {
         // ERROR: problem writing to config file
-	errlog->err(CONFIGFAILEDTOSAVE, "problem writing to config file");
+        errlog->err(CONFIGFAILEDTOSAVE, "problem writing to config file");
         myfile.close();
         return -1;
     }
@@ -138,7 +146,11 @@ int fbConfig::save(const char *filename)
 void fbConfig::setWebServerAddr(const char* strAddr)
 {
     dirty = true;
-    if (addr != NULL) delete [] addr;
+    if (addr != NULL)
+    {
+        delete [] addr;
+        addr = NULL;
+    }
     addr = new char[strlen(strAddr)+1];
     strcpy(addr,strAddr);
 }
@@ -158,7 +170,11 @@ void fbConfig::setWebServerPort(int intPort)
 void fbConfig::setWebServerRootPath(const char* strPath)
 {
     dirty = true;
-    if (webroot != NULL) delete [] webroot;
+    if (webroot != NULL)
+    {
+        delete [] webroot;
+        webroot = NULL;
+    }
     webroot = new char[strlen(strPath)+1];
     strcpy(webroot,strPath);
 }
@@ -166,7 +182,11 @@ void fbConfig::setWebServerRootPath(const char* strPath)
 void fbConfig::setDBPath(const char* strPath)
 {
     dirty = true;
-    if (dbpath != NULL) delete [] dbpath;
+    if (dbpath != NULL)
+    {
+        delete [] dbpath;
+        dbpath = NULL;
+    }
     dbpath = new char[strlen(strPath)+1];
     strcpy(dbpath,strPath);
 }
