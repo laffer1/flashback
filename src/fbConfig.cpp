@@ -1,3 +1,5 @@
+/* $Id: fbConfig.cpp,v 1.2 2008/03/22 19:24:48 ctubbsii Exp $ */
+
 #include "fbConfig.h"
 
 fbConfig::fbConfig(const fbErrorLogger &err)
