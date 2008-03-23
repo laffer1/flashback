@@ -1,4 +1,4 @@
-$Id: todo,v 1.9 2008/03/23 01:53:14 ctubbsii Exp $
+$Id: todo,v 1.10 2008/03/23 02:18:45 wyverex Exp $
 
 Current To Do List
 3/14/08 thru 3/18/08
@@ -8,21 +8,16 @@ Project			Who			%Done			Desc
 fbThread		BH			70%			Base Thread object, more testing needed
 fbCriticalSection	BH			70%			a thread mutex, test
 fbLock			BH			90%			quick mutex lock, test
-fbSocket		LH 			0%			C Socket Wrapper
 fbConfig	 	CT BH			90%			loads local setings, ie DB paths, web server config
 fbErrorLogger		BH			0%			Log Errors
 fbDiskDetector		BH			0%			Detect New Disks - not used in first version!!
 fbArchive		JM			0%			File Archive .tar
 fbSchedular		BH			0%			Backup sched, will do most of the work
 fbSQL			BH			70%			SQLite3 wrapper, needs testing
-fbWeb			LH			0%			Web interface, does secound most of work
-
-Database objects
-----------------------------------------------------------------------------------------------------
-fbSettings					0%			general settings database
-fbSchedule					0%			DB for scheduled jobs, and missed jobs
-fbRepository					0%			DB for stored backups, so we can restore
-
+fbDate			BH LH CT    90%         Date object
+fbTime          BH LH CT    90%         Time Object
+fbData          BH          70%         Core Data Object, includes setting
+fbDatabase      BH CT       02%          Main database front end
 
 # HTTP
 Integrate sockets 
@@ -33,6 +28,6 @@ http://tangentsoft.net/wskfaq/articles/bsd-compatibility.html
 
 Cont...
 --------
-flashback.cpp		BH LH CT JM AT		15%			Main function will be continues updated
+flashback.cpp		BH LH CT JM AT		15%			Main function sets up deamon and calls core
 fbCore.cpp		BH LH CT JM AT  	2%			Main calls core, core runs everything
 
