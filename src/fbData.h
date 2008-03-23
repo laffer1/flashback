@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.4 2008/03/22 20:30:12 wyverex Exp $ */
+/* $Id: fbData.h,v 1.5 2008/03/23 01:40:45 ctubbsii Exp $ */
 
 
 
@@ -27,15 +27,18 @@ public:
 	void debug(ERROR_CODES code, string& str);
 
 	//config functions
-	void setWebServerAddr(const char* strAddr);
-	void setWebServerPort(const char* strPort);
+
+	int loadConfig();
+	int saveConfig();
+
+	void setWebServerAddr(const string& strAddr);
 	void setWebServerPort(const int port);
-	void setWebServerRootPath(const char* strPath);
-	void setDBPath(const char* strPath);
-	const char* getWebServerAddr();
+	void setWebServerRootPath(const string& strPath);
+	void setDBPath(const string& strPath);
+	const string& getWebServerAddr();
 	const int   getWebServerPort();
-	const char* setWebServerRootPath();
-	const char* getDBPath();
+	const string& setWebServerRootPath();
+	const string& getDBPath();
 
 
 private:

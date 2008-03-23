@@ -1,4 +1,4 @@
-/* $Id: fbConfig.cpp,v 1.5 2008/03/22 23:10:18 laffer1 Exp $ */
+/* $Id: fbConfig.cpp,v 1.6 2008/03/23 01:40:45 ctubbsii Exp $ */
 
 #include "fbConfig.h"
 
@@ -36,22 +36,17 @@ fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(NULL), port(0)
 fbConfig::~fbConfig()
 {
     /* we can try to save here, but don't want to rely on it */
-    /* also, should we save to the default file or to the one that was opened? */
+    /* also, should we save to the default file or to the one that
+        initially provided the settings? */
     if (dirty) save();
-    if (addr != NULL)
-    	free(addr);
-    if (webroot != NULL)
-        free(webroot);
-    if (dbpath != NULL)
-        free(dbpath);
 }
 
 void fbConfig::loadDefaults()
 {
-    addr = strdup(FBCONFIG_DEFAULT_ADDR);
+    addr = FBCONFIG_DEFAULT_ADDR;
     port = FBCONFIG_DEFAULT_PORT;
-    webroot = strdup(FBCONFIG_DEFAULT_WEBROOT);
-    dbpath = strdup(FBCONFIG_DEFAULT_DBPATH);
+    webroot = FBCONFIG_DEFAULT_WEBROOT;
+    dbpath = FBCONFIG_DEFAULT_DBPATH;
 }
 
 int fbConfig::load()
@@ -59,7 +54,7 @@ int fbConfig::load()
     return load(FBCONFIG_DEFAULT_CONFIGFILE);
 }
 
-int fbConfig::load(const char *filename)
+int fbConfig::load(const char* filename)
 {
     string s;
     ifstream myfile;
@@ -78,19 +73,19 @@ int fbConfig::load(const char *filename)
 
         if ((i = s.find("WebServerAddr=",0) != string::npos))
         {
-            setWebServerAddr(s.substr((int)i+14).c_str());
+            setWebServerAddr(s.substr((int)i+14));
         }
         else if ((i = s.find("WebServerPort=",0) != string::npos))
         {
-            setWebServerPort(s.substr((int)i+14).c_str());
+            setWebServerPort(s.substr((int)i+14));
         }
         else if ((i = s.find("WebServerRootPath=",0) != string::npos))
         {
-            setWebServerRootPath(s.substr((int)i+18).c_str());
+            setWebServerRootPath(s.substr((int)i+18));
         }
         else if ((i = s.find("DBPath=",0) != string::npos))
         {
-            setDBPath(s.substr((int)i+7).c_str());
+            setDBPath(s.substr((int)i+7));
         }
         else
         {
@@ -120,7 +115,7 @@ int fbConfig::save()
     return i;
 }
 
-int fbConfig::save(const char *filename)
+int fbConfig::save(const char* filename)
 {
     ofstream myfile;
     myfile.open(filename, ios::out);
@@ -145,22 +140,17 @@ int fbConfig::save(const char *filename)
     return 0;
 }
 
-void fbConfig::setWebServerAddr(const char* strAddr)
+void fbConfig::setWebServerAddr(const string& strAddr)
 {
     dirty = true;
-    if (addr != NULL)
-    {
-        delete [] addr;
-        addr = NULL;
-    }
-    addr = new char[strlen(strAddr)+1];
-    strcpy(addr,strAddr);
+    addr = strAddr;
 }
 
-void fbConfig::setWebServerPort(const char* strPort)
+void fbConfig::setWebServerPort(const string& strPort)
 {
+    istringstream s(strPort);
+    s >> port;
     dirty = true;
-    port = atoi(strPort); // may need checking for validity
 }
 
 void fbConfig::setWebServerPort(int intPort)
@@ -169,31 +159,19 @@ void fbConfig::setWebServerPort(int intPort)
     port = intPort; // may need checking for validity
 }
 
-void fbConfig::setWebServerRootPath(const char* strPath)
+void fbConfig::setWebServerRootPath(const string& strPath)
 {
     dirty = true;
-    if (webroot != NULL)
-    {
-        delete [] webroot;
-        webroot = NULL;
-    }
-    webroot = new char[strlen(strPath)+1];
-    strcpy(webroot,strPath);
+    webroot = strPath;
 }
 
-void fbConfig::setDBPath(const char* strPath)
+void fbConfig::setDBPath(const string& strPath)
 {
     dirty = true;
-    if (dbpath != NULL)
-    {
-        delete [] dbpath;
-        dbpath = NULL;
-    }
-    dbpath = new char[strlen(strPath)+1];
-    strcpy(dbpath,strPath);
+    dbpath = strPath;
 }
 
-const char* fbConfig::getWebServerAddr()
+const string& fbConfig::getWebServerAddr()
 {
     return addr;
 }
@@ -203,12 +181,12 @@ const int fbConfig::getWebServerPort()
     return port;
 }
 
-const char* fbConfig::setWebServerRootPath()
+const string& fbConfig::setWebServerRootPath()
 {
     return webroot;
 }
 
-const char* fbConfig::getDBPath()
+const string& fbConfig::getDBPath()
 {
     return dbpath;
 }

@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.5 2008/03/22 20:30:12 wyverex Exp $ */
+/* $Id: fbData.cpp,v 1.6 2008/03/23 01:40:45 ctubbsii Exp $ */
 
 #include "fbData.h"
 
@@ -60,14 +60,19 @@ void fbData::debug(ERROR_CODES code, string& str)
 
 
 //fbConfig functions
-void fbData::setWebServerAddr(const char* strAddr)
+int fbData::loadConfig()
 {
-	config->setWebServerAddr(strAddr);
+    return config->load();
 }
 
-void fbData::setWebServerPort(const char* strPort)
+int fbData::saveConfig()
 {
-	config->setWebServerPort(strPort);
+    return config->save();
+}
+
+void fbData::setWebServerAddr(const string& strAddr)
+{
+	config->setWebServerAddr(strAddr);
 }
 
 void fbData::setWebServerPort(const int port)
@@ -75,17 +80,17 @@ void fbData::setWebServerPort(const int port)
 	config->setWebServerPort(port);
 }
 
-void fbData::setWebServerRootPath(const char* strPath)
+void fbData::setWebServerRootPath(const string& strPath)
 {
 	config->setWebServerRootPath(strPath);
 }
 
-void fbData::setDBPath(const char* strPath)
+void fbData::setDBPath(const string& strPath)
 {
 	config->setDBPath(strPath);
 }
 
-const char* fbData::getWebServerAddr()
+const string& fbData::getWebServerAddr()
 {
 	return config->getWebServerAddr();
 }
@@ -95,19 +100,12 @@ const int   fbData::getWebServerPort()
 	return config->getWebServerPort();
 }
 
-const char* fbData::setWebServerRootPath()
+const string& fbData::setWebServerRootPath()
 {
 	return config->setWebServerRootPath();
 }
 
-const char* fbData::getDBPath()
+const string& fbData::getDBPath()
 {
 	return config->getDBPath();
 }
-
-
-
-
-
-
-

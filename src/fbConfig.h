@@ -1,4 +1,4 @@
-/* $Id: fbConfig.h,v 1.3 2008/03/22 20:30:12 wyverex Exp $ */
+/* $Id: fbConfig.h,v 1.4 2008/03/23 01:40:45 ctubbsii Exp $ */
 
 #ifndef FBCONFIG_H
 #define FBCONFIG_H
@@ -35,26 +35,28 @@ public:
     void loadDefaults();
 
     int load();
-    int load(const char *filename);
     int save();
-    int save(const char *filename);
 
-	void setWebServerAddr(const char* strAddr);
-	void setWebServerPort(const char* strPort);
+	void setWebServerAddr(const string& strAddr);
 	void setWebServerPort(const int port);
-	void setWebServerRootPath(const char* strPath);
-	void setDBPath(const char* strPath);
+	void setWebServerRootPath(const string& strPath);
+	void setDBPath(const string& strPath);
 
-	const char* getWebServerAddr();
+	const string& getWebServerAddr();
 	const int   getWebServerPort();
-	const char* setWebServerRootPath();
-	const char* getDBPath();
+	const string& setWebServerRootPath();
+	const string& getDBPath();
 
 private:
-    char* addr;
+    int load(const char *filename);
+    int save(const char *filename);
+	void setWebServerPort(const string& strPort);
+    string addr;
+    string webroot;
+    string dbpath;
+
     int port;
-    char* webroot;
-    char* dbpath;
+
     fbErrorLogger* errlog;
 
     bool dirty;
