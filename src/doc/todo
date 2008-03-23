@@ -1,4 +1,4 @@
-$Id: todo,v 1.8 2008/03/22 23:59:38 laffer1 Exp $
+$Id: todo,v 1.9 2008/03/23 01:53:14 ctubbsii Exp $
 
 Current To Do List
 3/14/08 thru 3/18/08
@@ -9,7 +9,7 @@ fbThread		BH			70%			Base Thread object, more testing needed
 fbCriticalSection	BH			70%			a thread mutex, test
 fbLock			BH			90%			quick mutex lock, test
 fbSocket		LH 			0%			C Socket Wrapper
-fbLocalSettings 	CT BH			0%			loads local setings, ie DB paths
+fbConfig	 	CT BH			90%			loads local setings, ie DB paths, web server config
 fbErrorLogger		BH			0%			Log Errors
 fbDiskDetector		BH			0%			Detect New Disks - not used in first version!!
 fbArchive		JM			0%			File Archive .tar
