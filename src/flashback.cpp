@@ -1,4 +1,4 @@
-/* $Id: flashback.cpp,v 1.14 2008/03/20 18:25:25 wyverex Exp $ */
+/* $Id: flashback.cpp,v 1.15 2008/03/27 17:48:14 wyverex Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
@@ -102,7 +102,8 @@ int main(int argc, char** args)
 {
 #ifdef Debug
 	cout << "Running in Debug Mode!" << endl;
-#else
+#endif  //this was an else... thats why debug wasn't working!
+
 	/* In UNIX programming, a daemon MUST let go of the terminal it is 
            running on.  Otherwise, when you log out, the process dies.
            The solution is to fork a copy of yourself and then disconnect
@@ -111,19 +112,20 @@ int main(int argc, char** args)
            get a "service" in a microsoft product.
         */
 	// TODO: make this Windows friendly	
-	switch( fork() )
+	switch(fork())
 	{
 		// DIDNT WORK
 		case -1:
+#ifdef Debug
+			cout << "Failed to fork" << endl;
+#endif
 			perror("fork");
 			return -1;
 			break;
-
-		// parent process returns value > 0 upon success (child id)
-		default:
-			return 0;
-
 		case 0:
+#ifdef Debug
+			cout << "Starting Deamon.." << endl;
+#endif
 			// close unneeded file descriptors
 			fclose(stdout);
 			fclose(stdin);
@@ -137,8 +139,12 @@ int main(int argc, char** args)
 			//Call Flashback Start
 			core();
 			break;
-	}
+		// parent process returns value > 0 upon success (child id)
+		default:
+#ifdef Debug
+			cout << "Deamon running.." << endl;
 #endif
+	}
 	return 0;
 }	
 

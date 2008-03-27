@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.10 2008/03/21 05:07:40 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.11 2008/03/27 17:48:14 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -29,6 +29,7 @@
 
 fbHttpServer:: fbHttpServer(fbData* _data):fbThread(_data), data(_data), servsock(NULL), running(false)
 {
+	data->debug(NONE, "fbHttpServer.this");
 }
 
 fbHttpServer::~fbHttpServer()
@@ -38,14 +39,18 @@ fbHttpServer::~fbHttpServer()
 
     if (running)
         shutdown();
+
+    data->debug(NONE, "fbHttpServer.~this");
 }
 
 void fbHttpServer::startup()
 {
-    string bindhost = "127.0.0.1";
+    data->debug(NONE, "fbHttpServer.startup");
 
     if (running)
         return;
+
+    string bindhost = "127.0.0.1";
 
     servsock = new fbSocket(data, (char *) bindhost.c_str(), 8080 ); // TODO: Use the settings object to set these.
     start();
@@ -62,8 +67,11 @@ void fbHttpServer::shutdown()
 
 void fbHttpServer::run()
 {
+    
     fbClient *client;
     fbHttpResponse *resp;
+
+    data->debug(NONE, "fbHttpServer.run");
 
     while(!isStopping())
     {

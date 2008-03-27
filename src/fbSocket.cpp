@@ -1,4 +1,4 @@
-/* $Id: fbSocket.cpp,v 1.13 2008/03/21 05:07:40 laffer1 Exp $ */
+/* $Id: fbSocket.cpp,v 1.14 2008/03/27 17:48:14 wyverex Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -39,18 +39,19 @@ fbSocket::fbSocket(fbData* _data, char *addr, int port ):data(_data)
     setBindAddress( addr );
     setBindPort( port );
 
+    data->debug(NONE, "fbSocket.this");
+
     inittcp(); /* setup socket library */
 
     if ((sd = opentcp( true, getBindAddress(), getBindPort() )) < 0 )
-    {
-        //log.print(ERR, UNKNOWN, "Could not bind to TCP port");
-	exit(1);
-    }
+        data->err(UNKNOWN, "Could not bind to TCP port");
+
 }
 
 fbSocket::~fbSocket()
 {
     closetcp( sd );
+    data->debug(NONE, "fbSocket.~this");
 }
 
 char * fbSocket::getBindAddress()

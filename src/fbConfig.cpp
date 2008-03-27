@@ -1,4 +1,4 @@
-/* $Id: fbConfig.cpp,v 1.6 2008/03/23 01:40:45 ctubbsii Exp $ */
+/* $Id: fbConfig.cpp,v 1.7 2008/03/27 17:48:14 wyverex Exp $ */
 
 #include "fbConfig.h"
 
@@ -9,7 +9,7 @@
  * @author Christopher Tubbs
  * @date March 18, 2008
  */
-fbConfig::fbConfig(fbErrorLogger* err):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(true)
+fbConfig::fbConfig(fbErrorLogger* err):addr(""), webroot(""), dbpath(""), port(0), errlog(err), dirty(true)
 {
     loadDefaults(); // assume defaults
     if (load() == -1)
@@ -20,9 +20,11 @@ fbConfig::fbConfig(fbErrorLogger* err):addr(NULL), port(0), webroot(NULL), dbpat
     }
     else
         dirty = false;
+
+    errlog->debug(NONE, "fbConfig.this");
 }
 
-fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(NULL), port(0), webroot(NULL), dbpath(NULL), errlog(err), dirty(true)
+fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(""), webroot(""), dbpath(""), port(0), errlog(err), dirty(true)
 {
     loadDefaults(); // assume defaults
     if (load(filename) == -1)
@@ -31,6 +33,8 @@ fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(NULL), port(0)
         errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
     }
     dirty = true; // save to default config file regardless
+
+    errlog->debug(NONE, "fbConfig.this");
 }
 
 fbConfig::~fbConfig()
@@ -39,6 +43,7 @@ fbConfig::~fbConfig()
     /* also, should we save to the default file or to the one that
         initially provided the settings? */
     if (dirty) save();
+    errlog->debug(NONE, "fbConfig.~this");
 }
 
 void fbConfig::loadDefaults()

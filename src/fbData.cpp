@@ -1,12 +1,17 @@
-/* $Id: fbData.cpp,v 1.6 2008/03/23 01:40:45 ctubbsii Exp $ */
+/* $Id: fbData.cpp,v 1.7 2008/03/27 17:48:14 wyverex Exp $ */
 
 #include "fbData.h"
 
 fbData::fbData():errlog(NULL), db(NULL), config(NULL)
 {
 	errlog = new fbErrorLogger(new ofstream("/var/log/flashback", ios::out | ios::binary | ios::app));
+	debug(NONE, "Error Logger Created");
 	config = new fbConfig(errlog);
+	debug(NONE, "Config Created");
 	db = new fbDatabase(errlog, config->getDBPath());
+	debug(NONE, "Database Created");
+
+	debug(NONE, "fbData.this");
 }
 
 fbData::~fbData()
@@ -15,6 +20,7 @@ fbData::~fbData()
 	if(db) delete db;
 	if(config) delete config;
 
+	debug(NONE, "fbData.~this");
 	errlog = NULL;
 	db = NULL;
 	config = NULL;

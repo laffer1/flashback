@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.5 2008/03/20 19:07:49 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.6 2008/03/27 17:48:14 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -19,11 +19,13 @@
 */
 fbSQL::fbSQL(fbErrorLogger* log): errlog(log), cs(), db(NULL), open(false)
 {
+	errlog->debug(NONE, "fbSQL.this");
 }
 
 /// Destructor
 fbSQL::~fbSQL()
 {
+	errlog->debug(NONE, "fbSQL.~this");
 	close();
 }
 
@@ -32,8 +34,11 @@ fbSQL::~fbSQL()
 *   connects to a database file
 *  @param database File to open
 */
-void fbSQL::connect(char* database)
+void fbSQL::connect(const char* database)
 {
+	errlog->debug(NONE, "fbSQL.connect");
+	errlog->debug(NONE, database);
+	
     	// lock for thread safety
 	fbLock lock(cs);	
 	//error string

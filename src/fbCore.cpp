@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.7 2008/03/21 03:50:05 laffer1 Exp $ */
+/* $Id: fbCore.cpp,v 1.8 2008/03/27 17:48:14 wyverex Exp $ */
 
 /**
 *  fbCore.cpp
@@ -29,15 +29,19 @@ void core()
 	
 
 	//Scheduler
+	data.debug(NONE, "Making Scheduler");  //should only show in debug mode!	
 	fbScheduler scheduler(&data);
 	scheduler.startup();
+	data.debug(NONE, "Scheduler Made");  //should only show in debug mode!
 
 	//DiskDetector
-	fbDiskDetector diskdetect(&data);
-	diskdetect.startup();
+	//fbDiskDetector diskdetect(&data);
+	//diskdetect.startup();
 
+	data.debug(NONE, "Making Web Server");  //should only show in debug mode!
 	fbHttpServer http(&data);
 	http.startup();
+	data.debug(NONE, "Web Server Running");  //should only show in debug mode!
 
 
 	// Shutdown Detector
@@ -52,13 +56,17 @@ void core()
 	
 
 	//shutdown 
-
+	data.debug(NONE, "Shutting Down Web Server");  //should only show in debug mode!
         http.shutdown();
 
+
 	//scheduler
+	data.debug(NONE, "Shutting Down Scheduler");  //should only show in debug mode!
 	scheduler.shutdown();
 
 	//diskdetector
-	diskdetect.shutdown();	
+	//skdetect.shutdown();
+
+	data.debug(NONE, "Flashback Exiting");  //should only show in debug mode!
 }
 

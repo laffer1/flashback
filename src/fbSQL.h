@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.5 2008/03/20 19:07:49 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.6 2008/03/27 17:48:14 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
@@ -24,7 +24,7 @@ public:
  	fbSQL(fbErrorLogger* log);  /// < constructor
 	~fbSQL();  /// < destructor
 
-	void connect(char* database);   /// < connect to file
+	void connect(const char* database);   /// < connect to file
 	void connect(string database);  /// < connect to file 
 	void close();  /// < close open file
 

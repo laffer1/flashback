@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.6 2008/03/21 05:07:40 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.7 2008/03/27 17:48:14 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -30,16 +30,21 @@
 
 fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client), running(false)
 {
+    data->debug(NONE, "fbHttpResponse.this");
 }
 
 fbHttpResponse::~fbHttpResponse()
 {
     if (running)
         shutdown();
+
+    data->debug(NONE, "fbHttpResponse.~this");
 }
 
 void fbHttpResponse::startup()
 {
+    data->debug(NONE, "fbHttpResponse.startup");
+
     if (running)
         return;
 
