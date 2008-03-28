@@ -1,4 +1,4 @@
-/* $Id: fbDate.cpp,v 1.5 2008/03/22 23:48:21 laffer1 Exp $ */
+/* $Id: fbDate.cpp,v 1.6 2008/03/28 20:57:02 ctubbsii Exp $ */
 
 /**
  *  fbDate
@@ -53,14 +53,14 @@ void fbDate::setJulian(const int _month, const int _day, const int _year)
 
 void fbDate::setJulianLocal()
 {
-	time_t raw(NULL);
+	time_t raw = 0;
 	time(&raw);
 	tm time = *localtime(&raw);
 	time.tm_year += 1900;
  	time.tm_mon++;
 	setJulian(time);
 }
-	
+
 int fbDate::getMonth() const
 {
 	return mon;
@@ -80,8 +80,8 @@ fbDate& fbDate::operator=(const fbDate& right)
 {
 	if(this != &right)
 	{
-		julian = right.julian; 
-		update(); 
+		julian = right.julian;
+		update();
 	}
 	return *this;
 }
@@ -91,7 +91,7 @@ void fbDate::addMonth(const int num)
 {
 	int y = year;
 	int m = mon + (num);
-	
+
 	while(m > 12)
 	{
 		m -= 12;
@@ -124,14 +124,14 @@ void fbDate::update()
 
 void fbDate::mdy(string& d)
 {
-	ostringstream s;	
+	ostringstream s;
 	s << d << mon << '/' << (day < 10 ? "0" : "" )<< day << '/' << year;
 	d = s.str();
 }
 
 void fbDate::my(string& d)
 {
-	ostringstream s;	
+	ostringstream s;
 	s << d << mon << '/' << year;
 	d = s.str();
 }

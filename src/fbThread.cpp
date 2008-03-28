@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.14 2008/03/21 03:55:13 laffer1 Exp $ */
+/* $Id: fbThread.cpp,v 1.15 2008/03/28 20:57:02 ctubbsii Exp $ */
 
 /**
 *	fbThread.cpp
@@ -14,7 +14,7 @@
 *	Default constructor
 *	@note 3/5/08 Initilize vars to false
 */
-fbThread::fbThread(fbData* _data):_running(false), _stopping(false), _paused(false), data(_data), _hThread(NULL)
+fbThread::fbThread(fbData* _data):_running(false), _stopping(false), _paused(false), data(_data), _hThread(0)
 {
 }
 
@@ -79,7 +79,7 @@ void fbThread::forceStop()
 	_running = false;
 	_stopping = false;
 	_paused = false;
-	_hThread = NULL;
+	_hThread = 0;
 }
 
 /**
@@ -90,7 +90,7 @@ void fbThread::pause()
 {
 	if (!_running || _paused)
 		return;
-	
+
 #ifdef Win32
 	if(SuspendThread(_hThread) == -1)
 		data->err(THREADSUSPENDFAILED, "SuspendThread Failed");
@@ -116,7 +116,7 @@ void fbThread::resume()
 #endif
 	_paused = false;
 }
-	
+
 /**
 *	isRunning
 *	is the thread running
@@ -179,7 +179,7 @@ void* fbThread::threadStart(void* thread)
 	t->_running = false;
 	t->_stopping = false;
 	t->_paused = false;
-	t->_hThread = NULL;
+	t->_hThread = 0;
 	return 0;
 }
 #endif
