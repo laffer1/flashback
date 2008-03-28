@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.7 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.8 2008/03/28 23:46:50 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -98,6 +98,7 @@ void fbHttpResponse::notfound()
     status( "404", "Not Found" );
    // TODO: Date  header
     header( "Server", SERVERID );
+    headdate();
     header( "Connection", "close");
     header( "Content-Type", "text/html; charset=iso-8859-1" );
     header( "Content-Language", "en-US" );
@@ -126,7 +127,7 @@ void fbHttpResponse::status( string code, string msg )
     r.append( code );
     r.append( " " );
     r.append( msg );
-    r.append("\r\n");
+    r.append( "\r\n" );
     client->write(r);
 }
 
@@ -138,5 +139,19 @@ void fbHttpResponse::header( string name, string value )
     r.append(value);
     r.append("\r\n");
     client->write(r);
+}
+
+void fbHttpResponse::headdate()
+{
+    struct tm *tm;
+    time_t now;
+    char date[50];
+    string r;
+
+    now = time( 0 );
+    tm = gmtime( &now ); /* HTTP 1.1 spec rev 06 sez GMT only */
+    strftime( date, 50, "%a, %d %b %Y %H:%M:%S GMT", tm );
+    r.append(date);
+    header( "Date", r );
 }
 
