@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.4 2008/03/21 03:23:32 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.5 2008/03/28 23:46:34 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -56,9 +56,10 @@ protected:
 
     void run();     /// heavy lifting
     void index();  /// print index page for website.
-    void notfound();
-    void header( string name, string value );
-    void status( string code, string msg );
+    void notfound(); /// 404 Not Found handler
+    void header( string name, string value );  /// Create and write header for client
+    void status( string code, string msg );  /// write status code like 404 or 200 OK
+    void headdate();  /// print HTTP date header.
 };
 
 #endif
