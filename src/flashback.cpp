@@ -1,4 +1,4 @@
-/* $Id: flashback.cpp,v 1.15 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: flashback.cpp,v 1.16 2008/03/28 20:33:28 ctubbsii Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
@@ -144,6 +144,7 @@ int main(int argc, char** args)
 #ifdef Debug
 			cout << "Deamon running.." << endl;
 #endif
+			break;
 	}
 	return 0;
 }	
