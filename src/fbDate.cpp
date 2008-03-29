@@ -1,4 +1,4 @@
-/* $Id: fbDate.cpp,v 1.7 2008/03/29 16:25:35 wyverex Exp $ */
+/* $Id: fbDate.cpp,v 1.8 2008/03/29 16:34:07 wyverex Exp $ */
 
 /**
  *  fbDate
@@ -55,7 +55,13 @@ void fbDate::setJulianLocal()
 {
 	time_t raw = 0;
 	time(&raw);
-	tm time = *localtime(&raw);
+	tm time; // = *localtime(&raw);
+#ifndef Win32
+	localtime_r(&raw, &time);
+#else
+	//need to be changed in windows!!
+	time = *localtime(&raw);
+#endif
 	time.tm_year += 1900;
  	time.tm_mon++;
 	setJulian(time);

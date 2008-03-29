@@ -1,4 +1,4 @@
-/* $Id: fbTime.cpp,v 1.3 2008/03/29 16:25:35 wyverex Exp $ */
+/* $Id: fbTime.cpp,v 1.4 2008/03/29 16:34:07 wyverex Exp $ */
 
 
 /**
@@ -81,9 +81,15 @@ void fbTime::setTicks(int h, int m, int s)
  */
 void fbTime::setTicksLocal()
 {
-	time_t raw;
+	time_t raw = 0;
 	time(&raw);
-	tm time = *localtime(&raw);
+	tm time; // = *localtime(&raw);
+#ifndef Win32
+	localtime_r(&raw, &time);
+#else
+	//need to be changed in windows!!
+	time = *localtime(&raw);
+#endif
 	setTicks(time.tm_hour, time.tm_min, time.tm_sec);
 }
 
