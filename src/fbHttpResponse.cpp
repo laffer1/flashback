@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.15 2008/03/29 15:36:46 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.16 2008/03/29 18:25:13 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -45,14 +45,14 @@ static const char *  mime[][2] = {
     { NULL, NULL }
 };
 
-fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client), running(false)
+fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client)//, running(false)
 {
     data->debug(NONE, "fbHttpResponse.this");
 }
 
 fbHttpResponse::~fbHttpResponse()
 {
-    if (running)
+    if (isRunning())
         shutdown();
 
     data->debug(NONE, "fbHttpResponse.~this");
@@ -62,7 +62,7 @@ void fbHttpResponse::startup()
 {
     data->debug(NONE, "fbHttpResponse.startup");
 
-    if (running)
+    if (isRunning())
         return;
 
     start();
@@ -72,11 +72,11 @@ void fbHttpResponse::shutdown()
 {
     data->debug(NONE, "fbHttpResponse.shutdown");
 
-    if (!running)
+    if (!isRunning())
         return;
 
     stop();
-    running = false; // stop it gracefully
+    //running = false; // stop it gracefully
 
     data->debug(NONE, "fbHttpResponse.shutdown() delete myself");
     delete this;
