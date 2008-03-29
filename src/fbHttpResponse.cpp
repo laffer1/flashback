@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.9 2008/03/29 01:05:49 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.10 2008/03/29 01:07:33 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -139,6 +139,8 @@ void fbHttpResponse::sendfile( const char * path )
         if (towrite)
             client->write(towrite);
     }
+
+    fclose(fp);
     data->debug(NONE, "fbHttpResponse.sendfile() done writing file");
 }
 
