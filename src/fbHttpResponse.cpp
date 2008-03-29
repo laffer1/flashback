@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.8 2008/03/28 23:46:50 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.9 2008/03/29 01:05:49 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -23,6 +23,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
+#include <sys/param.h>
+#include <stdlib.h>
 
 #include "fbHttpServer.h"
 #include "fbHttpResponse.h"
@@ -65,15 +68,21 @@ void fbHttpResponse::shutdown()
 void fbHttpResponse::run()
 {
      // we should probably check this during the request  while(!isStopping())
-     char *path;
-     path = client->getPath();
+    char *path;
+    path = client->getPath();
 
-     if ( strcmp(path, "/") == 0 )
+    data->debug(NONE, "fbHttpResponse.run");
+
+    sendfile(path);
+
+/*
+    if ( strcmp(path, "/") == 0 )
         index();
     else if ( strcmp(path, "/index") == 0 )
         index();
     else
         notfound();
+*/
 
     // we're mallocing this elsewhere.
     if ( path != NULL )
@@ -84,19 +93,65 @@ void fbHttpResponse::run()
    shutdown();  // clean up 
 }
 
-void fbHttpResponse::index()
+void fbHttpResponse::sendfile( const char * path )
 {
+    FILE *fp;
+    string realp = "/usr/local/share/flashback/www/";
+    char tmp[513];
+    char resolved[PATH_MAX];
+    char *towrite;
 
+    data->debug(NONE, "fbHttpResponse.sendfile");
+
+    if (path != NULL)
+        realp.append(path);
+    else
+        return; // TODO: Error logging and 404?
+
+    realpath(realp.c_str(), resolved);
+
+    if (*resolved)
+    {
+        status( "200", "OK" );
+    }
+    else
+    {
+        notfound();
+        return;
+    }
+    header( "Server", SERVERID );
+    headdate();
+    header( "Connection", "close");
+    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    header( "Content-Language", "en-US" );
+    client->write("\r\n\r\n"); // end header section
+
+    if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
+        // TODO HANDLE ERROR
+        data->err(NONE, "fbHttpResponse: Unable to open file");
+        data->err(NONE, resolved);
+        return;
+    }
+        
+    while ( !feof( fp ) )
+    {
+        towrite = fgets(tmp, 512, fp);
+        if (towrite)
+            client->write(towrite);
+    }
+    data->debug(NONE, "fbHttpResponse.sendfile() done writing file");
 }
 
 void fbHttpResponse::notfound()
 {
     string r;  // response for client
     char *path;
+
+    data->debug(NONE, "fbHttpServer.notfound");
+
     path = client->getPath();
 
     status( "404", "Not Found" );
-   // TODO: Date  header
     header( "Server", SERVERID );
     headdate();
     header( "Connection", "close");

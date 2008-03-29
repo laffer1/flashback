@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.5 2008/03/28 23:46:34 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.6 2008/03/29 01:05:49 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -60,6 +60,7 @@ protected:
     void header( string name, string value );  /// Create and write header for client
     void status( string code, string msg );  /// write status code like 404 or 200 OK
     void headdate();  /// print HTTP date header.
+    void sendfile( const char * );  /// send a file via webserver using path
 };
 
 #endif
