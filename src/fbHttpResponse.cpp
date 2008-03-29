@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.14 2008/03/29 06:47:43 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.15 2008/03/29 15:36:46 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -126,7 +126,7 @@ void fbHttpResponse::sendfile( const char * path )
     else
         return; // TODO: Error logging and 404?
 
-    resolved = (char *)malloc(PATH_MAX * sizeof(char));
+    resolved = (char *)calloc(PATH_MAX, sizeof(char));
     realpath(realp.c_str(), resolved);
 
     if (!*resolved)
@@ -153,7 +153,8 @@ void fbHttpResponse::sendfile( const char * path )
         
     while ( (c = fgetc(fp)) != EOF && !ferror(fp))
     {
-        client->write(c);
+        if (c != EOF)
+            client->write(c);
     }
 
     fclose(fp);

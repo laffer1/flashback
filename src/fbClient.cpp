@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.15 2008/03/29 03:24:33 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.16 2008/03/29 15:36:46 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -37,15 +37,18 @@ fbClient::fbClient(fbData* _data, int sock ):data(_data)
 {
     if ( sock == ETCPACCEPTFAIL )
     { 
-        /* log this */
-		//data->err(ERRORCODE, "Message");
        /* handle this ? */
 	   //data->warn(ERRORCODE, "Message");
-    }
-
-    if ( ( clientfp = fdopen( sock, "r+" ) ) == NULL )
+        data->debug(NONE, "fbClient.this Invalid client socket descriptor.");
+        clientfp = NULL; // weŕe screwed.
+    } 
+    else
     {
-        /* log/handle */
+        if ( ( clientfp = fdopen( sock, "a+" ) ) == NULL )
+        {
+            /* log/handle */
+            data->debug(NONE, "fbClient.this  Could not convert file descriptor to FILE *");
+        }
     }
 }
 
@@ -62,9 +65,11 @@ fbClient::~fbClient()
 
 void fbClient::parseHeaders()
 {
-    char reqstr[MAX_REQUEST];
+    char *reqstr;
     char *tmp;
     char *tmp2;
+
+    reqstr = (char *)calloc( MAX_REQUEST,  sizeof(char));
     
     tmp2 = reqstr;
 
@@ -106,6 +111,7 @@ void fbClient::parseHeaders()
     }   
 
     // TODO: figure out HTTP version.  Not important for now.
+    free(reqstr);
 }
 
 int fbClient::begins_with( char * str1,const char * str2 )
@@ -143,11 +149,16 @@ char * fbClient::getPath()
 void fbClient::write( string val )
 {
     fprintf( clientfp, "%s", val.c_str() );
+    if (ferror( clientfp) )
+       data->warn( NONE, "fbClient.write() Error writing on socket" ); 
 }
 
 void fbClient::write( int c )
 {
     fputc( c, clientfp );
+    if (ferror( clientfp) )
+       data->warn( NONE, "fbClient.write() Error writing on socket" );
+
 }
  
 

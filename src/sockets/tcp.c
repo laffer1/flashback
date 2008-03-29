@@ -133,6 +133,7 @@ socketdesc opentcp( bool server, char * address, int port )
 {
     struct hostent *he; /* for DNS/hostname/ip lookups */
     int addresslen;     /* length of address string param */
+    int on; /* Should we use socket reuse */
 
     if ( ncons < TCPMAXCONS -1 )
         ncons++; /* increment the table cons for each connection */
@@ -162,6 +163,10 @@ socketdesc opentcp( bool server, char * address, int port )
 #else
     bzero(&(cons[ncons].sa), sizeof cons[ncons].sa); 
 #endif
+
+    /* Enable address reuse */
+    on = 1;
+    setsockopt( cons[ncons].sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) );
 
     /* setup some defaults for a TCP ip4 connection with a BIG ENDIAN safe
        port number */
