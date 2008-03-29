@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.14 2008/03/21 05:48:19 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.15 2008/03/29 03:24:33 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -144,6 +144,12 @@ void fbClient::write( string val )
 {
     fprintf( clientfp, "%s", val.c_str() );
 }
+
+void fbClient::write( int c )
+{
+    fputc( c, clientfp );
+}
+ 
 
 void fbClient::close()
 {

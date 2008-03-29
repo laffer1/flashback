@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.11 2008/03/29 02:04:19 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.12 2008/03/29 03:24:34 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -30,6 +30,20 @@
 #include "fbHttpServer.h"
 #include "fbHttpResponse.h"
 #include "fbSocket.h"
+
+#define MIMECOUNT 8
+
+static const char *  mime[][2] = { 
+    { ".html", "text/html" },
+    { ".htm", "text/htm" },
+    { ".png", "image/png" },
+    { ".jpg", "image/jpeg" },
+    { ".jpeg", "image/jpeg" },
+    { ".gif", "image/gif" },
+    { ".txt", "text/plain" },
+    { ".css", "text/css" },
+    { NULL, NULL }
+};
 
 fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client), running(false)
 {
@@ -97,9 +111,8 @@ void fbHttpResponse::sendfile( const char * path )
 {
     FILE *fp;
     string realp = "/usr/local/share/flashback/www/";
-    char tmp[513];
     char resolved[PATH_MAX];
-    char *towrite;
+    int c;
 
     data->debug(NONE, "fbHttpResponse.sendfile");
 
@@ -126,16 +139,14 @@ void fbHttpResponse::sendfile( const char * path )
     header( "Server", SERVERID );
     headdate();
     header( "Connection", "close");
-    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    header( "Content-Type", matchmimetype(resolved) );
     header( "Content-Language", "en-US" );
-    client->write("\r\n\r\n"); // end header section
+    client->write("\r\n"); // end header section
 
         
-    while ( !feof( fp ) )
+    while ( (c = fgetc(fp)) != EOF && !ferror(fp))
     {
-        towrite = fgets(tmp, 512, fp);
-        if (towrite)
-            client->write(towrite);
+        client->write(c);
     }
 
     fclose(fp);
@@ -210,3 +221,21 @@ void fbHttpResponse::headdate()
     header( "Date", r );
 }
 
+const char * fbHttpResponse::matchmimetype( const char *filename )
+{
+    size_t len;
+    size_t extlen;
+    int i;
+
+    len = strlen(filename);
+
+    for ( i = 0; i < MIMECOUNT; i++ )
+    {
+        extlen = strlen( mime[i][0] );
+        if (strcasecmp( mime[i][0], 
+                 filename + (len - extlen)) == 0)
+            return mime[i][1]; 
+    }
+
+    return "text/plain"; 
+}
