@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.10 2008/03/29 01:07:33 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.11 2008/03/29 02:04:19 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -110,15 +110,19 @@ void fbHttpResponse::sendfile( const char * path )
 
     realpath(realp.c_str(), resolved);
 
-    if (*resolved)
-    {
-        status( "200", "OK" );
-    }
-    else
+    if (!*resolved)
     {
         notfound();
         return;
     }
+    if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
+        //data->msg(NONE, "fbHttpResponse: Unable to open file");
+        //data->msg(NONE, resolved);
+	notfound();
+        return;
+    }
+
+    status( "200", "OK" );
     header( "Server", SERVERID );
     headdate();
     header( "Connection", "close");
@@ -126,12 +130,6 @@ void fbHttpResponse::sendfile( const char * path )
     header( "Content-Language", "en-US" );
     client->write("\r\n\r\n"); // end header section
 
-    if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
-        // TODO HANDLE ERROR
-        data->err(NONE, "fbHttpResponse: Unable to open file");
-        data->err(NONE, resolved);
-        return;
-    }
         
     while ( !feof( fp ) )
     {
