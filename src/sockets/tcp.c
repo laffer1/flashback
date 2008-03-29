@@ -132,7 +132,7 @@ void inittcp( void )
 socketdesc opentcp( bool server, char * address, int port )
 {
     struct hostent *he; /* for DNS/hostname/ip lookups */
-    int addresslen;     /* length of address string param */
+    size_t addresslen;     /* length of address string param */
     int on; /* Should we use socket reuse */
 
     if ( ncons < TCPMAXCONS -1 )
@@ -152,7 +152,8 @@ socketdesc opentcp( bool server, char * address, int port )
     if ((cons[ncons].address = (char *) calloc( addresslen+1, sizeof(char) )) == NULL)
         return ETCPGENERIC;  /* could not allocate memory :( */
     
-    strncpy( cons[ncons].address, address, addresslen );
+    strncpy( cons[ncons].address, address, addresslen ); /* sizeof the buffer -1 */
+    cons[ncons].address[addresslen] = '\0';
 
     /* create an endpoint for communication */
     if ((cons[ncons].sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
