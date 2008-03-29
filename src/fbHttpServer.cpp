@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.12 2008/03/28 20:57:02 ctubbsii Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.13 2008/03/29 06:24:39 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -53,6 +53,8 @@ void fbHttpServer::startup()
     string bindhost = "0.0.0.0";
 
     servsock = new fbSocket(data, (char *) bindhost.c_str(), 8080 ); // TODO: Use the settings object to set these.
+
+    data->debug(NONE, "fbHttpServer.startup socket created?");
     start();
 }
 
@@ -67,7 +69,6 @@ void fbHttpServer::shutdown()
 
 void fbHttpServer::run()
 {
-    
     fbClient *client;
     fbHttpResponse *resp;
 
@@ -75,8 +76,10 @@ void fbHttpServer::run()
 
     while(!isStopping())
     {
+        data->debug(NONE, "fbHttpServer.run() wait for client connection");
 	client = servsock->nextClient();
         client->parseHeaders();
+        data->debug(NONE, "fbHttpServer.run() Create response object");
         resp = new fbHttpResponse( data, client ); /*  This class calles delete on itself */
         resp->startup();
     }

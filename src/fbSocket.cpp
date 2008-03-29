@@ -1,4 +1,4 @@
-/* $Id: fbSocket.cpp,v 1.14 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbSocket.cpp,v 1.15 2008/03/29 06:24:39 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -34,8 +34,9 @@
  * @date March 7, 2008
  */
 
-fbSocket::fbSocket(fbData* _data, char *addr, int port ):data(_data)
+fbSocket::fbSocket(fbData* _data, string addr, int port ):data(_data)
 {
+    char *a;
     setBindAddress( addr );
     setBindPort( port );
 
@@ -43,8 +44,13 @@ fbSocket::fbSocket(fbData* _data, char *addr, int port ):data(_data)
 
     inittcp(); /* setup socket library */
 
-    if ((sd = opentcp( true, getBindAddress(), getBindPort() )) < 0 )
-        data->err(UNKNOWN, "Could not bind to TCP port");
+    a = strdup(getBindAddress().c_str());
+    if ((sd = opentcp( true, a, getBindPort() )) < 0 ) {
+       data->debug(NONE, "Could not bind to TCP port");
+//        data->err(NONE, "Could not bind to TCP port");
+    }
+
+    data->debug(NONE, "fbSocket.this : Must have a binding on TCP port");
 
 }
 
@@ -54,15 +60,15 @@ fbSocket::~fbSocket()
     data->debug(NONE, "fbSocket.~this");
 }
 
-char * fbSocket::getBindAddress()
+string fbSocket::getBindAddress()
 {
     return bindAddress;
 }
 
-void fbSocket::setBindAddress( char *addr )
+void fbSocket::setBindAddress( string addr )
 {
-    strncpy( bindAddress, addr, 16 );
-    bindAddress[15] = '\0';
+    data->debug(NONE, "fbSocket.setBindAddress()");
+    bindAddress = addr;
 }
 
 int fbSocket::getBindPort()
@@ -78,6 +84,7 @@ void fbSocket::setBindPort( int port )
 
 fbClient * fbSocket::nextClient()
 { 
+    data->debug(NONE, "fbSocket.nextClient()");
     return new fbClient(data, tcpserverclient( sd ) ); /* has to be deleted by the caller */
 }
 

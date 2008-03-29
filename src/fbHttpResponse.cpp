@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.12 2008/03/29 03:24:34 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.13 2008/03/29 06:24:39 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -70,6 +70,8 @@ void fbHttpResponse::startup()
 
 void fbHttpResponse::shutdown()
 {
+    data->debug(NONE, "fbHttpResponse.shutdown");
+
     if (!running)
         return;
 
@@ -98,13 +100,15 @@ void fbHttpResponse::run()
         notfound();
 */
 
+    data->debug(NONE, "fbHttpResponse.run() free path memory");
     // we're mallocing this elsewhere.
     if ( path != NULL )
        free( path );
 
+    data->debug(NONE, "fbHttpResponse.run() delete client");
     delete client;
 
-   shutdown();  // clean up 
+    shutdown();  // clean up 
 }
 
 void fbHttpResponse::sendfile( const char * path )

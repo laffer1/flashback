@@ -1,4 +1,4 @@
-/* $Id: fbSocket.h,v 1.12 2008/03/20 19:07:49 wyverex Exp $ */
+/* $Id: fbSocket.h,v 1.13 2008/03/29 06:24:39 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -42,11 +42,11 @@
 class fbSocket
 {
 public:
-    fbSocket(fbData* _data, char *addr, int port );   /// Default Constructor
+    fbSocket(fbData* _data, string addr, int port );   /// Default Constructor
     ~fbSocket();  /// Destructor
 
-    char *getBindAddress();
-    void setBindAddress( char *addr );
+    string getBindAddress();
+    void setBindAddress( string addr );
 
     int getBindPort();
     void setBindPort( int port );
@@ -56,7 +56,7 @@ public:
 protected:
     fbData* data;
     int bindPort;
-    char bindAddress[16]; /* ipv4 only */
+    string bindAddress; /* ipv4 only */
     socketdesc sd;
 };
 
