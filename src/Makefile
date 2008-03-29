@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.35 2008/03/29 01:20:54 laffer1 Exp $
+# $Id: Makefile,v 1.36 2008/03/29 01:50:07 laffer1 Exp $
 #
 #Flashback make file
 #
@@ -73,5 +73,7 @@ install:
 	mkdir -p ${DESTDIR}${DOCROOT}
 	cp -R www ${DESTDIR}${DOCROOT}
 	cp README  ${DESTDIR}${DOCROOT}
-	cp bin/flashback ${DESTDIR}${PREFIX}/bin/flashback
-	chmod 755 ${DESTDIR}${PREFIX}/bin/flashback
+	cp bin/flashback ${DESTDIR}${PREFIX}/sbin/flashback
+	chmod 755 ${DESTDIR}${PREFIX}/sbin/flashback
+	cp flashback.sh ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
+	chmod 755 ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
