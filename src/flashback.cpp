@@ -1,4 +1,4 @@
-/* $Id: flashback.cpp,v 1.17 2008/03/29 15:36:46 laffer1 Exp $ */
+/* $Id: flashback.cpp,v 1.18 2008/03/29 15:37:50 laffer1 Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
@@ -127,9 +127,9 @@ int main(int argc, char** args)
 			cout << "Starting Deamon.." << endl;
 #endif
 			// close unneeded file descriptors
-			//fclose(stdout);
+			fclose(stdout);
 			fclose(stdin);
-			//fclose(stderr);
+			fclose(stderr);
 
 			// safety features *
 			setsid(); // become session leader
