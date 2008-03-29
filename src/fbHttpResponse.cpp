@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.16 2008/03/29 18:25:13 wyverex Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.17 2008/03/29 19:05:26 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -45,14 +45,14 @@ static const char *  mime[][2] = {
     { NULL, NULL }
 };
 
-fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client)//, running(false)
+fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client), running(false)
 {
     data->debug(NONE, "fbHttpResponse.this");
 }
 
 fbHttpResponse::~fbHttpResponse()
 {
-    if (isRunning())
+    if (running)
         shutdown();
 
     data->debug(NONE, "fbHttpResponse.~this");
@@ -62,24 +62,23 @@ void fbHttpResponse::startup()
 {
     data->debug(NONE, "fbHttpResponse.startup");
 
-    if (isRunning())
+    if (running)
         return;
 
-    start();
+    running = true;
+    startDelete();
+    
 }
 
 void fbHttpResponse::shutdown()
 {
+    if (!running) return;
+
     data->debug(NONE, "fbHttpResponse.shutdown");
-
-    if (!isRunning())
-        return;
-
-    stop();
-    //running = false; // stop it gracefully
-
-    data->debug(NONE, "fbHttpResponse.shutdown() delete myself");
-    delete this;
+    running = false; // stop it gracefully
+    
+   // data->debug(NONE, "fbHttpResponse.shutdown() delete myself");
+    //delete this;
 }
 
 void fbHttpResponse::run()

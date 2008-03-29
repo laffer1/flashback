@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.8 2008/03/29 18:25:13 wyverex Exp $ */
+/* $Id: fbHttpResponse.h,v 1.9 2008/03/29 19:05:26 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -52,7 +52,7 @@ public:
 protected:
     fbData *data;
     fbClient *client;
-    //bool running;  /// is the response thread running?
+    bool running;  /// is the response thread running?
 
     void run();     /// heavy lifting
     void index();  /// print index page for website.

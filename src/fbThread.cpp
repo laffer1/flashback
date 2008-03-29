@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.15 2008/03/28 20:57:02 ctubbsii Exp $ */
+/* $Id: fbThread.cpp,v 1.16 2008/03/29 19:05:26 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -42,6 +42,27 @@ void fbThread::start()
 		data->err(THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
 #else
 	if(pthread_create(&_hThread, NULL, threadStart, this))
+	{
+		data->err(THREADCREATEFAIL, "pthread_create Failed");
+	}
+#endif
+}
+
+
+/**
+*	start
+*	starts the thread
+*/
+void fbThread::startDelete()
+{
+	if(_running)
+		return;
+#ifdef Win32
+	_hThread = CreateThread(NULL, 0, threadStartDelete, this, 0, NULL);
+	if(_hThread == NULL)
+		data->err(THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
+#else
+	if(pthread_create(&_hThread, NULL, threadStartDelete, this))
 	{
 		data->err(THREADCREATEFAIL, "pthread_create Failed");
 	}
@@ -165,6 +186,20 @@ DWORD WINAPI fbThread::threadStart(LPVOID thread)
 	t->_hThread = NULL;
 	return 0;
 }
+
+
+DWORD WINAPI fbThread::threadStartDelete(LPVOID thread)
+{
+	fbThread* t = (fbThread*)thread;
+	t->_running = true;
+	t->run();	/// < cast thread and call run
+	t->_running = false;
+	t->_stopping = false;
+	t->_paused = false;
+	t->_hThread = NULL;
+	delete t;
+	return 0;
+}
 #else
 /**
 *	threadStart
@@ -180,6 +215,25 @@ void* fbThread::threadStart(void* thread)
 	t->_stopping = false;
 	t->_paused = false;
 	t->_hThread = 0;
+	return 0;
+}
+
+/**
+*	threadStart
+*	real thread function
+*	@param thread thread to run
+*/
+void* fbThread::threadStartDelete(void* thread)
+{
+	fbThread* t = (fbThread*)thread;
+	t->_running = true;
+	t->run();	/// < cast thread and call run
+	t->_running = false;
+	t->_stopping = false;
+	t->_paused = false;
+	t->_hThread = 0;
+	t->data->debug(NONE, "fbThread.run delete myself");
+	delete t;
 	return 0;
 }
 #endif

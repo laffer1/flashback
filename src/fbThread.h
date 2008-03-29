@@ -1,4 +1,4 @@
-/* $Id: fbThread.h,v 1.9 2008/03/20 19:07:49 wyverex Exp $ */
+/* $Id: fbThread.h,v 1.10 2008/03/29 19:05:26 wyverex Exp $ */
 
 #ifndef fbTHREAD_H
 #define fbTHREAD_H
@@ -20,6 +20,7 @@ public:
 	virtual ~fbThread();		 /// < Destructor
 
 	void start();		/// < starts the thread
+	void startDelete();		/// < starts the thread
 	void stop();		/// < tell thread to stop
 	void forceStop();	/// < force the thread to stop
 
@@ -43,9 +44,11 @@ private:
 #ifdef Win32
 	HANDLE _hThread;		/// < handle to running thread
 	static DWORD WINAPI threadStart(LPVOID thread);	/// < Real thread func
+	static DWORD WINAPI threadStartDelete(LPVOID thread);	/// < Real thread func, deletes thread when done
 #else
 	pthread_t _hThread;		/// < handle to running thread
 	static void* threadStart(void* thread);	/// < Real thread func
+	static void* threadStartDelete(void* thread);	/// < Real thread func, deletes thread when done
 #endif
 	
 	virtual void run();		/// < Overload this function to run your thread in
