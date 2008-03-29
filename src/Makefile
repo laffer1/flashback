@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.34 2008/03/22 23:48:41 laffer1 Exp $
+# $Id: Makefile,v 1.35 2008/03/29 01:20:54 laffer1 Exp $
 #
 #Flashback make file
 #
@@ -11,6 +11,11 @@ LIBS=-lsqlite3
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
 	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o fbConfig.o
+
+PREFIX= /usr/local
+DESTDIR=
+DOCROOT= ${PREFIX}/share/flashback
+DATABASEROOT= /var/flashback
 
 ifdef DEBUG
 CFLAGS += -DDebug -g
@@ -62,4 +67,11 @@ flashback: ${OBJECTS}
 %.o: sockets/%.c
 	${CC} ${CFLAGS} -c -o $@ $<
 
-
+install:
+	@echo "Installing Flashback"
+	mkdir -p ${DESTDIR}${DATABASEROOT}
+	mkdir -p ${DESTDIR}${DOCROOT}
+	cp -R www ${DESTDIR}${DOCROOT}
+	cp README  ${DESTDIR}${DOCROOT}
+	cp bin/flashback ${DESTDIR}${PREFIX}/bin/flashback
+	chmod 755 ${DESTDIR}${PREFIX}/bin/flashback
