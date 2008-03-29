@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.43 2008/03/29 22:19:29 wyverex Exp $
+# $Id: Makefile,v 1.44 2008/03/29 23:33:06 wyverex Exp $
 #
 #Flashback make file
 #
@@ -10,7 +10,8 @@ BINNAME=bin/flashback
 LIBS=-lsqlite3
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
-	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o fbConfig.o
+	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o fbConfig.o \
+	fbBackup.o
 
 PREFIX= /usr/local
 DESTDIR=
