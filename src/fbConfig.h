@@ -1,4 +1,4 @@
-/* $Id: fbConfig.h,v 1.4 2008/03/23 01:40:45 ctubbsii Exp $ */
+/* $Id: fbConfig.h,v 1.5 2008/03/29 17:38:37 laffer1 Exp $ */
 
 #ifndef FBCONFIG_H
 #define FBCONFIG_H
@@ -50,7 +50,8 @@ public:
 private:
     int load(const char *filename);
     int save(const char *filename);
-	void setWebServerPort(const string& strPort);
+    void setWebServerPort(const string& strPort);
+
     string addr;
     string webroot;
     string dbpath;

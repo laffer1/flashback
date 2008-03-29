@@ -1,4 +1,4 @@
-/* $Id: fbConfig.cpp,v 1.8 2008/03/29 16:25:35 wyverex Exp $ */
+/* $Id: fbConfig.cpp,v 1.9 2008/03/29 17:38:37 laffer1 Exp $ */
 
 #include "fbConfig.h"
 
@@ -9,7 +9,7 @@
  * @author Christopher Tubbs
  * @date March 18, 2008
  */
-fbConfig::fbConfig(fbErrorLogger* err):addr(""), webroot(""), dbpath(""), port(0), errlog(err), dirty(true)
+fbConfig::fbConfig(fbErrorLogger* err): port(0), errlog(err), dirty(true)
 {
     loadDefaults(); // assume defaults
     if (load() == -1)
@@ -24,7 +24,7 @@ fbConfig::fbConfig(fbErrorLogger* err):addr(""), webroot(""), dbpath(""), port(0
     errlog->debug(NONE, "fbConfig.this");
 }
 
-fbConfig::fbConfig(fbErrorLogger* err, const char* filename):addr(""), webroot(""), dbpath(""), port(0), errlog(err), dirty(true)
+fbConfig::fbConfig(fbErrorLogger* err, const char* filename): port(0), errlog(err), dirty(true)
 {
     loadDefaults(); // assume defaults
     if (load(filename) == -1)
