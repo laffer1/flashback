@@ -140,13 +140,16 @@ socketdesc opentcp( bool server, char * address, int port )
     else
         return ETCPMAXCONS;  /* error to many connections */
 
+    if ( address == NULL )
+        return ETCPGENERIC;
+ 
     addresslen = strlen( address );
 
     cons[ncons].server = server; /* hostname or ip as stated above */
     cons[ncons].port = port;     /* port to bind to or connect to */
 
     /* allocate space to store the original address before doing a lookup */
-    if ((cons[ncons].address = (char *) malloc( addresslen+1 * sizeof(char) )) == NULL)
+    if ((cons[ncons].address = (char *) calloc( addresslen+1, sizeof(char) )) == NULL)
         return ETCPGENERIC;  /* could not allocate memory :( */
     
     strncpy( cons[ncons].address, address, addresslen );
@@ -154,6 +157,7 @@ socketdesc opentcp( bool server, char * address, int port )
     /* create an endpoint for communication */
     if ((cons[ncons].sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket");
+        free(cons[ncons].address); /* don´t leak */
         return ETCPGENERIC;
     }
 
@@ -181,6 +185,7 @@ socketdesc opentcp( bool server, char * address, int port )
 #else
         herror(cons[ncons].address);
 #endif
+        free(cons[ncons].address); /* dont leak */
         return ETCPBADADDRESS;
     }
 
@@ -200,6 +205,7 @@ socketdesc opentcp( bool server, char * address, int port )
                   sizeof cons[ncons].sa) < 0) 
         {
             perror("bind");
+            free(cons[ncons].address); /* dont leak */
             return ETCPBINDFAIL;
         }
 
@@ -207,9 +213,9 @@ socketdesc opentcp( bool server, char * address, int port )
         if (listen( cons[ncons].sockfd, BACKLOG) < 0)
         {
             perror("listen");
+            free( cons[ncons].address );
             return ETCPLISTENFAIL;
         }
-
     }
     else
     {
@@ -219,6 +225,7 @@ socketdesc opentcp( bool server, char * address, int port )
                      sizeof cons[ncons].sa) < 0) 
         {
             perror("connect");
+            free( cons[ncons].address );
             return ETCPCONNFAIL;
         }
     }
