@@ -1,0 +1,140 @@
+wyverex@wyverex-mobile:~/Programming/flashback/src$ valgrind --leak-check=yes flashback
+==12267== Memcheck, a memory error detector.
+==12267== Copyright (C) 2002-2007, and GNU GPL'd, by Julian Seward et al.
+==12267== Using LibVEX rev 1804, a library for dynamic binary translation.
+==12267== Copyright (C) 2004-2007, and GNU GPL'd, by OpenWorks LLP.
+==12267== Using valgrind-3.3.0-Debian, a dynamic binary instrumentation framework.
+==12267== Copyright (C) 2000-2007, and GNU GPL'd, by Julian Seward et al.
+==12267== For more details, rerun with: -v
+==12267== 
+Running in Debug Mode!
+Starting Deamon..
+Deamon running..
+==12267== 
+==12267== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 8 from 1)
+==12267== malloc/free: in use at exit: 0 bytes in 0 blocks.
+==12267== malloc/free: 0 allocs, 0 frees, 0 bytes allocated.
+==12267== For counts of detected errors, rerun with: -v
+==12267== All heap blocks were freed -- no leaks are possible.
+wyverex@wyverex-mobile:~/Programming/flashback/src$ ==12268== Conditional jump or move depends on uninitialised value(s)
+==12268==    at 0x4C23F68: strlen (mc_replace_strmem.c:242)
+==12268==    by 0x5B32717: __nss_hostname_digits_dots (in /lib/libc-2.7.so)
+==12268==    by 0x5B3746F: gethostbyname (in /lib/libc-2.7.so)
+==12268==    by 0x405D82: opentcp(bool, char*, int) (tcp.c:177)
+==12268==    by 0x407F0E: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:48)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== Conditional jump or move depends on uninitialised value(s)
+==12268==    at 0x5B3277E: __nss_hostname_digits_dots (in /lib/libc-2.7.so)
+==12268==    by 0x5B3746F: gethostbyname (in /lib/libc-2.7.so)
+==12268==    by 0x405D82: opentcp(bool, char*, int) (tcp.c:177)
+==12268==    by 0x407F0E: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:48)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== Use of uninitialised value of size 8
+==12268==    at 0x5A7FA54: (within /lib/libc-2.7.so)
+==12268==    by 0x5B2D8F8: inet_aton (in /lib/libc-2.7.so)
+==12268==    by 0x5B32B51: __nss_hostname_digits_dots (in /lib/libc-2.7.so)
+==12268==    by 0x5B3746F: gethostbyname (in /lib/libc-2.7.so)
+==12268==    by 0x405D82: opentcp(bool, char*, int) (tcp.c:177)
+==12268==    by 0x407F0E: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:48)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== Conditional jump or move depends on uninitialised value(s)
+==12268==    at 0x5A7F939: (within /lib/libc-2.7.so)
+==12268==    by 0x5B2D8F8: inet_aton (in /lib/libc-2.7.so)
+==12268==    by 0x5B32B51: __nss_hostname_digits_dots (in /lib/libc-2.7.so)
+==12268==    by 0x5B3746F: gethostbyname (in /lib/libc-2.7.so)
+==12268==    by 0x405D82: opentcp(bool, char*, int) (tcp.c:177)
+==12268==    by 0x407F0E: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:48)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== Conditional jump or move depends on uninitialised value(s)
+==12268==    at 0x5B2D916: inet_aton (in /lib/libc-2.7.so)
+==12268==    by 0x5B32B51: __nss_hostname_digits_dots (in /lib/libc-2.7.so)
+==12268==    by 0x5B3746F: gethostbyname (in /lib/libc-2.7.so)
+==12268==    by 0x405D82: opentcp(bool, char*, int) (tcp.c:177)
+==12268==    by 0x407F0E: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:48)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== Conditional jump or move depends on uninitialised value(s)
+==12268==    at 0x5B2D958: inet_aton (in /lib/libc-2.7.so)
+==12268==    by 0x5B32B51: __nss_hostname_digits_dots (in /lib/libc-2.7.so)
+==12268==    by 0x5B3746F: gethostbyname (in /lib/libc-2.7.so)
+==12268==    by 0x405D82: opentcp(bool, char*, int) (tcp.c:177)
+==12268==    by 0x407F0E: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:48)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== Conditional jump or move depends on uninitialised value(s)
+==12268==    at 0x4C252A1: strcpy (mc_replace_strmem.c:268)
+==12268==    by 0x5B32920: __nss_hostname_digits_dots (in /lib/libc-2.7.so)
+==12268==    by 0x5B3746F: gethostbyname (in /lib/libc-2.7.so)
+==12268==    by 0x405D82: opentcp(bool, char*, int) (tcp.c:177)
+==12268==    by 0x407F0E: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:48)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== ERROR SUMMARY: 7 errors from 7 contexts (suppressed: 8 from 1)
+==12268== malloc/free: in use at exit: 23,005 bytes in 203 blocks.
+==12268== malloc/free: 3,556 allocs, 3,353 frees, 382,047 bytes allocated.
+==12268== For counts of detected errors, rerun with: -v
+==12268== searching for pointers to 203 not-freed blocks.
+==12268== checked 293,742,688 bytes.
+==12268== 
+==12268== 
+==12268== 8 bytes in 1 blocks are definitely lost in loss record 2 of 12
+==12268==    at 0x4C22FAB: malloc (vg_replace_malloc.c:207)
+==12268==    by 0x5AC3E21: strdup (in /lib/libc-2.7.so)
+==12268==    by 0x407ECF: fbSocket::fbSocket(fbData*, std::string, int) (fbSocket.cpp:47)
+==12268==    by 0x407648: fbHttpServer::startup() (fbHttpServer.cpp:55)
+==12268==    by 0x403185: core() (fbCore.cpp:43)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== 
+==12268== 165 bytes in 4 blocks are possibly lost in loss record 7 of 12
+==12268==    at 0x4C23809: operator new(unsigned long) (vg_replace_malloc.c:230)
+==12268==    by 0x5134610: std::string::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&) (in /usr/lib/libstdc++.so.6.0.9)
+==12268==    by 0x5135FB2: std::string::_M_mutate(unsigned long, unsigned long, unsigned long) (in /usr/lib/libstdc++.so.6.0.9)
+==12268==    by 0x513612B: std::string::_M_replace_safe(unsigned long, unsigned long, char const*, unsigned long) (in /usr/lib/libstdc++.so.6.0.9)
+==12268==    by 0x40B21D: fbConfig::loadDefaults() (fbConfig.cpp:51)
+==12268==    by 0x40C11C: fbConfig::fbConfig(fbErrorLogger*) (fbConfig.cpp:14)
+==12268==    by 0x409612: fbData::fbData() (fbData.cpp:9)
+==12268==    by 0x4030F4: core() (fbCore.cpp:25)
+==12268==    by 0x402EF3: main (flashback.cpp:140)
+==12268== 
+==12268== 
+==12268== 10,080 bytes in 35 blocks are possibly lost in loss record 12 of 12
+==12268==    at 0x4C220BC: calloc (vg_replace_malloc.c:397)
+==12268==    by 0x401132B: _dl_allocate_tls (in /lib/ld-2.7.so)
+==12268==    by 0x5833B87: pthread_create@@GLIBC_2.2.5 (in /lib/libpthread-2.7.so)
+==12268==    by 0x4E57856: (within /usr/lib/libsqlite3.so.0.8.6)
+==12268==    by 0x4E57BCC: (within /usr/lib/libsqlite3.so.0.8.6)
+==12268==    by 0x4E5BF32: sqlite3PagerOpen (in /usr/lib/libsqlite3.so.0.8.6)
+==12268==    by 0x4E43A52: sqlite3BtreeOpen (in /usr/lib/libsqlite3.so.0.8.6)
+==12268==    by 0x4E55F26: sqlite3BtreeFactory (in /usr/lib/libsqlite3.so.0.8.6)
+==12268==    by 0x4E5686B: (within /usr/lib/libsqlite3.so.0.8.6)
+==12268==    by 0x40639D: fbSQL::connect(char const*) (fbSQL.cpp:51)
+==12268==    by 0x40644C: fbSQL::connect(std::string) (fbSQL.cpp:71)
+==12268==    by 0x408DF2: fbDatabase::fbDatabase(fbErrorLogger*, std::string) (fbDatabase.cpp:15)
+==12268== 
+==12268== LEAK SUMMARY:
+==12268==    definitely lost: 8 bytes in 1 blocks.
+==12268==      possibly lost: 10,245 bytes in 39 blocks.
+==12268==    still reachable: 12,752 bytes in 163 blocks.
+==12268==         suppressed: 0 bytes in 0 blocks.
+==12268== Reachable blocks (those to which a pointer was found) are not shown.
+==12268== To see them, rerun with: --leak-check=full --show-reachable=yes
+
