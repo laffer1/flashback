@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.8 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbCore.cpp,v 1.9 2008/03/29 23:18:03 wyverex Exp $ */
 
 /**
 *  fbCore.cpp
@@ -13,6 +13,8 @@
 #include "fbDiskDetector.h"
 #include "fbScheduler.h"
 #include "fbHttpServer.h"
+
+bool FlashBackRunning;
 
 /**
 * core
@@ -43,10 +45,16 @@ void core()
 	http.startup();
 	data.debug(NONE, "Web Server Running");  //should only show in debug mode!
 
+	//global running varible
+	FlashBackRunning = true;
 
 	// Shutdown Detector
-	while(1)
+
+
+	//core loop
+	while(FlashBackRunning)
 	{
+		//what was the plan for here???
 #ifdef Win32
 		Sleep(1000 * 60);
 #else

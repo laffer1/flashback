@@ -1,4 +1,4 @@
-/* $Id: flashback.cpp,v 1.18 2008/03/29 15:37:50 laffer1 Exp $ */
+/* $Id: flashback.cpp,v 1.19 2008/03/29 23:18:03 wyverex Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
@@ -112,7 +112,10 @@ int main(int argc, char** args)
            get a "service" in a microsoft product.
         */
 	// TODO: make this Windows friendly	
-	switch(fork())
+
+
+	int pid = fork();
+	switch(pid)
 	{
 		// DIDNT WORK
 		case -1:
@@ -142,7 +145,7 @@ int main(int argc, char** args)
 		// parent process returns value > 0 upon success (child id)
 		default:
 #ifdef Debug
-			cout << "Deamon running.." << endl;
+			cout << "Deamon running.." << pid << endl;
 #endif
 			break;
 	}
