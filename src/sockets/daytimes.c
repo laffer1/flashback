@@ -43,7 +43,7 @@ int main( void )
     inittcp();
     
     /* 0.0.0.0 should be all interfaces on a unix/linux host */
-    if ( (sd = opentcp( TRUE, "0.0.0.0", 13 )) < 0 )
+    if ( (sd = opentcp( true, "0.0.0.0", 13 )) < 0 )
     {
         fprintf( stderr, "Error opening the connection\n" );
         exit(1);

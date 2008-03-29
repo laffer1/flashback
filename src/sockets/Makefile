@@ -4,8 +4,8 @@
 #class: cs224
 #class time: 11am MWF
 
-CC=gcc
-CFLAGS=-Wall -ansi -pedantic
+CC=g++
+CFLAGS=-Wall 
 
 all: clean tcp.o udp.o daytimec daytimes echos echoc
 
@@ -21,10 +21,10 @@ daytimes: tcp.o daytimes.c
 daytimec: tcp.o daytimec.c
 	${CC} ${CFLAGS} tcp.o daytimec.c -o daytimec
 
-tcp.o: bool.h tcp.h tcp.c
+tcp.o: tcp.h tcp.c
 	${CC} ${CFLAGS} -c tcp.c
 
-udp.o: bool.h udp.h udp.c
+udp.o: udp.h udp.c
 	${CC} ${CFLAGS} -c udp.c
 
 clean:

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.38 2008/03/29 05:32:44 laffer1 Exp $
+# $Id: Makefile,v 1.39 2008/03/29 06:47:43 laffer1 Exp $
 #
 #Flashback make file
 #
@@ -40,7 +40,7 @@ all: clean release
 release: flashback
 
 debug:
-	gmake flashback DEBUG=yes
+	make flashback DEBUG=yes
 
 clean:
 	rm -f bin/flashback bin/flashback_d bin/flashback.exe bin/flashback_d.exe *.o

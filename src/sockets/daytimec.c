@@ -28,10 +28,10 @@ int main( int argc, char *argv[] )
     socketdesc sd; /* similar to a file desc, part of my tcp library */
     char *output;  /* a temp pointer to output.  */
 
-    host = (argc > 1) ? (char *)argv[1] : "time.nist.gov";
+    host = (argc > 1) ? (char *)argv[1] : (char *)"time.nist.gov";
 
     inittcp(); /* required the first time the library is used. */
-    if ( (sd = opentcp( FALSE, host, 13 )) < 0 )
+    if ( (sd = opentcp( false, host, 13 )) < 0 )
     {
         fprintf( stderr, "Error opening the connection\n" );
         exit(1);

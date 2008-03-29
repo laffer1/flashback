@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.13 2008/03/29 06:24:39 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.14 2008/03/29 06:47:43 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -29,7 +29,7 @@
 
 fbHttpServer:: fbHttpServer(fbData* _data):fbThread(_data), data(_data), servsock(NULL), running(false)
 {
-	data->debug(NONE, "fbHttpServer.this");
+    data->debug(NONE, "fbHttpServer.this");
 }
 
 fbHttpServer::~fbHttpServer()

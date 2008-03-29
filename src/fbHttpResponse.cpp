@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.13 2008/03/29 06:24:39 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.14 2008/03/29 06:47:43 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -78,6 +78,7 @@ void fbHttpResponse::shutdown()
     stop();
     running = false; // stop it gracefully
 
+    data->debug(NONE, "fbHttpResponse.shutdown() delete myself");
     delete this;
 }
 
@@ -115,8 +116,8 @@ void fbHttpResponse::sendfile( const char * path )
 {
     FILE *fp;
     string realp = "/usr/local/share/flashback/www/";
-    char resolved[PATH_MAX];
     int c;
+    char *resolved;
 
     data->debug(NONE, "fbHttpResponse.sendfile");
 
@@ -125,6 +126,7 @@ void fbHttpResponse::sendfile( const char * path )
     else
         return; // TODO: Error logging and 404?
 
+    resolved = (char *)malloc(PATH_MAX * sizeof(char));
     realpath(realp.c_str(), resolved);
 
     if (!*resolved)
@@ -135,6 +137,7 @@ void fbHttpResponse::sendfile( const char * path )
     if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
         //data->msg(NONE, "fbHttpResponse: Unable to open file");
         //data->msg(NONE, resolved);
+        free(resolved);
 	notfound();
         return;
     }
@@ -154,6 +157,7 @@ void fbHttpResponse::sendfile( const char * path )
     }
 
     fclose(fp);
+    free(resolved);
     data->debug(NONE, "fbHttpResponse.sendfile() done writing file");
 }
 
