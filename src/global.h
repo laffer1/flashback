@@ -1,4 +1,4 @@
-/* $Id: global.h,v 1.9 2008/03/29 16:25:35 wyverex Exp $ */
+/* $Id: global.h,v 1.10 2008/03/29 22:19:29 wyverex Exp $ */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -11,6 +11,7 @@
 	#include <cstdlib>
 	#include <cstdio>
 	#include <fstream>
+	#include <vector>
 	using namespace std;
 
 	#ifdef Win32

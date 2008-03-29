@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.17 2008/03/29 17:22:29 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.18 2008/03/29 22:19:29 wyverex Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -35,6 +35,7 @@
 
 fbClient::fbClient(fbData* _data, int sock ):data(_data)
 {
+    data->debug(NONE, "fbClient.this");
     if ( sock == ETCPACCEPTFAIL )
     { 
        /* handle this ? */
@@ -54,6 +55,7 @@ fbClient::fbClient(fbData* _data, int sock ):data(_data)
 
 fbClient::~fbClient()
 {
+    data->debug(NONE, "fbClient.~this");
     if (clientfp != NULL)
         close();
 

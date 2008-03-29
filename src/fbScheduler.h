@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.h,v 1.3 2008/03/20 18:46:13 wyverex Exp $ */
+/* $Id: fbScheduler.h,v 1.4 2008/03/29 22:19:29 wyverex Exp $ */
 
 #ifndef fbSCHEDULER_H
 #define fbSCHEDULER_H
@@ -25,9 +25,7 @@ public:
 	void shutdown();
 
 private:
-	bool running;
 	fbData* data;
-
 	void run();
 };
 

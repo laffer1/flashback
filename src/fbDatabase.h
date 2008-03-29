@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.h,v 1.4 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbDatabase.h,v 1.5 2008/03/29 22:19:29 wyverex Exp $ */
 
 #ifndef fbDATABASE_H
 #define fbDATABASE_H
@@ -32,7 +32,9 @@ public:
 	fbDatabase(fbErrorLogger* log, const char* path);
 	~fbDatabase();
 
-	
+	/// Add Back up job
+	bool addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt = ONCE, int rv = 0);
+
 	
 
 private:

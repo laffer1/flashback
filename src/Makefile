@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.42 2008/03/29 17:09:13 wyverex Exp $
+# $Id: Makefile,v 1.43 2008/03/29 22:19:29 wyverex Exp $
 #
 #Flashback make file
 #
@@ -79,7 +79,7 @@ install:
 #	cp flashback.sh ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
 #	chmod 755 ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
 
-dinstall:
+dinstall: uninstall
 	@echo "Installing Flashback Debug Version"
 	mkdir -p ${DESTDIR}${DATABASEROOT}
 	mkdir -p ${DESTDIR}${DOCROOT}

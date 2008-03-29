@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.16 2008/03/29 19:05:26 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.17 2008/03/29 22:19:29 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -16,6 +16,7 @@
 */
 fbThread::fbThread(fbData* _data):_running(false), _stopping(false), _paused(false), data(_data), _hThread(0)
 {
+	data->debug(NONE, "fbThread.this");
 }
 
 /**
@@ -26,6 +27,7 @@ fbThread::~fbThread()
 {
 	if(_running)
 		forceStop();
+	data->debug(NONE, "fbThread.~this");
 }
 
 /**
@@ -36,6 +38,9 @@ void fbThread::start()
 {
 	if(_running)
 		return;
+
+	data->debug(NONE, "fbThread.start");
+
 #ifdef Win32
 	_hThread = CreateThread(NULL, 0, threadStart, this, 0, NULL);
 	if(_hThread == NULL)
@@ -57,6 +62,9 @@ void fbThread::startDelete()
 {
 	if(_running)
 		return;
+
+	data->debug(NONE, "fbThread.startDelete");
+
 #ifdef Win32
 	_hThread = CreateThread(NULL, 0, threadStartDelete, this, 0, NULL);
 	if(_hThread == NULL)
@@ -77,6 +85,7 @@ void fbThread::stop()
 {
 	if (!_running)
 		return;
+	data->debug(NONE, "fbThread.stop");
 	_stopping = true;
 }
 
@@ -178,6 +187,7 @@ bool fbThread::isStopping()
 DWORD WINAPI fbThread::threadStart(LPVOID thread)
 {
 	fbThread* t = (fbThread*)thread;
+	t->data->debug(NONE, "fbThread.threadStart");
 	t->_running = true;
 	t->run();	/// < cast thread and call run
 	t->_running = false;
@@ -191,6 +201,7 @@ DWORD WINAPI fbThread::threadStart(LPVOID thread)
 DWORD WINAPI fbThread::threadStartDelete(LPVOID thread)
 {
 	fbThread* t = (fbThread*)thread;
+	t->data->debug(NONE, "fbThread.threadStartDelete");
 	t->_running = true;
 	t->run();	/// < cast thread and call run
 	t->_running = false;
@@ -209,13 +220,15 @@ DWORD WINAPI fbThread::threadStartDelete(LPVOID thread)
 void* fbThread::threadStart(void* thread)
 {
 	fbThread* t = (fbThread*)thread;
+	t->data->debug(NONE, "fbThread.threadStart");
 	t->_running = true;
 	t->run();	/// < cast thread and call run
 	t->_running = false;
 	t->_stopping = false;
 	t->_paused = false;
+	pthread_detach(t->_hThread);
 	t->_hThread = 0;
-	return 0;
+	return NULL;
 }
 
 /**
@@ -226,15 +239,17 @@ void* fbThread::threadStart(void* thread)
 void* fbThread::threadStartDelete(void* thread)
 {
 	fbThread* t = (fbThread*)thread;
+	t->data->debug(NONE, "fbThread.threadStartDelete");
 	t->_running = true;
 	t->run();	/// < cast thread and call run
 	t->_running = false;
 	t->_stopping = false;
 	t->_paused = false;
+	pthread_detach(t->_hThread);
 	t->_hThread = 0;
 	t->data->debug(NONE, "fbThread.run delete myself");
 	delete t;
-	return 0;
+	return NULL;
 }
 #endif
 

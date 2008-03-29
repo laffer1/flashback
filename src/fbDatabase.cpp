@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.4 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.5 2008/03/29 22:19:29 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -28,6 +28,25 @@ fbDatabase::~fbDatabase()
 	errlog->debug(NONE, "fbDatabase.~this");
 }
 
+
+bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt, int rv)
+{
+	char buff[500];
+	sprintf(buff,"insert into backup (desc, date, time, repeatmode, repeatval, disk) values  (\'%s\',%ld,%ld,%d,%d,\'%s\');",
+		desc.c_str(), date.getJulian(), time.getTicks(), rt, rv, path.c_str());
+	string cmd = buff;
+
+	errlog->debug(NONE, cmd);
+	if(db.exe(cmd))
+	{
+		return false;
+		errlog->warn(UNKNOWN, "Failed to add Backup Job..");
+	}
+
+//backup (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);
+	
+	return true;
+}
 
 
 

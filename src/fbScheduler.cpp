@@ -1,43 +1,48 @@
-/* $Id: fbScheduler.cpp,v 1.4 2008/03/20 19:07:49 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.5 2008/03/29 22:19:29 wyverex Exp $ */
 
 
 
 #include "fbScheduler.h"
 
 
-fbScheduler::fbScheduler(fbData* _data):fbThread(_data), running(false), data(_data)
+fbScheduler::fbScheduler(fbData* _data):fbThread(_data), data(_data)
 {
+	data->debug(NONE, "fbScheduler.this");
 }
 
 fbScheduler::~fbScheduler()
 {
-	if(running)
-		shutdown();
+	data->debug(NONE, "fbScheduler.this");
+	shutdown();
 }
 
 
 void fbScheduler::startup()
 {
-	if(running)
-		return;
 	start();
 }
 
 
 void fbScheduler::shutdown()
 {
-	if(!running)
-		return;
-
 	stop();
-	running = false;
 }
 
 void fbScheduler::run()
 {
+	data->debug(NONE, "fbScheduler.run");
+	string desc("test");
+	fbDate date;
+	fbTime time;
+	string path("/var/log");
+
+	data->db->addBackupJob(desc,date,time,path);
+
 	while(!isStopping())
 	{
+		//Backup querry
 		_sleep(60*15);
 	}
 }
+
 

@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.6 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.7 2008/03/29 22:19:29 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -17,7 +17,29 @@
 *  constructor
 *  @param errlog Pointer to main error logger
 */
-fbSQL::fbSQL(fbErrorLogger* log): errlog(log), cs(), db(NULL), open(false)
+fbSQL::fbSQL(fbErrorLogger* log): errlog(log), cs(), db(NULL), open(false), _rows(0), _cols(0)
+{
+	errlog->debug(NONE, "fbSQL.this");
+}
+
+
+/**
+*  fbSQL
+*  constructor
+*  @param errlog Pointer to main error logger
+*/
+fbSQL::fbSQL(fbErrorLogger* log, sqlite3* database): errlog(log), cs(), db(database), open(false), _rows(0), _cols(0)
+{
+	errlog->debug(NONE, "fbSQL.this");
+}
+
+
+/**
+*  fbSQL
+*  constructor
+*  @param errlog Pointer to main error logger
+*/
+fbSQL::fbSQL(fbSQL& sql): errlog(sql.errlog), cs(), db(sql.db), open(false), _rows(0), _cols(0)
 {
 	errlog->debug(NONE, "fbSQL.this");
 }
@@ -52,7 +74,7 @@ void fbSQL::connect(const char* database)
 		if(ret)
 		{	//open failed report error
 			err = database;
-			//data->err(FAILEDTOOPENDB, err);
+			errlog->err(FAILEDTOOPENDB, err);
 			return;
 		}
 	}
@@ -118,7 +140,7 @@ int fbSQL::exec(char* command,int(*callback)(void*,int,char**,char**))
 	if(ret != SQLITE_OK)
 	{	//error, report warning
 		err += ret;
-		//data->warn(SQLEXECERROR, err);
+		errlog->warn(SQLEXECERROR, err);
 		sqlite3_free(errmsg);
 	}
 
@@ -139,4 +161,51 @@ int fbSQL::exec(string command,int(*callback)(void*,int,char**,char**) )
 {
 	return exec(command.c_str(), callback);
 }
+
+
+int fbSQL::exe(string cmd)
+{
+	int ret = 0;
+	char* errmsg;
+	char** result;
+	string err = "sqlite3 error code: ";
+	
+	if(db == NULL)
+	{
+		errlog->warn(FAILEDTOOPENDB, "fbSQL: Querry on none opened database");
+		return -1;
+	}
+
+	// lock so two commands can't be sent at once
+	fbLock lock(cs);
+
+	// send command
+	//ret = sqlite3_exec(db, command, callback, 0 , &errmsg);
+	ret = sqlite3_get_table(db, cmd.c_str(), &result, &_rows, &_cols, &errmsg);
+
+	// test if okay
+	if(ret != SQLITE_OK)
+	{	//error, report warning
+		err += ret;
+		errlog->warn(SQLEXECERROR, err);
+		sqlite3_free(errmsg);
+		return ret;
+	}
+
+	//clear vectors
+	if(col_header.size() != 0) col_header.clear();
+	if(table.size() != 0) table.clear();
+
+	//save header information
+	for(int i = 0; i < _cols; ++i)
+		col_header.push_back(result[i]);
+
+	//save data
+	for(int i = 0; i < _cols*_rows; ++i)
+		col_header.push_back(result[_cols+i]);
+
+	sqlite3_free_table(result);
+	return ret;
+}
+
 

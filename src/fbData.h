@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.5 2008/03/23 01:40:45 ctubbsii Exp $ */
+/* $Id: fbData.h,v 1.6 2008/03/29 22:19:29 wyverex Exp $ */
 
 
 
@@ -40,8 +40,8 @@ public:
 	const string& setWebServerRootPath();
 	const string& getDBPath();
 
-
-private:
+	
+//private:
 	fbErrorLogger* errlog;
 	fbDatabase*    db;
 	fbConfig*    config;
