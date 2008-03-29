@@ -1,4 +1,4 @@
-/* $Id: fbSocket.cpp,v 1.16 2008/03/29 06:47:43 laffer1 Exp $ */
+/* $Id: fbSocket.cpp,v 1.17 2008/03/29 17:25:19 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -49,8 +49,8 @@ fbSocket::fbSocket(fbData* _data, string addr, int port ):data(_data)
         data->err(NONE, "Could not bind to TCP port");
     }
 
+    free(a);
     data->debug(NONE, "fbSocket.this : Must have a binding on TCP port");
-
 }
 
 fbSocket::~fbSocket()
