@@ -1,4 +1,4 @@
-/* $Id: fbDate.cpp,v 1.6 2008/03/28 20:57:02 ctubbsii Exp $ */
+/* $Id: fbDate.cpp,v 1.7 2008/03/29 16:25:35 wyverex Exp $ */
 
 /**
  *  fbDate
@@ -124,15 +124,27 @@ void fbDate::update()
 
 void fbDate::mdy(string& d)
 {
-	ostringstream s;
-	s << d << mon << '/' << (day < 10 ? "0" : "" )<< day << '/' << year;
-	d = s.str();
+	d += (mon < 10 ? "0" : "");
+	ltostr(mon, d);
+	d += "/";
+	d += (day < 10 ? "0" : "");
+	ltostr(day, d);
+	d += "/";
+	ltostr(year, d);
 }
 
 void fbDate::my(string& d)
 {
-	ostringstream s;
-	s << d << mon << '/' << year;
-	d = s.str();
+	d += (mon < 10 ? "0" : "");
+	ltostr(mon, d);
+	d += "/";
+	ltostr(year, d);
+}
+
+void fbDate::ltostr(long val, string& str)
+{
+	char buff[20];
+	sprintf(buff, "%ld", val);
+	str += buff;
 }
 

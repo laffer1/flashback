@@ -1,4 +1,4 @@
-/* $Id: fbTime.h,v 1.3 2008/03/20 18:25:25 wyverex Exp $ */
+/* $Id: fbTime.h,v 1.4 2008/03/29 16:25:35 wyverex Exp $ */
 
 
 #ifndef fbTIME_H
@@ -73,6 +73,7 @@ private:
 	int sec;
 
 	void update();
+	void ltostr(long val, string& str);
 };
 
 #endif

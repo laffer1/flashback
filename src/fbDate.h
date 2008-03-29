@@ -1,4 +1,4 @@
-/* $Id: fbDate.h,v 1.5 2008/03/22 23:48:07 laffer1 Exp $ */
+/* $Id: fbDate.h,v 1.6 2008/03/29 16:25:35 wyverex Exp $ */
 
 #ifndef fbDATE_H
 #define fbDATE_H
@@ -74,6 +74,8 @@ private:
 		
 	void update();		/// < call update when the julian changes to update year, mon, day
 				/// its a long calculation, so don't call to often
+
+	void ltostr(long val, string& str);
 };
 
 #endif

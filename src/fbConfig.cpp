@@ -1,4 +1,4 @@
-/* $Id: fbConfig.cpp,v 1.7 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbConfig.cpp,v 1.8 2008/03/29 16:25:35 wyverex Exp $ */
 
 #include "fbConfig.h"
 
@@ -153,8 +153,9 @@ void fbConfig::setWebServerAddr(const string& strAddr)
 
 void fbConfig::setWebServerPort(const string& strPort)
 {
-    istringstream s(strPort);
-    s >> port;
+    //istringstream s(strPort);  //we think string stream has memory leak
+    //s >> port;
+    port = atol(strPort.c_str());
     dirty = true;
 }
 
