@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.13 2008/03/29 03:24:33 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.14 2008/03/29 17:22:29 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -69,7 +69,7 @@ public:
     ~fbClient();  /// Destructor
 
     void parseHeaders();  /// Parse the HTTP headers on the client connection.
-    int begins_with( char * str1, const char * str2 );
+    int begins_with( const char * str1, const char * str2 );
 
     char * getPath();
     char * getHost();

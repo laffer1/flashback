@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.16 2008/03/29 15:36:46 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.17 2008/03/29 17:22:29 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -65,9 +65,9 @@ fbClient::~fbClient()
 
 void fbClient::parseHeaders()
 {
-    char *reqstr;
-    char *tmp;
-    char *tmp2;
+    char *reqstr = NULL;
+    char *tmp = NULL;
+    char *tmp2 = NULL;
 
     reqstr = (char *)calloc( MAX_REQUEST,  sizeof(char));
     
@@ -82,11 +82,11 @@ void fbClient::parseHeaders()
     {
         if ( strcmp( tmp, "GET" ) == 0 ) 
             httptype = GET;
-       else if ( strcmp( tmp, "POST" ) == 0 )
+        else if ( strcmp( tmp, "POST" ) == 0 )
            httptype = POST;
-       else if ( strcmp( tmp, "HEAD" ) == 0 )
+        else if ( strcmp( tmp, "HEAD" ) == 0 )
            httptype = HEAD;
-       else
+        else
            httptype = NOTSUPPORTED;
     }
 
@@ -102,30 +102,31 @@ void fbClient::parseHeaders()
          else if ( begins_with( tmp, "https://" ) == 1 )
          {
 
-          }
+         }
          else // relative url
          {
               path = new string(tmp);
               host = new string("*"); // host was not defined here, probably a host header
-          }
+         }
     }   
 
     // TODO: figure out HTTP version.  Not important for now.
     free(reqstr);
 }
 
-int fbClient::begins_with( char * str1,const char * str2 )
+
+int fbClient::begins_with( const char * str1, const char * str2 )
 {
-    int str2len;
-    int str1len;
-    int i;
+    size_t str2len;
+    size_t str1len;
+    unsigned int i;
 
     str2len = strlen( str2 );
     str1len = strlen( str1 );
 
     if ( str1len < str2len )
         return -1;  // error
-   else if ( str1len == 0 )
+    else if ( str1len == 0 )
         return -1; // error
     else
         for ( i = 0; i < str2len; i++ )
