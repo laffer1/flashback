@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.41 2008/03/29 17:04:35 wyverex Exp $
+# $Id: Makefile,v 1.42 2008/03/29 17:09:13 wyverex Exp $
 #
 #Flashback make file
 #
@@ -87,7 +87,7 @@ dinstall:
 	cp README  ${DESTDIR}${DOCROOT}
 	cp flashback.db ${DESTDIR}${DATABASEROOT}
 	cp bin/flashback_d ${DESTDIR}${PREFIX}/sbin/flashback
-	chmod 755 ${DESTDIR}${PREFIX}/sbin/flashback_d
+	chmod 755 ${DESTDIR}${PREFIX}/sbin/flashback
 #	cp flashback.sh ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
 #	chmod 755 ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
 
@@ -95,11 +95,5 @@ uninstall:
 	rm -rf ${DESTDIR}${DATABASEROOT}
 	rm -rf ${DESTDIR}${DOCROOT}
 	rm ${DESTDIR}${PREFIX}/sbin/flashback
-#	rm ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
-
-duninstall:
-	rm -rf ${DESTDIR}${DATABASEROOT}
-	rm -rf ${DESTDIR}${DOCROOT}
-	rm ${DESTDIR}${PREFIX}/sbin/flashback_d
 #	rm ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
 
