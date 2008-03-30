@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.18 2008/03/30 16:49:11 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.19 2008/03/30 17:18:16 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -24,7 +24,10 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/param.h>
+
 #include <stdlib.h>
 
 #include "fbHttpServer.h"
@@ -113,28 +116,61 @@ void fbHttpResponse::run()
     shutdown();  // clean up 
 }
 
+
 void fbHttpResponse::sendfile( const char * path )
 {
-    FILE *fp;
+    FILE *fp;           // the file to send to the client
     string realp = "/usr/local/share/flashback/www/";
-    int c;
-    char *resolved;
+    int c;                  // an individual character we're going to write to stream
+    char *resolved;  // The path after it has been tested with realpath
+    struct stat st;  // the information about a file from lstat call
 
     data->debug(NONE, "fbHttpResponse.sendfile");
 
     if (path != NULL)
         realp.append(path);
     else
-        return; // TODO: Error logging and 404?
+    {
+        notfound();
+        return; // TODO: Error logging
+    }
 
     resolved = (char *)calloc(PATH_MAX, sizeof(char));
+    if (resolved == NULL)
+    {
+       /* TODO: change this to a 500 internal server error since we didn't get memory */
+        notfound();
+        return;
+    }
     realpath(realp.c_str(), resolved);
 
+   /* The file is not there */
     if (!*resolved)
     {
         notfound();
         return;
     }
+
+    /* Find out if it's a symlink */
+    if ( lstat( resolved, &st ) == -1 )
+   {
+       /* since the system call failed, let's assume we can't read the file. */
+       free(resolved);
+       notfound();
+       return;
+   }
+   else
+   {
+       if (S_ISLNK(st.st_mode) )
+       { 
+          // this means it's a symlink which we don't support.
+         // TODO: permissions error instead?
+         free(resolved);
+          notfound();
+          return;
+       }
+   }
+
     if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
         //data->msg(NONE, "fbHttpResponse: Unable to open file");
         //data->msg(NONE, resolved);
@@ -151,7 +187,6 @@ void fbHttpResponse::sendfile( const char * path )
     header( "Content-Language", "en-US" );
     client->write("\r\n"); // end header section
 
-        
     while ( (c = fgetc(fp)) != EOF && !ferror(fp))
     {
         if (c != EOF)
