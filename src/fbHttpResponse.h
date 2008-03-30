@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.9 2008/03/29 19:05:26 wyverex Exp $ */
+/* $Id: fbHttpResponse.h,v 1.10 2008/03/30 17:27:29 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -55,7 +55,7 @@ protected:
     bool running;  /// is the response thread running?
 
     void run();     /// heavy lifting
-    void index();  /// print index page for website.
+    void internal();  ///  500 internal server error
     void notfound(); /// 404 Not Found handler
     void header( string name, string value );  /// Create and write header for client
     void status( string code, string msg );  /// write status code like 404 or 200 OK
