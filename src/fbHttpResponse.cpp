@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.17 2008/03/29 19:05:26 wyverex Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.18 2008/03/30 16:49:11 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -31,7 +31,7 @@
 #include "fbHttpResponse.h"
 #include "fbSocket.h"
 
-#define MIMECOUNT 8
+#define MIMECOUNT 12
 
 static const char *  mime[][2] = { 
     { ".html", "text/html" },
@@ -42,6 +42,10 @@ static const char *  mime[][2] = {
     { ".gif", "image/gif" },
     { ".txt", "text/plain" },
     { ".css", "text/css" },
+    { ".xml", "text/xml" },
+    { ".xsl", "text/xml" },
+    { ".xslt", "text/xml" },
+    { ".tar", "multipart/x-tar" },
     { NULL, NULL }
 };
 
@@ -89,16 +93,14 @@ void fbHttpResponse::run()
 
     data->debug(NONE, "fbHttpResponse.run");
 
-    sendfile(path);
+    /* deal with / and /index it shoudl access our default index.html */
+    if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 ) 
+    {
+        free(path);
+        path = strdup("/index.hml");
+    }
 
-/*
-    if ( strcmp(path, "/") == 0 )
-        index();
-    else if ( strcmp(path, "/index") == 0 )
-        index();
-    else
-        notfound();
-*/
+    sendfile(path);
 
     data->debug(NONE, "fbHttpResponse.run() free path memory");
     // we're mallocing this elsewhere.
