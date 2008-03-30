@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.19 2008/03/30 17:18:16 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.20 2008/03/30 17:27:07 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -138,8 +138,7 @@ void fbHttpResponse::sendfile( const char * path )
     resolved = (char *)calloc(PATH_MAX, sizeof(char));
     if (resolved == NULL)
     {
-       /* TODO: change this to a 500 internal server error since we didn't get memory */
-        notfound();
+        internal();
         return;
     }
     realpath(realp.c_str(), resolved);
@@ -228,6 +227,18 @@ void fbHttpResponse::notfound()
 
     if (path != NULL)
         free( path );
+}
+
+void fbHttpResponse::internal()
+{
+    data->debug(NONE, "fbHttpServer.internal");
+    status( "500", "Internal Server Error" );
+    header( "Server", SERVERID );
+    headdate();
+    header( "Connection", "close");
+    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    header( "Content-Language", "en-US" );
+    client->write("\r\n");;
 }
 
 // ok so it's invalid for .9... 
