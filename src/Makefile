@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.44 2008/03/29 23:33:06 wyverex Exp $
+# $Id: Makefile,v 1.45 2008/03/31 01:26:04 ctubbsii Exp $
 #
 #Flashback make file
 #
@@ -95,6 +95,6 @@ dinstall: uninstall
 uninstall:
 	rm -rf ${DESTDIR}${DATABASEROOT}
 	rm -rf ${DESTDIR}${DOCROOT}
-	rm ${DESTDIR}${PREFIX}/sbin/flashback
-#	rm ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
+	rm -f ${DESTDIR}${PREFIX}/sbin/flashback
+#	rm -f ${DESTDIR}${PREFIX}/etc/rc.d/flashback.sh
 
