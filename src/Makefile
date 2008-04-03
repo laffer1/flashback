@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.45 2008/03/31 01:26:04 ctubbsii Exp $
+# $Id: Makefile,v 1.46 2008/04/03 07:56:42 ctubbsii Exp $
 #
 #Flashback make file
 #
@@ -7,11 +7,11 @@
 CC=g++
 CFLAGS= -pthread -Wall -pedantic
 BINNAME=bin/flashback
-LIBS=-lsqlite3
+LIBS=-lsqlite3 -larchive
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
 	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o fbConfig.o \
-	fbBackup.o
+	fbBackup.o fbRestore.o
 
 PREFIX= /usr/local
 DESTDIR=
