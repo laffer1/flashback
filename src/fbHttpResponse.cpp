@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.22 2008/04/07 14:12:46 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.23 2008/04/07 14:20:59 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -100,7 +100,13 @@ void fbHttpResponse::run()
         path = strdup("/index.hml");
     }
 
-    sendfile(path);
+    // Is this a built in command.. ? for forms
+    if ( strstr( path, "?" ) != NULL )
+    {
+
+    }
+    else  // Must be a file on the file system!
+        sendfile(path);
 
     data->debug(NONE, "fbHttpResponse.run() free path memory");
     // we're mallocing this elsewhere.
