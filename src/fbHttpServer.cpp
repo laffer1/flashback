@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.15 2008/03/29 18:25:13 wyverex Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.16 2008/04/07 14:11:08 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -50,9 +50,7 @@ void fbHttpServer::startup()
     if (isRunning())
         return;
 
-    string bindhost = "0.0.0.0";
-
-    servsock = new fbSocket(data, (char *) bindhost.c_str(), 8080 ); // TODO: Use the settings object to set these.
+    servsock = new fbSocket(data, (char *) data->getWebServerAddr().c_str(), data->getWebServerPort() );
 
     data->debug(NONE, "fbHttpServer.startup socket created?");
     start();
