@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.17 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.18 2008/04/07 13:20:47 wyverex Exp $ */
 
 /**
 *	fbThread.cpp
@@ -101,7 +101,7 @@ void fbThread::forceStop()
 	if(TerminateThread(_hThread, 0) == -1)
 		data->err(THREADTERMINATEFAILED, "TerminateThread Failed");
 #else
-	if(!pthread_cancel(_hThread))
+	if(pthread_cancel(_hThread))
 	{
 		data->err(THREADTERMINATEFAILED, "pthread_cancel Failed");
 	}

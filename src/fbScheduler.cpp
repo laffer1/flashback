@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.5 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.6 2008/04/07 13:20:47 wyverex Exp $ */
 
 
 
@@ -12,7 +12,7 @@ fbScheduler::fbScheduler(fbData* _data):fbThread(_data), data(_data)
 
 fbScheduler::~fbScheduler()
 {
-	data->debug(NONE, "fbScheduler.this");
+	data->debug(NONE, "fbScheduler.~this");
 	shutdown();
 }
 
@@ -36,7 +36,7 @@ void fbScheduler::run()
 	fbTime time;
 	string path("/var/log");
 
-	data->db->addBackupJob(desc,date,time,path);
+	//data->db->addBackupJob(desc,date,time,path);
 
 	while(!isStopping())
 	{
