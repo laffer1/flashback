@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.23 2008/04/07 14:20:59 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.24 2008/04/07 14:56:01 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -88,7 +88,11 @@ void fbHttpResponse::shutdown()
 void fbHttpResponse::run()
 {
      // we should probably check this during the request  while(!isStopping())
-    char *path;
+    char *path; // the virtual path 
+    char *loc; // the location of a query string if any
+    size_t pathlen; // length of path
+    char **ap, *argv[1024];
+
     path = client->getPath();
 
     data->debug(NONE, "fbHttpResponse.run");
@@ -101,9 +105,31 @@ void fbHttpResponse::run()
     }
 
     // Is this a built in command.. ? for forms
-    if ( strstr( path, "?" ) != NULL )
+    if ( ( loc = strstr( path, "?" ) ) != NULL )
     {
+        pathlen = strlen(path);
 
+        if ( strlen((loc + 1)) < pathlen )
+        {
+           // break it up into an argument vector.
+	   for (ap = argv; (*ap = strsep(&loc, ";")) != NULL;)
+                   if (**ap != '\0')
+                           if (++ap >= &argv[1024])
+                                   break;
+
+           loc[0] = '\0'; // whack the ?
+           // it's path testing time
+           if ( strcmp( path, "/current" ) == 0 )
+               notfound();
+           else if ( strcmp( path, "/schedule" ) == 0 )
+               notfound();
+           else if ( strcmp( path, "/restore" ) == 0 )
+               notfound();
+           else if ( strcmp( path, "/settings" ) == 0 )
+               notfound();
+        }
+        else // can't be valid
+           internal(); 
     }
     else  // Must be a file on the file system!
         sendfile(path);
