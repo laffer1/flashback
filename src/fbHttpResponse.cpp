@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.21 2008/04/07 13:56:49 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.22 2008/04/07 14:12:46 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -117,7 +117,7 @@ void fbHttpResponse::run()
 void fbHttpResponse::sendfile( const char * path )
 {
     FILE *fp;           // the file to send to the client
-    string realp = "/usr/local/share/flashback/www/";
+    string realp = data->getWebServerRootPath();
     int c;                  // an individual character we're going to write to stream
     char *resolved;  // The path after it has been tested with realpath
     struct stat st;  // the information about a file from lstat call
