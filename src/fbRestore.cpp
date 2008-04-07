@@ -1,8 +1,8 @@
-/* $Id: fbRestore.cpp,v 1.2 2008/04/03 09:28:32 ctubbsii Exp $ */
+/* $Id: fbRestore.cpp,v 1.3 2008/04/07 10:34:45 ctubbsii Exp $ */
 
 #include "fbRestore.h"
 
-fbRestore::fbRestore(fbData* _data, string& src, string& dest):fbThread(_data), data(_data), from(src), to(dest)
+fbRestore::fbRestore(fbData* _data, string& src, string& dest):fbThread(_data), data(_data), filename(src), path(dest)
 {
     data->debug(NONE,"fbRestore.this");
     startDelete();
@@ -15,29 +15,30 @@ fbRestore::~fbRestore()
 
 void fbRestore::run()
 {
-    struct archive *a;
-    struct archive_entry *entry;
-    int resp;
+    struct archive *a = NULL;
+    struct archive_entry *entry = NULL;
+    bool goAhead = true;
+    int resp = 0;
 
     a = archive_read_new();
     archive_read_support_format_tar(a);
     archive_read_support_compression_bzip2(a);
 
     // change to destination directory
-    if (chdir(to.c_str()) != 0)
+    if (chdir(path.c_str()) != 0)
     {
         data->err(NONE, "Can't change to destination directory to perform restore");
-        return;
+        goAhead = false;
     }
 
     // open archive; requires absolute path, since we've already changed to destination directory
-    if (archive_read_open_filename(a, from.c_str(), 10240))
+    else if (archive_read_open_filename(a, filename.c_str(), 10240))
     {
         data->err(NONE, archive_error_string(a));
-        return;
+        goAhead = false;
     }
 
-    while(true)
+    while(goAhead)
     {
         // place next archive entry into variable named entry
         resp = archive_read_next_header(a, &entry);
@@ -55,7 +56,6 @@ void fbRestore::run()
             data->err(NONE, archive_error_string(a));
             break;
         }
-
 
         data->debug(NONE, "Attempting to extract file from archive: ");
         data->debug(NONE, archive_entry_pathname(entry));
@@ -79,5 +79,6 @@ void fbRestore::run()
         }
     } // end while(true);
 
+    if (entry) free(entry);
     archive_read_finish(a);
 }

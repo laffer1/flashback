@@ -1,4 +1,4 @@
-/* $Id: fbRestore.h,v 1.1 2008/04/03 07:56:43 ctubbsii Exp $ */
+/* $Id: fbRestore.h,v 1.2 2008/04/07 10:34:45 ctubbsii Exp $ */
 
 #ifndef fbRESTORE_H
 #define fbRESTORE_H
@@ -17,8 +17,8 @@ public:
 
 private:
 	fbData* data;
-	string from;
-	string to;
+	string filename;
+	string path;
 
 	void run();
 

@@ -1,4 +1,4 @@
-/* $Id: fbBackup.h,v 1.2 2008/04/03 07:56:43 ctubbsii Exp $ */
+/* $Id: fbBackup.h,v 1.3 2008/04/07 10:34:45 ctubbsii Exp $ */
 
 #ifndef fbBACKUP_H
 #define fbBACKUP_H
@@ -8,6 +8,7 @@
 #include "fbData.h"
 #include <archive.h>
 #include <archive_entry.h>
+#include <dirent.h>
 
 class fbBackup: public fbThread
 {
@@ -17,8 +18,8 @@ public:
 
 private:
 	fbData* data;
-	string from;
-	string to;
+	string path;
+	string filename;
 
 	void run();
 
