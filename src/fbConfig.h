@@ -1,4 +1,4 @@
-/* $Id: fbConfig.h,v 1.5 2008/03/29 17:38:37 laffer1 Exp $ */
+/* $Id: fbConfig.h,v 1.6 2008/04/07 13:56:49 laffer1 Exp $ */
 
 #ifndef FBCONFIG_H
 #define FBCONFIG_H
@@ -8,7 +8,7 @@
 
 #define FBCONFIG_DEFAULT_ADDR "127.0.0.1"
 #define FBCONFIG_DEFAULT_PORT 8080
-#define FBCONFIG_DEFAULT_WEBROOT "/var/flashback/webroot"
+#define FBCONFIG_DEFAULT_WEBROOT "/usr/local/share/flashback/www/"
 #define FBCONFIG_DEFAULT_DBPATH "/var/flashback/flashback.db"
 
 

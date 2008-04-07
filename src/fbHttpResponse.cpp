@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.20 2008/03/30 17:27:07 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.21 2008/04/07 13:56:49 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -83,9 +83,6 @@ void fbHttpResponse::shutdown()
 
     data->debug(NONE, "fbHttpResponse.shutdown");
     running = false; // stop it gracefully
-    
-   // data->debug(NONE, "fbHttpResponse.shutdown() delete myself");
-    //delete this;
 }
 
 void fbHttpResponse::run()
