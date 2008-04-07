@@ -1,4 +1,4 @@
-/* $Id: fbConfig.cpp,v 1.9 2008/03/29 17:38:37 laffer1 Exp $ */
+/* $Id: fbConfig.cpp,v 1.10 2008/04/07 14:00:57 laffer1 Exp $ */
 
 #include "fbConfig.h"
 
@@ -187,7 +187,7 @@ const int fbConfig::getWebServerPort()
     return port;
 }
 
-const string& fbConfig::setWebServerRootPath()
+const string& fbConfig::getWebServerRootPath()
 {
     return webroot;
 }

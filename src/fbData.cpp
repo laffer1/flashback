@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.7 2008/03/27 17:48:14 wyverex Exp $ */
+/* $Id: fbData.cpp,v 1.8 2008/04/07 14:00:57 laffer1 Exp $ */
 
 #include "fbData.h"
 
@@ -106,9 +106,9 @@ const int   fbData::getWebServerPort()
 	return config->getWebServerPort();
 }
 
-const string& fbData::setWebServerRootPath()
+const string& fbData::getWebServerRootPath()
 {
-	return config->setWebServerRootPath();
+	return config->getWebServerRootPath();
 }
 
 const string& fbData::getDBPath()

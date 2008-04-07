@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.6 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbData.h,v 1.7 2008/04/07 14:00:57 laffer1 Exp $ */
 
 
 
@@ -37,7 +37,7 @@ public:
 	void setDBPath(const string& strPath);
 	const string& getWebServerAddr();
 	const int   getWebServerPort();
-	const string& setWebServerRootPath();
+	const string& getWebServerRootPath();
 	const string& getDBPath();
 
 	

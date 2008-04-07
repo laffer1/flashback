@@ -1,4 +1,4 @@
-/* $Id: fbConfig.h,v 1.6 2008/04/07 13:56:49 laffer1 Exp $ */
+/* $Id: fbConfig.h,v 1.7 2008/04/07 14:00:57 laffer1 Exp $ */
 
 #ifndef FBCONFIG_H
 #define FBCONFIG_H
@@ -44,7 +44,7 @@ public:
 
 	const string& getWebServerAddr();
 	const int   getWebServerPort();
-	const string& setWebServerRootPath();
+	const string& getWebServerRootPath();
 	const string& getDBPath();
 
 private:
