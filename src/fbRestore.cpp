@@ -1,4 +1,4 @@
-/* $Id: fbRestore.cpp,v 1.3 2008/04/07 10:34:45 ctubbsii Exp $ */
+/* $Id: fbRestore.cpp,v 1.4 2008/04/07 10:36:51 ctubbsii Exp $ */
 
 #include "fbRestore.h"
 
@@ -77,8 +77,9 @@ void fbRestore::run()
             data->err(NONE, "Archive failure");
             break;
         }
+
+        archive_entry_free(entry);
     } // end while(true);
 
-    if (entry) free(entry);
     archive_read_finish(a);
 }
