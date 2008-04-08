@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.9 2008/04/08 15:56:29 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.10 2008/04/08 19:16:46 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -171,7 +171,7 @@ int fbSQL::querry(string& cmd)
 	// test if okay
 	if(ret != SQLITE_OK)
 	{	//error, report warning
-		err += ret;
+		err += errmsg;
 		errlog->warn(SQLEXECERROR, err);
 		sqlite3_free(errmsg);
 		return ret;
@@ -190,6 +190,7 @@ int fbSQL::querry(string& cmd)
 		col_header.push_back(result[_cols+i]);
 
 	sqlite3_free_table(result);
+	errlog->debug(NONE, "fbSQL: Querry OK");
 	return ret;
 }
 

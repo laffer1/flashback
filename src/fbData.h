@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.7 2008/04/07 14:00:57 laffer1 Exp $ */
+/* $Id: fbData.h,v 1.8 2008/04/08 19:16:46 wyverex Exp $ */
 
 
 
@@ -39,6 +39,10 @@ public:
 	const int   getWebServerPort();
 	const string& getWebServerRootPath();
 	const string& getDBPath();
+
+	//Database functions
+	bool addBackupJob(string* desc, fbDate* date, fbTime* time, string* path, Repeat_type rt = ONCE, int rv = 0);
+	bool querryBackups();
 
 	
 //private:

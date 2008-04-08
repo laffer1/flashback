@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.8 2008/04/07 14:00:57 laffer1 Exp $ */
+/* $Id: fbData.cpp,v 1.9 2008/04/08 19:16:46 wyverex Exp $ */
 
 #include "fbData.h"
 
@@ -115,3 +115,28 @@ const string& fbData::getDBPath()
 {
 	return config->getDBPath();
 }
+
+
+
+// Database functions
+// addBackupJob(new string("test"), new fbDate, new fbTime, new string("/var/log"));
+//
+bool fbData::addBackupJob(string* desc, fbDate* date, fbTime* time, string* path, Repeat_type rt, int rv)
+{
+	bool ret = db->addBackupJob(*desc, *date, *time, *path, rt, rv);
+	delete desc;
+	delete date;
+	delete time;
+	delete path;
+	return ret;
+}
+
+
+bool fbData::querryBackups()
+{
+	return db->querryBackups();
+
+}
+
+
+

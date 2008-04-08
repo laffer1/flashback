@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.10 2008/03/31 01:26:04 ctubbsii Exp $ */
+/* $Id: fbCore.cpp,v 1.11 2008/04/08 19:16:46 wyverex Exp $ */
 
 /**
 *  fbCore.cpp
@@ -51,6 +51,13 @@ void core()
 
 	// Shutdown Detector
 	signal(SIGTERM, sigterm_handler);
+
+	data.addBackupJob(new string("test1"),new fbDate,new fbTime, new string("/var/log"));
+	data.addBackupJob(new string("test2"),new fbDate,new fbTime, new string("/var/log"));
+	data.addBackupJob(new string("test3"),new fbDate,new fbTime, new string("/var/log"));
+	data.addBackupJob(new string("test4"),new fbDate,new fbTime, new string("/var/log"));
+
+
 
 	//core loop
 	while(FlashBackRunning)

@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.6 2008/04/08 15:33:45 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.7 2008/04/08 19:16:46 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -10,13 +10,13 @@
 */
 
 
-fbDatabase::fbDatabase(fbErrorLogger* log, string path):errlog(log), cs(), db(errlog)
+fbDatabase::fbDatabase(fbErrorLogger* log, string path):errlog(log), cs(), db(errlog), row(0)
 {
 	db.connect(path);
 	errlog->debug(NONE, "fbDatabase.this");
 }
 
-fbDatabase::fbDatabase(fbErrorLogger* log, const char* path):errlog(log), cs(), db(errlog)
+fbDatabase::fbDatabase(fbErrorLogger* log, const char* path):errlog(log), cs(), db(errlog), row(0)
 {
 	db.connect(path);
 	errlog->debug(NONE, "fbDatabase.this");
@@ -48,6 +48,63 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 	return true;
 }
 
+
+
+bool fbDatabase::querryBackups()
+{
+	char buff[500];
+	fbDate date;
+	fbTime time;
+
+	sprintf(buff,"select * from backup where date <= %ld AND time <= %ld;", 
+	   date.getJulian(), time.getTicks());
+
+	string cmd = buff;
+	errlog->debug(NONE, cmd);
+
+	db.querry(cmd);
+	
+	errlog->debug(NONE, "Querry Done");
+
+	row = 0;
+
+	return true;
+}
+
+bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& path, 
+		Repeat_type* rt, int* rv, int* id)
+{
+	errlog->debug(NONE, "fbDatabase:  Getting Backup Rows");
+
+	if(row >= db.rows()) 
+	{
+		errlog->debug(NONE, "fbDatabase:  No Rows To Get");
+		return false;
+	}
+	
+	int index =  db.cols() * row;
+
+	errlog->debug(NONE, "fbDatabase:  Found a ROW!");
+
+	*id = atoi(db.table[index++].c_str());
+	errlog->debug(NONE, "fbDatabase:  OK1");
+	desc = db.table[index++];
+	errlog->debug(NONE, "fbDatabase:  OK2");
+	date.setJulian(atol(db.table[index++].c_str()));
+	errlog->debug(NONE, "fbDatabase:  OK3");
+	time.setTicks(atol(db.table[index++].c_str()));
+	errlog->debug(NONE, "fbDatabase:  OK4");
+	*rt = (Repeat_type)atoi(db.table[index++].c_str());
+	errlog->debug(NONE, "fbDatabase:  OK5");
+	*rv =  atoi(db.table[index++].c_str());
+	errlog->debug(NONE, "fbDatabase:  OK6");
+	path = db.table[index++];
+	errlog->debug(NONE, "fbDatabase:  OK7");
+
+	++row;
+	errlog->debug(NONE, "fbDatabase:  Got Row");
+	return true;
+}
 
 
 

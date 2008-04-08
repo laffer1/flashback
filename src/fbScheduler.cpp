@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.6 2008/04/07 13:20:47 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.7 2008/04/08 19:16:46 wyverex Exp $ */
 
 
 
@@ -30,18 +30,43 @@ void fbScheduler::shutdown()
 
 void fbScheduler::run()
 {
-	data->debug(NONE, "fbScheduler.run");
-	string desc("test");
+	string desc, path;
 	fbDate date;
 	fbTime time;
-	string path("/var/log");
+	int repeatval, index;
+	Repeat_type repeat;
+	bool ret;
 
-	//data->db->addBackupJob(desc,date,time,path);
 
 	while(!isStopping())
 	{
 		//Backup querry
-		_sleep(60*15);
+		data->querryBackups();
+
+		do
+		{	
+			ret = data->db->getBackupRow(desc, date, time, path, &repeat, 
+				&repeatval, &index);
+			if(ret)
+			{
+				//backup!?!
+				char buff[500];
+				string msg;
+				sprintf(buff, "Backing up: %s: %s at %ld %ld %d %d",
+				desc.c_str(), path.c_str(), time.getTicks(), date.getJulian(),
+				repeat, repeatval);
+				msg = buff;
+				data->debug(NONE, msg);
+
+				//test repeat!
+			}
+		}while(ret);
+		
+
+
+
+		//sleep 15 mins! 60 * 15
+		_sleep(10);
 	}
 }
 
