@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.h,v 1.6 2008/04/08 19:16:46 wyverex Exp $ */
+/* $Id: fbDatabase.h,v 1.7 2008/04/08 20:44:30 wyverex Exp $ */
 
 #ifndef fbDATABASE_H
 #define fbDATABASE_H
@@ -31,6 +31,10 @@ public:
 	bool querryBackups();
 	bool getBackupRow(string& desc, fbDate& date, fbTime& time, string& path, 
 		Repeat_type* rt, int* rv, int* id);
+
+	
+	bool deleteRow(const char* table, int id);
+	
 	
 
 private:

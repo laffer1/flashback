@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.8 2008/04/08 19:44:38 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.9 2008/04/08 20:44:30 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -98,6 +98,17 @@ bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& 
 	errlog->debug(NONE, "fbDatabase:  Got Row");
 	return true;
 }
+
+
+
+bool fbDatabase::deleteRow(const char* table, int id)
+{
+	char buff[500];
+	sprintf(buff, "DELETE FROM %s WHERE ID = %d;", table, id);
+	string cmd = buff;
+	return db.exe(cmd);
+}
+
 
 
 

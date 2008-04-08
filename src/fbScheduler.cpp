@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.7 2008/04/08 19:16:46 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.8 2008/04/08 20:44:30 wyverex Exp $ */
 
 
 
@@ -42,7 +42,6 @@ void fbScheduler::run()
 	{
 		//Backup querry
 		data->querryBackups();
-
 		do
 		{	
 			ret = data->db->getBackupRow(desc, date, time, path, &repeat, 
@@ -52,16 +51,52 @@ void fbScheduler::run()
 				//backup!?!
 				char buff[500];
 				string msg;
-				sprintf(buff, "Backing up: %s: %s at %ld %ld %d %d",
+				sprintf(buff, "Backing up: %d %s: %s at %ld %ld %d %d", index,
 				desc.c_str(), path.c_str(), time.getTicks(), date.getJulian(),
 				repeat, repeatval);
 				msg = buff;
 				data->debug(NONE, msg);
 
+				//do the backup here!
+
 				//test repeat!
+				data->db->deleteRow("backup", index);
+				switch(repeat)
+				{
+					case MINS:
+						time.addMin(repeatval);
+						//need to check for day overflow!
+						data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
+						break;
+					case HOUR:
+						time.addHour(repeatval);
+						//need to check for day overflow
+						data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
+						break;
+					case DAY:
+						date.addDay(repeatval);
+						data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
+						break;
+					case WEEK:
+						date.addWeek(repeatval);
+						data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
+						break;
+					case MONTH:
+						date.addMonth(repeatval);
+						data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
+						break;
+					case YEAR:
+						date.addMonth(repeatval*12);
+						data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
+						break;
+					default:
+						break;
+				}
+
 			}
 		}while(ret);
 		
+		//check resotres here... mostly the same.. but no repeats
 
 
 
