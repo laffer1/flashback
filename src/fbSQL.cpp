@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.10 2008/04/08 19:16:46 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.11 2008/04/08 19:44:38 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -177,6 +177,13 @@ int fbSQL::querry(string& cmd)
 		return ret;
 	}
 
+
+	char buff[500];
+	sprintf(buff, "found %d rows with %d cols",  _rows, _cols);
+	string msg = buff;	
+	errlog->debug(NONE, msg);
+	
+
 	//clear vectors
 	if(col_header.size() != 0) col_header.clear();
 	if(table.size() != 0) table.clear();
@@ -187,7 +194,12 @@ int fbSQL::querry(string& cmd)
 
 	//save data
 	for(int i = 0; i < _cols*_rows; ++i)
-		col_header.push_back(result[_cols+i]);
+		table.push_back(result[_cols+i]);
+
+
+	sprintf(buff, "filled Table data: %d", table.size());
+	msg = buff;	
+	errlog->debug(NONE, msg);
 
 	sqlite3_free_table(result);
 	errlog->debug(NONE, "fbSQL: Querry OK");

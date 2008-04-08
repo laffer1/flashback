@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.7 2008/04/08 19:16:46 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.8 2008/04/08 19:44:38 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -87,19 +87,12 @@ bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& 
 	errlog->debug(NONE, "fbDatabase:  Found a ROW!");
 
 	*id = atoi(db.table[index++].c_str());
-	errlog->debug(NONE, "fbDatabase:  OK1");
 	desc = db.table[index++];
-	errlog->debug(NONE, "fbDatabase:  OK2");
 	date.setJulian(atol(db.table[index++].c_str()));
-	errlog->debug(NONE, "fbDatabase:  OK3");
 	time.setTicks(atol(db.table[index++].c_str()));
-	errlog->debug(NONE, "fbDatabase:  OK4");
 	*rt = (Repeat_type)atoi(db.table[index++].c_str());
-	errlog->debug(NONE, "fbDatabase:  OK5");
 	*rv =  atoi(db.table[index++].c_str());
-	errlog->debug(NONE, "fbDatabase:  OK6");
 	path = db.table[index++];
-	errlog->debug(NONE, "fbDatabase:  OK7");
 
 	++row;
 	errlog->debug(NONE, "fbDatabase:  Got Row");
