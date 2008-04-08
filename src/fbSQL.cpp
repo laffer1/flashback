@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.8 2008/04/08 15:33:45 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.9 2008/04/08 15:56:29 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -148,7 +148,7 @@ int ret = 0;
 }
 
 
-int fbSQL::querry(string cmd)
+int fbSQL::querry(string& cmd)
 {
 	int ret = 0;
 	char* errmsg;

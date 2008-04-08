@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.8 2008/04/08 15:33:45 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.9 2008/04/08 15:56:29 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
@@ -32,7 +32,7 @@ public:
 
 	bool isConnected();  /// < are we connected
 
-	int exe(string& cmd)  /// < new command method
+	int exe(string& cmd);  /// < new command method
 	int querry(string& cmd);  /// < runs a querry
 
 
