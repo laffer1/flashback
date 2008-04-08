@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.7 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.8 2008/04/08 15:33:45 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -118,52 +118,37 @@ bool fbSQL::isConnected()
 }
 
 /**
-*  exec
-*  exectues a querry on the database
+*  exe
+*  exectues an command on the database
 *  @param command SQL command to send to DB
-*  @param callback SQLite sends result to callback
-*  @return sqlite3_exec return value
 */
-int fbSQL::exec(char* command,int(*callback)(void*,int,char**,char**))
+int fbSQL::exe(string& cmd)
 {
-	int ret = 0;
+int ret = 0;
 	char* errmsg;
 	string err = "sqlite3 error code: ";
-	
 	// lock so two commands can't be sent at once
 	fbLock lock(cs);
 
 	// send command
-	ret = sqlite3_exec(db, command, callback, 0 , &errmsg);
+	errlog->debug(NONE, cmd);
+	ret = sqlite3_exec(db, cmd.c_str(), NULL, 0 , &errmsg);
 
 	// test if okay
 	if(ret != SQLITE_OK)
 	{	//error, report warning
 		err += ret;
 		errlog->warn(SQLEXECERROR, err);
+		errlog->warn(SQLEXECERROR, errmsg);
 		sqlite3_free(errmsg);
 	}
 
-	//done, unlocks here
+	//done, after return
 	return ret;
 }
 
 
-/**
-*  exec
-*  exectues a querry on the database
-*  overloaded string wrapper
-*  @param command SQL command to send to DB
-*  @param callback SQLite sends result to callback
-*  @return sqlite3_exec return value
-*/
-int fbSQL::exec(string command,int(*callback)(void*,int,char**,char**) )
-{
-	return exec(command.c_str(), callback);
-}
-
-
-int fbSQL::exe(string cmd)
+int fbSQL::querry(string cmd)
 {
 	int ret = 0;
 	char* errmsg;

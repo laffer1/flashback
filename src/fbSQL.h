@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.7 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.8 2008/04/08 15:33:45 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
@@ -32,21 +32,18 @@ public:
 
 	bool isConnected();  /// < are we connected
 
-	int exec(char* command,int(*callback)(void*,int,char**,char**));  /// < exec quarry
-	int exec(string command,int(*callback)(void*,int,char**,char**)); /// < execute quarry
-	
-	int exe(string cmd);  /// < better way...
+	int exe(string& cmd)  /// < new command method
+	int querry(string& cmd);  /// < runs a querry
 
 
-	int rows() { return _rows; };
-	int cols() { return _cols; };
+	const int rows() { return _rows; };
+	const int cols() { return _cols; };
 
 	
 	vector<string> col_header;
 	vector<string> table;
-	
 
-private:
+	private:
 	fbErrorLogger* errlog;	/// < error logger
 	fbCriticalSection cs;   /// < critical section
 	sqlite3* db;		/// < database

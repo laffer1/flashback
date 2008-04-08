@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.5 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.6 2008/04/08 15:33:45 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -37,7 +37,7 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 	string cmd = buff;
 
 	errlog->debug(NONE, cmd);
-	if(db.exe(cmd))
+	if(!db.exe(cmd))
 	{
 		return false;
 		errlog->warn(UNKNOWN, "Failed to add Backup Job..");
