@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.11 2008/04/09 15:13:43 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.12 2008/04/09 15:27:20 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -140,6 +140,7 @@ bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& 
 	if(row >= db.rows()) 
 	{
 		errlog->debug(NONE, "fbDatabase:  No Rows To Get");
+		db.querryDone();
 		return false;
 	}
 	
@@ -168,6 +169,7 @@ bool fbDatabase::getRestoreRow(string& tarfile, string& path, int* id)
 	if(row >= db.rows()) 
 	{
 		errlog->debug(NONE, "fbDatabase:  No Rows To Get");
+		db.querryDone();
 		return false;
 	}
 	
@@ -192,6 +194,7 @@ bool fbDatabase::getRepoRow(string& desc, fbDate& date, fbTime& time, string& pa
 	if(row >= db.rows()) 
 	{
 		errlog->debug(NONE, "fbDatabase:  No Rows To Get");
+		db.querryDone();
 		return false;
 	}
 	

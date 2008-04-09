@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.14 2008/04/09 12:52:50 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.15 2008/04/09 15:27:20 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -17,7 +17,7 @@
 *  constructor
 *  @param errlog Pointer to main error logger
 */
-fbSQL::fbSQL(fbErrorLogger* log): errlog(log), cs(), db(NULL), open(false), _rows(0), _cols(0)
+fbSQL::fbSQL(fbErrorLogger* log): errlog(log), cs(), qCS(), db(NULL), open(false), _rows(0), _cols(0)
 {
 	errlog->debug(NONE, "fbSQL.this");
 }
@@ -28,7 +28,7 @@ fbSQL::fbSQL(fbErrorLogger* log): errlog(log), cs(), db(NULL), open(false), _row
 *  constructor
 *  @param errlog Pointer to main error logger
 */
-fbSQL::fbSQL(fbErrorLogger* log, sqlite3* database): errlog(log), cs(), db(database), open(false), _rows(0), _cols(0)
+fbSQL::fbSQL(fbErrorLogger* log, sqlite3* database): errlog(log), cs(), qCS(), db(database), open(false), _rows(0), _cols(0)
 {
 	errlog->debug(NONE, "fbSQL.this");
 }
@@ -39,7 +39,7 @@ fbSQL::fbSQL(fbErrorLogger* log, sqlite3* database): errlog(log), cs(), db(datab
 *  constructor
 *  @param errlog Pointer to main error logger
 */
-fbSQL::fbSQL(fbSQL& sql): errlog(sql.errlog), cs(), db(sql.db), open(false), _rows(0), _cols(0)
+fbSQL::fbSQL(fbSQL& sql): errlog(sql.errlog), cs(), qCS(), db(sql.db), open(false), _rows(0), _cols(0)
 {
 	errlog->debug(NONE, "fbSQL.this");
 }
@@ -170,6 +170,7 @@ int fbSQL::querry(string& cmd)
 
 	// lock so two commands can't be sent at once
 	fbLock lock(cs);
+	qCS.lock();   /// < lock querry
 
 	// send command
 	//ret = sqlite3_exec(db, command, callback, 0 , &errmsg);

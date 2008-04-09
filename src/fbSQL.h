@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.9 2008/04/08 15:56:29 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.10 2008/04/09 15:27:20 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
@@ -33,12 +33,14 @@ public:
 	bool isConnected();  /// < are we connected
 
 	int exe(string& cmd);  /// < new command method
-	int querry(string& cmd);  /// < runs a querry
+	int querry(string& cmd);  /// < runs a querry, locks qCS()
+	void querryDone() {qCS.unlock();}; /// < unlock querry
 
 
 	const int rows() { return _rows; };
 	const int cols() { return _cols; };
 
+	
 	
 	vector<string> col_header;
 	vector<string> table;
@@ -46,6 +48,7 @@ public:
 	private:
 	fbErrorLogger* errlog;	/// < error logger
 	fbCriticalSection cs;   /// < critical section
+	fbCriticalSection qCS;   /// < critical section
 	sqlite3* db;		/// < database
 	bool open;		/// < open bool
 
