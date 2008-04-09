@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.12 2008/04/09 00:24:17 wyverex Exp $ */
+/* $Id: fbCore.cpp,v 1.13 2008/04/09 13:03:25 wyverex Exp $ */
 
 /**
 *  fbCore.cpp
@@ -52,16 +52,10 @@ void core()
 	// Shutdown Detector
 	signal(SIGTERM, sigterm_handler);
 
-	data.addBackupJob(new string("test1"),new fbDate,new fbTime, new string("/var/log"));
-	data.addBackupJob(new string("test2"),new fbDate,new fbTime, new string("/var/log"));
-	data.addBackupJob(new string("test3"),new fbDate,new fbTime, new string("/var/log"));
-	data.addBackupJob(new string("test4"),new fbDate,new fbTime, new string("/var/log"));
-
-	data.addRestoreJob(new string("something0.tar"), new string("/home/backups/something/"));
-	data.addRestoreJob(new string("something1.tar"), new string("/home/backups/something/"));
-	data.addRestoreJob(new string("something2.tar"), new string("/home/backups/something/"));
-	data.addRestoreJob(new string("something3.tar"), new string("/home/backups/something/"));
-
+	data.addBackupJob(new string("backup test"),new fbDate,new fbTime, new string("/var/games/"));
+	
+	//data.addRestoreJob(new string("something0.tar"), new string("/home/backups/something/"));
+	
 
 
 	//core loop

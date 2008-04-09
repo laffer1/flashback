@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.10 2008/04/09 12:52:50 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.11 2008/04/09 13:03:25 wyverex Exp $ */
 
 
 
@@ -61,9 +61,8 @@ void fbScheduler::run()
 				//do the backup here!
 				sprintf(buff, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
 				msg = buff;
-				fbBackup* back = new fbBackup(data, path, msg);
-				back->startDelete();
-				
+				new fbBackup(data, path, msg);
+		
 
 				//test repeat!
 				data->db->deleteRow("backup", index);
