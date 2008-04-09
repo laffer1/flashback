@@ -1,4 +1,4 @@
-/* $Id: fbBackup.h,v 1.3 2008/04/07 10:34:45 ctubbsii Exp $ */
+/* $Id: fbBackup.h,v 1.4 2008/04/09 06:23:07 ctubbsii Exp $ */
 
 #ifndef fbBACKUP_H
 #define fbBACKUP_H
@@ -9,6 +9,15 @@
 #include <archive.h>
 #include <archive_entry.h>
 #include <dirent.h>
+#include <limits.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#ifdef WIN32
+#define PATH_NAME_SEPARATOR '\'
+#else
+#define PATH_NAME_SEPARATOR '/'
+#endif
 
 class fbBackup: public fbThread
 {
@@ -22,7 +31,8 @@ private:
 	string filename;
 
 	void run();
-
+    void fixAbsolutePaths(struct archive_entry *entry);
+    void traverseDir(struct archive **ap, const char *pathname);
 };
 
 #endif
