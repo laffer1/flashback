@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.10 2008/04/09 15:27:20 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.11 2008/04/09 15:37:30 wyverex Exp $ */
 
 
 #ifndef fbSQL_H
@@ -34,7 +34,7 @@ public:
 
 	int exe(string& cmd);  /// < new command method
 	int querry(string& cmd);  /// < runs a querry, locks qCS()
-	void querryDone() {qCS.unlock();}; /// < unlock querry
+	void querryDone(); /// < unlock querry
 
 
 	const int rows() { return _rows; };

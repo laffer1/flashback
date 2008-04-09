@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.15 2008/04/09 15:27:20 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.16 2008/04/09 15:37:30 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -155,6 +155,13 @@ int ret = 0;
 }
 
 
+void fbSQL::querryDone()
+{
+	qCS.unlock(); 
+	errlog->debug(NONE, "fbSQL: Querry Unlocked");
+
+}
+
 int fbSQL::querry(string& cmd)
 {
 	int ret = 0;
@@ -170,6 +177,7 @@ int fbSQL::querry(string& cmd)
 
 	// lock so two commands can't be sent at once
 	fbLock lock(cs);
+	errlog->debug(NONE, "fbSQL: Querry Locked");
 	qCS.lock();   /// < lock querry
 
 	// send command
