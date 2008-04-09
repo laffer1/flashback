@@ -1,10 +1,10 @@
-$Id: todo,v 1.11 2008/04/07 13:45:34 wyverex Exp $
+$Id: todo,v 1.12 2008/04/09 06:31:04 ctubbsii Exp $
 
 Current To Do List
 
 we need back up running by April 9, 2008
 Byron planning on having fbSQL.. fbDatabase.. fbSchedular working by April 8 8-9pm so we can run backups/restores
-Chris plan on having fbBackup.. fbArchive..?  fbRestore..? working by ?
+Chris plan on having fbBackup.. fbArchive..?  fbRestore..? working by... (backup/restore working now, AFAIK, needs further testing, but seems to work on my end. What is fbArchive?)
 Luke plan on having backup page working by ?
 
 
@@ -16,7 +16,8 @@ fbLock			BH			90%			quick mutex lock, test
 fbConfig	 	CT BH			90%			loads local setings, ie DB paths, web server config
 fbErrorLogger		BH			90%			Log Errors
 fbDiskDetector		BH			0%			Detect New Disks - not used in first version!!
-fbArchive		JM			0%			File Archive .tar
+fbBackup		CT			80%			Backs up a directory tree to a specified archive
+fbRestore		CT			80%			Restores archive to a specified directory
 fbSchedular		BH			10%			Backup sched, will do most of the work
 fbSQL			BH			60%			SQLite3 wrapper, needs testing
 fbDate			BH LH CT    		90%		        Date object
