@@ -1,8 +1,9 @@
-/* $Id: fbScheduler.cpp,v 1.9 2008/04/09 00:24:17 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.10 2008/04/09 12:52:50 wyverex Exp $ */
 
 
 
 #include "fbScheduler.h"
+#define bk_path "/var/flashback/"
 
 
 fbScheduler::fbScheduler(fbData* _data):fbThread(_data), data(_data)
@@ -58,6 +59,11 @@ void fbScheduler::run()
 				data->debug(NONE, msg);
 
 				//do the backup here!
+				sprintf(buff, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
+				msg = buff;
+				fbBackup* back = new fbBackup(data, path, msg);
+				back->startDelete();
+				
 
 				//test repeat!
 				data->db->deleteRow("backup", index);

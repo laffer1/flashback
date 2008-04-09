@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.h,v 1.4 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbScheduler.h,v 1.5 2008/04/09 12:52:50 wyverex Exp $ */
 
 #ifndef fbSCHEDULER_H
 #define fbSCHEDULER_H
@@ -6,8 +6,9 @@
 #include "global.h"
 #include "fbThread.h"
 #include "fbData.h"
+#include "fbBackup.h"
 
-#include <ctime>
+//#include <ctime>
 
 /**
 *  fbScheduler

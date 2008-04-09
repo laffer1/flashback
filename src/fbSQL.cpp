@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.13 2008/04/09 00:37:06 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.14 2008/04/09 12:52:50 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -207,7 +207,7 @@ int fbSQL::querry(string& cmd)
 			table.push_back("");
 
 
-	sprintf(buff, "filled Table data: %d", table.size());
+	sprintf(buff, "filled Table data: %d", (int)table.size());
 	msg = buff;	
 	errlog->debug(NONE, msg);
 
