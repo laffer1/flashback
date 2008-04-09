@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.9 2008/04/08 19:16:46 wyverex Exp $ */
+/* $Id: fbData.cpp,v 1.10 2008/04/09 00:24:17 wyverex Exp $ */
 
 #include "fbData.h"
 
@@ -136,6 +136,19 @@ bool fbData::querryBackups()
 {
 	return db->querryBackups();
 
+}
+
+bool fbData::addRestoreJob(string* tarfile, string* dest)
+{
+	bool ret = db->addRestoreJob(*tarfile, *dest);
+	delete tarfile;
+	delete dest;
+	return ret;
+}
+
+bool fbData::querryRestore()
+{
+	return db->querryRestore();
 }
 
 

@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.8 2008/04/08 19:16:46 wyverex Exp $ */
+/* $Id: fbData.h,v 1.9 2008/04/09 00:24:17 wyverex Exp $ */
 
 
 
@@ -43,6 +43,9 @@ public:
 	//Database functions
 	bool addBackupJob(string* desc, fbDate* date, fbTime* time, string* path, Repeat_type rt = ONCE, int rv = 0);
 	bool querryBackups();
+	bool addRestoreJob(string* tarfile, string* dest);
+	bool querryRestore();
+
 
 	
 //private:

@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.h,v 1.7 2008/04/08 20:44:30 wyverex Exp $ */
+/* $Id: fbDatabase.h,v 1.8 2008/04/09 00:24:17 wyverex Exp $ */
 
 #ifndef fbDATABASE_H
 #define fbDATABASE_H
@@ -27,11 +27,13 @@ public:
 
 	/// Add Back up job
 	bool addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt = ONCE, int rv = 0);
+	bool addRestoreJob(string& tarfile, string& dest);
 
 	bool querryBackups();
+	bool querryRestore();
 	bool getBackupRow(string& desc, fbDate& date, fbTime& time, string& path, 
 		Repeat_type* rt, int* rv, int* id);
-
+	bool getRestoreRow(string& tarfile, string& path, int* id);
 	
 	bool deleteRow(const char* table, int id);
 	

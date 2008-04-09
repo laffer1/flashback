@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.8 2008/04/08 20:44:30 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.9 2008/04/09 00:24:17 wyverex Exp $ */
 
 
 
@@ -96,9 +96,28 @@ void fbScheduler::run()
 			}
 		}while(ret);
 		
-		//check resotres here... mostly the same.. but no repeats
+		//check restore here... mostly the same.. but no repeats
 
+		//restore querry
+		data->querryRestore();
+		do
+		{	
+			ret = data->db->getRestoreRow(desc, path, &index);
+			if(ret)
+			{
+				char buff[500];
+				string msg;
+				sprintf(buff, "Restoring: %d %s: %s", index, desc.c_str(), path.c_str());
+				msg = buff;
+				data->debug(NONE, msg);
 
+				//do the restore here!
+
+				//test repeat!
+				data->db->deleteRow("restore", index);
+
+			}
+		}while(ret);
 
 		//sleep 15 mins! 60 * 15
 		_sleep(10);

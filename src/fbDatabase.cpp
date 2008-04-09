@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.9 2008/04/08 20:44:30 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.10 2008/04/09 00:24:17 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -48,7 +48,24 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 	return true;
 }
 
+bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
+{
+	char buff[500];
+	sprintf(buff,"insert into restore (tarfile, path) values (\'%s\', \'%s\');", tarfile.c_str(), dest.c_str());
+	string cmd = buff;
 
+	errlog->debug(NONE, cmd);
+	if(!db.exe(cmd))
+	{
+		return false;
+		errlog->warn(UNKNOWN, "Failed to add Restore Job..");
+	}
+
+//restore (ID INTEGER PRIMARY KEY, tarfile TEXT, path TEXT);
+	
+	return true;
+
+}
 
 bool fbDatabase::querryBackups()
 {
@@ -71,6 +88,21 @@ bool fbDatabase::querryBackups()
 	return true;
 }
 
+
+bool fbDatabase::querryRestore()
+{
+	string cmd = "select * from restore;";
+	errlog->debug(NONE, cmd);
+
+	db.querry(cmd);
+	errlog->debug(NONE, "Querry Done");
+
+	row = 0;
+
+	return true;
+}
+
+
 bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& path, 
 		Repeat_type* rt, int* rv, int* id)
 {
@@ -92,6 +124,30 @@ bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& 
 	time.setTicks(atol(db.table[index++].c_str()));
 	*rt = (Repeat_type)atoi(db.table[index++].c_str());
 	*rv =  atoi(db.table[index++].c_str());
+	path = db.table[index++];
+
+	++row;
+	errlog->debug(NONE, "fbDatabase:  Got Row");
+	return true;
+}
+
+
+bool fbDatabase::getRestoreRow(string& tarfile, string& path, int* id)
+{
+	errlog->debug(NONE, "fbDatabase:  Getting Restore Rows");
+
+	if(row >= db.rows()) 
+	{
+		errlog->debug(NONE, "fbDatabase:  No Rows To Get");
+		return false;
+	}
+	
+	int index =  db.cols() * row;
+
+	errlog->debug(NONE, "fbDatabase:  Found a ROW!");
+
+	*id = atoi(db.table[index++].c_str());
+	tarfile = db.table[index++];
 	path = db.table[index++];
 
 	++row;
