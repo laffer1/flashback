@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.10 2008/04/09 00:24:17 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.11 2008/04/09 15:13:43 wyverex Exp $ */
 
 #include "fbDatabase.h"
 
@@ -62,9 +62,24 @@ bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 	}
 
 //restore (ID INTEGER PRIMARY KEY, tarfile TEXT, path TEXT);
-	
 	return true;
+}
 
+bool fbDatabase::addRepo(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile)
+{
+	char buff[500];
+	sprintf(buff,"insert into repo (desc, date, time, path, tarfile) values (\'%s\', %ld, %ld, \'%s\', \'%s\');", 
+		desc.c_str(), date.getJulian(), time.getTicks(), path.c_str(), tarfile.c_str());
+	string cmd = buff;
+
+	errlog->debug(NONE, cmd);
+	if(!db.exe(cmd))
+	{
+		return false;
+		errlog->warn(UNKNOWN, "Failed to add Restore Job..");
+	}
+//repo (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, path TEXT, tarfile TEXT);
+	return true;
 }
 
 bool fbDatabase::querryBackups()
@@ -92,6 +107,20 @@ bool fbDatabase::querryBackups()
 bool fbDatabase::querryRestore()
 {
 	string cmd = "select * from restore;";
+	errlog->debug(NONE, cmd);
+
+	db.querry(cmd);
+	errlog->debug(NONE, "Querry Done");
+
+	row = 0;
+
+	return true;
+}
+
+
+bool fbDatabase::querryRepo()
+{
+	string cmd = "select * from repo;";
 	errlog->debug(NONE, cmd);
 
 	db.querry(cmd);
@@ -155,6 +184,32 @@ bool fbDatabase::getRestoreRow(string& tarfile, string& path, int* id)
 	return true;
 }
 
+
+bool fbDatabase::getRepoRow(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile, int* id)
+{
+	errlog->debug(NONE, "fbDatabase:  Getting Repo Rows");
+
+	if(row >= db.rows()) 
+	{
+		errlog->debug(NONE, "fbDatabase:  No Rows To Get");
+		return false;
+	}
+	
+	int index =  db.cols() * row;
+
+	errlog->debug(NONE, "fbDatabase:  Found a ROW!");
+
+	*id = atoi(db.table[index++].c_str());
+	desc = db.table[index++];
+	date.setJulian(atol(db.table[index++].c_str()));
+	time.setTicks(atol(db.table[index++].c_str()));
+	path = db.table[index++];
+	tarfile = db.table[index++];
+
+	++row;
+	errlog->debug(NONE, "fbDatabase:  Got Row");
+	return true;
+}
 
 
 bool fbDatabase::deleteRow(const char* table, int id)

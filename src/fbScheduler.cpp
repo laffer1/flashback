@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.11 2008/04/09 13:03:25 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.12 2008/04/09 15:13:43 wyverex Exp $ */
 
 
 
@@ -49,6 +49,10 @@ void fbScheduler::run()
 				&repeatval, &index);
 			if(ret)
 			{
+				//re sync time/date
+				time.setTicksLocal();
+				date.setJulianLocal();
+
 				//backup!?!
 				char buff[500];
 				string msg;
@@ -61,6 +65,7 @@ void fbScheduler::run()
 				//do the backup here!
 				sprintf(buff, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
 				msg = buff;
+				data->db->addRepo(desc, date, time, path, msg);
 				new fbBackup(data, path, msg);
 		
 
@@ -125,7 +130,7 @@ void fbScheduler::run()
 		}while(ret);
 
 		//sleep 15 mins! 60 * 15
-		_sleep(10);
+		_sleep(60);
 	}
 }
 

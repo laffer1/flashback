@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.10 2008/04/09 00:24:17 wyverex Exp $ */
+/* $Id: fbData.cpp,v 1.11 2008/04/09 15:13:43 wyverex Exp $ */
 
 #include "fbData.h"
 
@@ -132,6 +132,18 @@ bool fbData::addBackupJob(string* desc, fbDate* date, fbTime* time, string* path
 }
 
 
+bool fbData::addRepo(string* desc, fbDate* date, fbTime* time, string* path, string* tarfile)
+{
+	bool ret = db->addRepo(*desc, *date, *time, *path, *tarfile);
+	delete desc;
+	delete date;
+	delete time;
+	delete path;
+	delete tarfile;
+	return ret;
+}
+
+
 bool fbData::querryBackups()
 {
 	return db->querryBackups();
@@ -149,6 +161,11 @@ bool fbData::addRestoreJob(string* tarfile, string* dest)
 bool fbData::querryRestore()
 {
 	return db->querryRestore();
+}
+
+bool fbData::querryRepo()
+{
+	return db->querryRepo();
 }
 
 
