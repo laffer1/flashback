@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.12 2008/04/09 00:24:17 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.13 2008/04/09 00:37:06 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -80,6 +80,13 @@ void fbSQL::connect(const char* database)
 	}
 	//were open, mark it
 	open = true;
+
+	//force table creation 
+	//string cmd = "CREATE TABLE backup (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);";
+	//exe(cmd);
+	//cmd = "CREATE TABLE restore(ID INTEGER PRIMARY KEY, tarfile TEXT, path TEXT);";
+	//exe(cmd);
+
 }
 
 
