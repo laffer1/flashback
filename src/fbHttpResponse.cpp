@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.25 2008/04/10 20:27:56 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.26 2008/04/10 20:53:04 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -93,9 +93,14 @@ void fbHttpResponse::run()
     size_t pathlen; // length of path
     char **ap, *argv[1024];
 
-    path = client->getPath();
+    if ( (path = client->getPath()) == NULL)
+    {
+        internal();
+        goto CLEANUP;
+    }
 
     data->debug(NONE, "fbHttpResponse.run");
+    data->msg(NONE, path); // log webserver request
 
     /* deal with / and /index it should access our default index.html */
     if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 ) 
@@ -134,6 +139,7 @@ void fbHttpResponse::run()
     else  // Must be a file on the file system!
         sendfile(path);
 
+CLEANUP:
     data->debug(NONE, "fbHttpResponse.run() free path memory");
     // we're mallocing this elsewhere.
     if ( path != NULL )
