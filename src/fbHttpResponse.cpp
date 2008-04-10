@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.24 2008/04/07 14:56:01 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.25 2008/04/10 20:27:56 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -97,11 +97,11 @@ void fbHttpResponse::run()
 
     data->debug(NONE, "fbHttpResponse.run");
 
-    /* deal with / and /index it shoudl access our default index.html */
+    /* deal with / and /index it should access our default index.html */
     if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 ) 
     {
         free(path);
-        path = strdup("/index.hml");
+        path = strdup("/index.html");
     }
 
     // Is this a built in command.. ? for forms
