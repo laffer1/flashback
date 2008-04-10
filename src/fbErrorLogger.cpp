@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.15 2008/03/29 17:11:45 laffer1 Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.16 2008/04/10 18:33:36 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -189,36 +189,60 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 	}
 }
 
-void fbErrorLogger::err(ERROR_CODES code, const char* str)
+void fbErrorLogger::err(ERROR_CODES code, const char* str, ...)
 {
-	print(ERR, code, str);
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	print(ERR, code, buff);
+	va_end(list);
 }
 void fbErrorLogger::err(ERROR_CODES code, string& str)
 {
 	print(ERR, code, str);
 }
 
-void fbErrorLogger::warn(ERROR_CODES code, const char* str)
+void fbErrorLogger::warn(ERROR_CODES code, const char* str, ...)
 {
-	print(WARN, code, str);
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	print(WARN, code, buff);
+	va_end(list);
 }
 void fbErrorLogger::warn(ERROR_CODES code, string& str)
 {
 	print(WARN, code, str);
 }
 
-void fbErrorLogger::msg(ERROR_CODES code, const char* str)
+void fbErrorLogger::msg(ERROR_CODES code, const char* str, ...)
 {
-	print(INFO, code, str);
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	print(INFO, code, buff);
+	va_end(list);
 }
 void fbErrorLogger::msg(ERROR_CODES code, string& str)
 {
 	print(INFO, code, str);
 }
 
-void fbErrorLogger::debug(ERROR_CODES code, const char* str)
+void fbErrorLogger::debug(ERROR_CODES code, const char* str, ...)
 {
-	print(DBUG, code, str);
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	print(DBUG, code, buff);
+	va_end(list);
 }
 void fbErrorLogger::debug(ERROR_CODES code, string& str)
 {

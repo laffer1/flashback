@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.4 2008/04/09 06:23:07 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.5 2008/04/10 18:33:36 wyverex Exp $ */
 
 #include "fbBackup.h"
 
@@ -28,7 +28,7 @@ void fbBackup::run()
     resp = archive_write_open_filename(a, filename.c_str());
     if (resp != ARCHIVE_OK)
     {
-        data->err(NONE, "Unable to create backup file");
+        data->err(NONE, "Unable to create backup file: %d", resp);
         goAhead = false;
     }
 
@@ -56,7 +56,7 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
         int len = 0;
 
     if (lstat(pathname, &st) < 0)
-        data->err(NONE, "Can't lstat pathname");
+        data->err(NONE, "Can't lstat pathname: %s", pathname);
     else
     {
 
@@ -66,7 +66,7 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
 
         if ((fd = open(pathname, O_RDONLY)) < 0)
         {
-            data->err(NONE, "Can't open pathname for archiving");
+            data->err(NONE, "Can't open pathname for archiving: %d = open(%s)", pathname, fd);
             archive_entry_set_size(entry, 0);
         }
 

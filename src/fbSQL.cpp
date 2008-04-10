@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.16 2008/04/09 15:37:30 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.17 2008/04/10 18:33:36 wyverex Exp $ */
 
 #include "fbSQL.h"
 
@@ -133,7 +133,6 @@ int fbSQL::exe(string& cmd)
 {
 int ret = 0;
 	char* errmsg;
-	string err = "sqlite3 error code: ";
 	// lock so two commands can't be sent at once
 	fbLock lock(cs);
 
@@ -143,10 +142,8 @@ int ret = 0;
 
 	// test if okay
 	if(ret != SQLITE_OK)
-	{	//error, report warning
-		err += ret;
-		errlog->warn(SQLEXECERROR, err);
-		errlog->warn(SQLEXECERROR, errmsg);
+	{
+		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3 error code: %s", errmsg);
 		sqlite3_free(errmsg);
 	}
 
@@ -167,11 +164,10 @@ int fbSQL::querry(string& cmd)
 	int ret = 0;
 	char* errmsg;
 	char** result;
-	string err = "sqlite3 error code: ";
 	
 	if(db == NULL)
 	{
-		errlog->warn(FAILEDTOOPENDB, "fbSQL: Querry on none opened database");
+		errlog->warn(FAILEDTOOPENDB, "fbSQL: Querry on non-opened database");
 		return -1;
 	}
 
@@ -187,17 +183,12 @@ int fbSQL::querry(string& cmd)
 	// test if okay
 	if(ret != SQLITE_OK)
 	{	//error, report warning
-		err += errmsg;
-		errlog->warn(SQLEXECERROR, err);
+		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3 error code: %s", errmsg);
 		sqlite3_free(errmsg);
 		return ret;
 	}
-
-
-	char buff[500];
-	sprintf(buff, "found %d rows with %d cols",  _rows, _cols);
-	string msg = buff;	
-	errlog->debug(NONE, msg);
+	
+	errlog->debug(NONE, "fbSQL: found %d rows with %d cols",  _rows, _cols);
 	
 
 	//clear vectors
@@ -214,11 +205,8 @@ int fbSQL::querry(string& cmd)
 			table.push_back(result[_cols+i]);
 		else
 			table.push_back("");
-
-
-	sprintf(buff, "filled Table data: %d", (int)table.size());
-	msg = buff;	
-	errlog->debug(NONE, msg);
+	
+	errlog->debug(NONE, "fbSQL: Filled Table data: %d", (int)table.size());
 
 	sqlite3_free_table(result);
 	errlog->debug(NONE, "fbSQL: Querry OK");

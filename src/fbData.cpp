@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.11 2008/04/09 15:13:43 wyverex Exp $ */
+/* $Id: fbData.cpp,v 1.12 2008/04/10 18:33:36 wyverex Exp $ */
 
 #include "fbData.h"
 
@@ -28,40 +28,92 @@ fbData::~fbData()
 
 
 //fbErrorLogger Functions
-void fbData::err(ERROR_CODES code, const char* str)
+/*void fbData::err(ERROR_CODES code, const char* str)
 {
 	errlog->print(ERR, code, str);
-}
+}*/
 void fbData::err(ERROR_CODES code, string& str)
 {
 	errlog->print(ERR, code, str);
 }
 
-void fbData::warn(ERROR_CODES code, const char* str)
+/*void fbData::warn(ERROR_CODES code, const char* str)
 {
 	errlog->print(WARN, code, str);
-}
+}*/
 void fbData::warn(ERROR_CODES code, string& str)
 {
 	errlog->print(WARN, code, str);
 }
 
-void fbData::msg(ERROR_CODES code, const char* str)
+/*void fbData::msg(ERROR_CODES code, const char* str)
 {
 	errlog->print(INFO, code, str);
-}
+}*/
 void fbData::msg(ERROR_CODES code, string& str)
 {
 	errlog->print(INFO, code, str);
 }
 
-void fbData::debug(ERROR_CODES code, const char* str)
+/*void fbData::debug(ERROR_CODES code, const char* str)
 {
 	errlog->print(DBUG, code, str);
-}
+}*/
 void fbData::debug(ERROR_CODES code, string& str)
 {
 	errlog->print(DBUG, code, str);
+}
+
+
+
+void fbData::err(ERROR_CODES code, const char* str,  ...)
+{
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	mesg = buff;
+	err(code, mesg);
+	va_end(list);
+}
+
+
+void fbData::warn(ERROR_CODES code, const char* str, ...)
+{
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	mesg = buff;
+	warn(code, mesg);
+	va_end(list);
+}
+
+void fbData::msg(ERROR_CODES code, const char* str,  ...)
+{
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	mesg = buff;
+	msg(code, mesg);
+	va_end(list);
+}
+
+
+void fbData::debug(ERROR_CODES code, const char* str,...)
+{
+	va_list list;
+	char buff[500];
+	string mesg;
+	va_start(list, str);
+	vsprintf(buff, str, list);
+	mesg = buff;
+	debug(code, mesg);
+	va_end(list);
 }
 
 

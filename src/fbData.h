@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.10 2008/04/09 15:13:43 wyverex Exp $ */
+/* $Id: fbData.h,v 1.11 2008/04/10 18:33:36 wyverex Exp $ */
 
 
 
@@ -17,14 +17,21 @@ public:
 	~fbData();
 
 	//ErrorLogger Functions
-	void err(ERROR_CODES code, const char* str);
+	//void err(ERROR_CODES code, const char* str);
 	void err(ERROR_CODES code, string& str);
-	void warn(ERROR_CODES code, const char* str);
+	//void warn(ERROR_CODES code, const char* str);
 	void warn(ERROR_CODES code, string& str);
-	void msg(ERROR_CODES code, const char* str);
+	//void msg(ERROR_CODES code, const char* str);
 	void msg(ERROR_CODES code, string& str);
-	void debug(ERROR_CODES code, const char* str);
+	//void debug(ERROR_CODES code, const char* str);
 	void debug(ERROR_CODES code, string& str);
+
+
+	void err(ERROR_CODES code, const char* str,  ...);
+	void warn(ERROR_CODES code, const char* str, ...);
+	void msg(ERROR_CODES code, const char* str,  ...);
+	void debug(ERROR_CODES code, const char* str,...);
+
 
 	//config functions
 

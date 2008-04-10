@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.12 2008/04/09 15:13:43 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.13 2008/04/10 18:33:36 wyverex Exp $ */
 
 
 
@@ -54,17 +54,14 @@ void fbScheduler::run()
 				date.setJulianLocal();
 
 				//backup!?!
-				char buff[500];
-				string msg;
-				sprintf(buff, "Backing up: %d %s: %s at %ld %ld %d %d", index,
+				data->debug(NONE, "Backing up: %d %s: %s at %ld %ld %d %d", index,
 				desc.c_str(), path.c_str(), time.getTicks(), date.getJulian(),
 				repeat, repeatval);
-				msg = buff;
-				data->debug(NONE, msg);
 
 				//do the backup here!
+				char buff[500];
 				sprintf(buff, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
-				msg = buff;
+				string msg = buff;
 				data->db->addRepo(desc, date, time, path, msg);
 				new fbBackup(data, path, msg);
 		
@@ -115,11 +112,7 @@ void fbScheduler::run()
 			ret = data->db->getRestoreRow(desc, path, &index);
 			if(ret)
 			{
-				char buff[500];
-				string msg;
-				sprintf(buff, "Restoring: %d %s: %s", index, desc.c_str(), path.c_str());
-				msg = buff;
-				data->debug(NONE, msg);
+				data->debug(NONE, "Restoring: %d %s: %s", index, desc.c_str(), path.c_str());
 
 				//do the restore here!
 

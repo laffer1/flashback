@@ -1,4 +1,4 @@
-/* $Id: global.h,v 1.11 2008/03/31 01:26:04 ctubbsii Exp $ */
+/* $Id: global.h,v 1.12 2008/04/10 18:33:36 wyverex Exp $ */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -13,6 +13,8 @@
 	#include <fstream>
 	#include <vector>
 	#include <csignal>
+	#include <cstdarg>
+
 	using namespace std;
 
 	#ifdef Win32
