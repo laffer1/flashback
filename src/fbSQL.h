@@ -1,4 +1,4 @@
-/* $Id: fbSQL.h,v 1.11 2008/04/09 15:37:30 wyverex Exp $ */
+/* $Id: fbSQL.h,v 1.12 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 
 #ifndef fbSQL_H
@@ -12,7 +12,7 @@
 #include <sqlite3.h>
 
 /**
-*  fbSQL 
+*  fbSQL
 *  Thread safe Wrapper for SQLite3
 *  @author Byron Heads
 *  @date March 14, 2008
@@ -27,21 +27,21 @@ public:
 	~fbSQL();  /// < destructor
 
 	void connect(const char* database);   /// < connect to file
-	void connect(string database);  /// < connect to file 
+	void connect(string database);  /// < connect to file
 	void close();  /// < close open file
 
 	bool isConnected();  /// < are we connected
 
 	int exe(string& cmd);  /// < new command method
-	int querry(string& cmd);  /// < runs a querry, locks qCS()
-	void querryDone(); /// < unlock querry
+	int query(string& cmd);  /// < runs a query, locks qCS()
+	void queryDone(); /// < unlock query
 
 
 	const int rows() { return _rows; };
 	const int cols() { return _cols; };
 
-	
-	
+
+
 	vector<string> col_header;
 	vector<string> table;
 

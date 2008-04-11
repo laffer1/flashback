@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.13 2008/04/09 15:37:30 wyverex Exp $ */
+/* $Id: fbDatabase.cpp,v 1.14 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 #include "fbDatabase.h"
 
@@ -44,7 +44,7 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 	}
 
 //backup (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);
-	
+
 	return true;
 }
 
@@ -68,7 +68,7 @@ bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 bool fbDatabase::addRepo(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile)
 {
 	char buff[500];
-	sprintf(buff,"insert into repo (desc, date, time, path, tarfile) values (\'%s\', %ld, %ld, \'%s\', \'%s\');", 
+	sprintf(buff,"insert into repo (desc, date, time, path, tarfile) values (\'%s\', %ld, %ld, \'%s\', \'%s\');",
 		desc.c_str(), date.getJulian(), time.getTicks(), path.c_str(), tarfile.c_str());
 	string cmd = buff;
 
@@ -82,21 +82,21 @@ bool fbDatabase::addRepo(string& desc, fbDate& date, fbTime& time, string& path,
 	return true;
 }
 
-bool fbDatabase::querryBackups()
+bool fbDatabase::queryBackups()
 {
 	char buff[500];
 	fbDate date;
 	fbTime time;
 
-	sprintf(buff,"select * from backup where date <= %ld AND time <= %ld;", 
+	sprintf(buff,"select * from backup where date <= %ld AND time <= %ld;",
 	   date.getJulian(), time.getTicks());
 
 	string cmd = buff;
 	errlog->debug(NONE, cmd);
 
-	db.querry(cmd);
-	
-	errlog->debug(NONE, "Querry Done");
+	db.query(cmd);
+
+	errlog->debug(NONE, "Query Done");
 
 	row = 0;
 
@@ -104,13 +104,13 @@ bool fbDatabase::querryBackups()
 }
 
 
-bool fbDatabase::querryRestore()
+bool fbDatabase::queryRestore()
 {
 	string cmd = "select * from restore;";
 	errlog->debug(NONE, cmd);
 
-	db.querry(cmd);
-	errlog->debug(NONE, "Querry Done");
+	db.query(cmd);
+	errlog->debug(NONE, "Query Done");
 
 	row = 0;
 
@@ -118,13 +118,13 @@ bool fbDatabase::querryRestore()
 }
 
 
-bool fbDatabase::querryRepo()
+bool fbDatabase::queryRepo()
 {
 	string cmd = "select * from repo;";
 	errlog->debug(NONE, cmd);
 
-	db.querry(cmd);
-	errlog->debug(NONE, "Querry Done");
+	db.query(cmd);
+	errlog->debug(NONE, "Query Done");
 
 	row = 0;
 
@@ -132,18 +132,18 @@ bool fbDatabase::querryRepo()
 }
 
 
-bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& path, 
+bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& path,
 		Repeat_type* rt, int* rv, int* id)
 {
 	errlog->debug(NONE, "fbDatabase:  Getting Backup Rows");
 
-	if(row >= db.rows()) 
+	if(row >= db.rows())
 	{
 		errlog->debug(NONE, "fbDatabase:  No Backup Rows To Get");
-		db.querryDone();
+		db.queryDone();
 		return false;
 	}
-	
+
 	int index =  db.cols() * row;
 
 	errlog->debug(NONE, "fbDatabase:  Found a ROW!");
@@ -166,13 +166,13 @@ bool fbDatabase::getRestoreRow(string& tarfile, string& path, int* id)
 {
 	errlog->debug(NONE, "fbDatabase:  Getting Restore Rows");
 
-	if(row >= db.rows()) 
+	if(row >= db.rows())
 	{
 		errlog->debug(NONE, "fbDatabase:  No Restore Rows To Get");
-		db.querryDone();
+		db.queryDone();
 		return false;
 	}
-	
+
 	int index =  db.cols() * row;
 
 	errlog->debug(NONE, "fbDatabase:  Found a ROW!");
@@ -191,13 +191,13 @@ bool fbDatabase::getRepoRow(string& desc, fbDate& date, fbTime& time, string& pa
 {
 	errlog->debug(NONE, "fbDatabase:  Getting Repo Rows");
 
-	if(row >= db.rows()) 
+	if(row >= db.rows())
 	{
 		errlog->debug(NONE, "fbDatabase:  No Repo Rows To Get");
-		db.querryDone();
+		db.queryDone();
 		return false;
 	}
-	
+
 	int index =  db.cols() * row;
 
 	errlog->debug(NONE, "fbDatabase:  Found a ROW!");

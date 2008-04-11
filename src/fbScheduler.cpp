@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.13 2008/04/10 18:33:36 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.14 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 
 
@@ -41,11 +41,11 @@ void fbScheduler::run()
 
 	while(!isStopping())
 	{
-		//Backup querry
-		data->querryBackups();
+		//Backup query
+		data->queryBackups();
 		do
-		{	
-			ret = data->db->getBackupRow(desc, date, time, path, &repeat, 
+		{
+			ret = data->db->getBackupRow(desc, date, time, path, &repeat,
 				&repeatval, &index);
 			if(ret)
 			{
@@ -64,7 +64,7 @@ void fbScheduler::run()
 				string msg = buff;
 				data->db->addRepo(desc, date, time, path, msg);
 				new fbBackup(data, path, msg);
-		
+
 
 				//test repeat!
 				data->db->deleteRow("backup", index);
@@ -102,13 +102,13 @@ void fbScheduler::run()
 
 			}
 		}while(ret);
-		
+
 		//check restore here... mostly the same.. but no repeats
 
-		//restore querry
-		data->querryRestore();
+		//restore query
+		data->queryRestore();
 		do
-		{	
+		{
 			ret = data->db->getRestoreRow(desc, path, &index);
 			if(ret)
 			{

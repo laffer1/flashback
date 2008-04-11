@@ -1,4 +1,4 @@
-/* $Id: fbSQL.cpp,v 1.17 2008/04/10 18:33:36 wyverex Exp $ */
+/* $Id: fbSQL.cpp,v 1.18 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 #include "fbSQL.h"
 
@@ -60,9 +60,9 @@ void fbSQL::connect(const char* database)
 {
 	errlog->debug(NONE, "fbSQL.connect");
 	errlog->debug(NONE, database);
-	
+
     	// lock for thread safety
-	fbLock lock(cs);	
+	fbLock lock(cs);
 	//error string
 	string err = "File: ";
 
@@ -81,7 +81,7 @@ void fbSQL::connect(const char* database)
 	//were open, mark it
 	open = true;
 
-	//force table creation 
+	//force table creation
 	//string cmd = "CREATE TABLE backup (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);";
 	//exe(cmd);
 	//cmd = "CREATE TABLE restore(ID INTEGER PRIMARY KEY, tarfile TEXT, path TEXT);";
@@ -90,7 +90,7 @@ void fbSQL::connect(const char* database)
 }
 
 
-/** 
+/**
 *  connect
 *  connect database, string overload
 *  @param database String
@@ -115,7 +115,7 @@ void fbSQL::close()
 
 
 /**
-*  isConnected 
+*  isConnected
 *  test if were connected to a database
 *  @return True if connect passed
 */
@@ -152,29 +152,29 @@ int ret = 0;
 }
 
 
-void fbSQL::querryDone()
+void fbSQL::queryDone()
 {
-	qCS.unlock(); 
-	errlog->debug(NONE, "fbSQL: Querry Unlocked");
+	qCS.unlock();
+	errlog->debug(NONE, "fbSQL: Query Unlocked");
 
 }
 
-int fbSQL::querry(string& cmd)
+int fbSQL::query(string& cmd)
 {
 	int ret = 0;
 	char* errmsg;
 	char** result;
-	
+
 	if(db == NULL)
 	{
-		errlog->warn(FAILEDTOOPENDB, "fbSQL: Querry on non-opened database");
+		errlog->warn(FAILEDTOOPENDB, "fbSQL: Query on non-opened database");
 		return -1;
 	}
 
 	// lock so two commands can't be sent at once
 	fbLock lock(cs);
-	errlog->debug(NONE, "fbSQL: Querry Locked");
-	qCS.lock();   /// < lock querry
+	errlog->debug(NONE, "fbSQL: Query Locked");
+	qCS.lock();   /// < lock query
 
 	// send command
 	//ret = sqlite3_exec(db, command, callback, 0 , &errmsg);
@@ -187,9 +187,9 @@ int fbSQL::querry(string& cmd)
 		sqlite3_free(errmsg);
 		return ret;
 	}
-	
+
 	errlog->debug(NONE, "fbSQL: found %d rows with %d cols",  _rows, _cols);
-	
+
 
 	//clear vectors
 	if(col_header.size() != 0) col_header.clear();
@@ -205,11 +205,11 @@ int fbSQL::querry(string& cmd)
 			table.push_back(result[_cols+i]);
 		else
 			table.push_back("");
-	
+
 	errlog->debug(NONE, "fbSQL: Filled Table data: %d", (int)table.size());
 
 	sqlite3_free_table(result);
-	errlog->debug(NONE, "fbSQL: Querry OK");
+	errlog->debug(NONE, "fbSQL: Query OK");
 	return ret;
 }
 

@@ -1,4 +1,4 @@
-/* $Id: fbData.h,v 1.11 2008/04/10 18:33:36 wyverex Exp $ */
+/* $Id: fbData.h,v 1.12 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 
 
@@ -49,13 +49,13 @@ public:
 
 	//Database functions
 	bool addBackupJob(string* desc, fbDate* date, fbTime* time, string* path, Repeat_type rt = ONCE, int rv = 0);
-	bool querryBackups();
+	bool queryBackups();
 	bool addRestoreJob(string* tarfile, string* dest);
-	bool querryRestore();
+	bool queryRestore();
 	bool addRepo(string* desc, fbDate* date, fbTime* time, string* path, string* tarfile);
-	bool querryRepo();
+	bool queryRepo();
 
-	
+
 //private:
 	fbErrorLogger* errlog;
 	fbDatabase*    db;

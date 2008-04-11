@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.12 2008/04/10 18:33:36 wyverex Exp $ */
+/* $Id: fbData.cpp,v 1.13 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 #include "fbData.h"
 
@@ -69,51 +69,58 @@ void fbData::debug(ERROR_CODES code, string& str)
 void fbData::err(ERROR_CODES code, const char* str,  ...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
+	va_end(list);
+
 	mesg = buff;
 	err(code, mesg);
-	va_end(list);
 }
 
 
 void fbData::warn(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
+	va_end(list);
+
 	mesg = buff;
 	warn(code, mesg);
-	va_end(list);
 }
 
 void fbData::msg(ERROR_CODES code, const char* str,  ...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
+	va_end(list);
+
 	mesg = buff;
 	msg(code, mesg);
-	va_end(list);
 }
-
 
 void fbData::debug(ERROR_CODES code, const char* str,...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
+	va_end(list);
+
 	mesg = buff;
 	debug(code, mesg);
-	va_end(list);
 }
 
 
@@ -196,9 +203,9 @@ bool fbData::addRepo(string* desc, fbDate* date, fbTime* time, string* path, str
 }
 
 
-bool fbData::querryBackups()
+bool fbData::queryBackups()
 {
-	return db->querryBackups();
+	return db->queryBackups();
 
 }
 
@@ -210,14 +217,14 @@ bool fbData::addRestoreJob(string* tarfile, string* dest)
 	return ret;
 }
 
-bool fbData::querryRestore()
+bool fbData::queryRestore()
 {
-	return db->querryRestore();
+	return db->queryRestore();
 }
 
-bool fbData::querryRepo()
+bool fbData::queryRepo()
 {
-	return db->querryRepo();
+	return db->queryRepo();
 }
 
 

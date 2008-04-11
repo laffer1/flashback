@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.h,v 1.9 2008/04/09 15:13:43 wyverex Exp $ */
+/* $Id: fbDatabase.h,v 1.10 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 #ifndef fbDATABASE_H
 #define fbDATABASE_H
@@ -27,25 +27,25 @@ public:
 
 	/// Backup SQL
 	bool addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt = ONCE, int rv = 0);
-	bool querryBackups();
-	bool getBackupRow(string& desc, fbDate& date, fbTime& time, string& path, 
+	bool queryBackups();
+	bool getBackupRow(string& desc, fbDate& date, fbTime& time, string& path,
 		Repeat_type* rt, int* rv, int* id);
 
 	/// Restore SQL
 	bool addRestoreJob(string& tarfile, string& dest);
 	bool getRestoreRow(string& tarfile, string& path, int* id);
-	bool querryRestore();
-	
+	bool queryRestore();
+
 	//Repo SQL
 	bool addRepo(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile);
 	bool getRepoRow(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile, int* id);
-	bool querryRepo();
+	bool queryRepo();
 
 
 	/// Generic SQL
 	bool deleteRow(const char* table, int id);
-	
-	
+
+
 
 private:
 	fbErrorLogger* errlog;

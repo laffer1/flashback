@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.16 2008/04/10 18:33:36 wyverex Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.17 2008/04/11 02:21:15 ctubbsii Exp $ */
 
 /**
 *	fbErrorLogger
@@ -58,14 +58,14 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, const char* str)
 	if(lvl == DBUG)	/// < if not in debug mode then no debug messages
 		return;
 #endif
-	
+
 	{
 		fbLock lock(cs);	/// <lock critical section so text wont write over each other
 		errorlevel(lvl, level);		/// < get error level string
 		errordesc(code, desc);		/// < get error description
 		errordate(date);		/// < get error date and time
 		/// print error message
-		*out << date.c_str() << '\t' << level.c_str() << '\t' << static_cast<int>(code) << 
+		*out << date.c_str() << '\t' << level.c_str() << '\t' << static_cast<int>(code) <<
 			(code == NONE ? "" : "\t") << desc.c_str() << '\t' << str <<  endl;
 
 		//kill on errors
@@ -84,19 +84,19 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, const char* str)
 void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, string& str)
 {
 	string desc, level, date;
-	
+
 #ifndef Debug
 	if(lvl == DBUG)	/// < if not in debug mode then no debug messages
 		return;
 #endif
-	
+
 	{
 		fbLock lock(cs);	/// <lock critical section so text wont write over each other
 		errorlevel(lvl, level);		/// < get error level string
 		errordesc(code, desc);		/// < get error description
-		errordate(date);		/// < get error date and time		
+		errordate(date);		/// < get error date and time
 		/// print error message
-		*out << date << '\t' << level << '\t' << static_cast<int>(code) << 
+		*out << date << '\t' << level << '\t' << static_cast<int>(code) <<
 			(code == NONE ? "" : "\t") << desc << '\t' << str <<  endl;
 
 		//kill on errors
@@ -138,7 +138,7 @@ void fbErrorLogger::errorlevel(ERROR_LEVEL lvl, string& level)
 			break;
 		default:
 			level = "UNKNOWN";
-	}	
+	}
 }
 
 /**
@@ -192,12 +192,14 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 void fbErrorLogger::err(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
-	print(ERR, code, buff);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
 	va_end(list);
+
+	print(ERR, code, buff);
 }
 void fbErrorLogger::err(ERROR_CODES code, string& str)
 {
@@ -207,12 +209,14 @@ void fbErrorLogger::err(ERROR_CODES code, string& str)
 void fbErrorLogger::warn(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
-	print(WARN, code, buff);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
 	va_end(list);
+
+	print(WARN, code, buff);
 }
 void fbErrorLogger::warn(ERROR_CODES code, string& str)
 {
@@ -222,12 +226,14 @@ void fbErrorLogger::warn(ERROR_CODES code, string& str)
 void fbErrorLogger::msg(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
-	print(INFO, code, buff);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
 	va_end(list);
+
+	print(INFO, code, buff);
 }
 void fbErrorLogger::msg(ERROR_CODES code, string& str)
 {
@@ -237,12 +243,14 @@ void fbErrorLogger::msg(ERROR_CODES code, string& str)
 void fbErrorLogger::debug(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[500];
+	char buff[1024];
 	string mesg;
+
 	va_start(list, str);
-	vsprintf(buff, str, list);
-	print(DBUG, code, buff);
+	vsnprintf(buff, sizeof(buff)-1, str, list);
 	va_end(list);
+
+	print(DBUG, code, buff);
 }
 void fbErrorLogger::debug(ERROR_CODES code, string& str)
 {
