@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.6 2008/04/11 05:09:29 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.7 2008/04/11 06:16:17 ctubbsii Exp $ */
 
 #include "fbBackup.h"
 
@@ -66,6 +66,9 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
     }
 
     entry = archive_entry_new();
+
+    archive_entry_copy_stat(entry, &st);
+
     archive_entry_set_pathname(entry, pathname);
     fixAbsolutePaths(entry);
 
@@ -77,10 +80,10 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
 
     if (!S_ISREG(st.st_mode))
     {
-        archive_entry_set_size(entry, 0);
+        data->debug(NONE, "%s is NOT a regular file!", pathname);
+        /* archive_entry_set_size(entry, 0); */
     }
 
-    archive_entry_copy_stat(entry, &st);
     archive_write_header(*ap, entry);
     // might want to check for success here
 
