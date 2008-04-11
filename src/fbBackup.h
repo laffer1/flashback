@@ -1,4 +1,4 @@
-/* $Id: fbBackup.h,v 1.6 2008/04/11 05:09:29 ctubbsii Exp $ */
+/* $Id: fbBackup.h,v 1.7 2008/04/11 23:49:30 ctubbsii Exp $ */
 
 #ifndef fbBACKUP_H
 #define fbBACKUP_H
@@ -26,7 +26,7 @@ private:
 
 	void run();
     void fixAbsolutePaths(struct archive_entry *entry);
-    void traverseDir(struct archive **ap, const char *pathname);
+    void traverseDir(struct archive *a, const char *pathname);
 };
 
 #endif

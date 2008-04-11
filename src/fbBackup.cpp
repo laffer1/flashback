@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.8 2008/04/11 21:42:32 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.9 2008/04/11 23:49:30 ctubbsii Exp $ */
 
 #include "fbBackup.h"
 
@@ -35,7 +35,7 @@ void fbBackup::run()
     }
 
     if (goAhead)
-        traverseDir(&a, path.c_str());
+        traverseDir(a, path.c_str());
 
     archive_write_finish(a);
 
@@ -51,13 +51,13 @@ void fbBackup::run()
 	*/
 }
 
-void fbBackup::traverseDir(struct archive **ap, const char *pathname)
+void fbBackup::traverseDir(struct archive *a, const char *pathname)
 {
     struct stat st;
     struct archive_entry *entry = NULL;
     int fd = 0;
-    int buff[10240];
-    size_t len = 0;
+    int buff[1024];
+    ssize_t len = 0;
     int resp = 0;
 
     if (lstat(pathname, &st) < 0)
@@ -82,16 +82,20 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
     if (!S_ISREG(st.st_mode))
     {
         data->debug(NONE, "%s is NOT a regular file!", pathname);
-        /* archive_entry_set_size(entry, 0); */
+        archive_entry_set_size(entry, 0);
     }
 
-    archive_write_header(*ap, entry);
-    // might want to check for success here
+    resp = archive_write_header(a, entry);
+    if (resp != ARCHIVE_OK)
+    {
+        data->debug(NONE, "Problem writing header for %s", archive_entry_pathname(entry));
+        return;
+    }
 
-    while (S_ISREG(st.st_mode) && fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
+    while (S_ISREG(st.st_mode) && fd >= 0 && (len = read(fd, buff, 1024*sizeof(int))) > 0)
     {
         data->debug(NONE, "Wrote %i bytes from %s", len, archive_entry_pathname(entry));
-        resp = archive_write_data(*ap, buff, len);
+        resp = archive_write_data(a, buff, len);
         if (resp != ARCHIVE_OK)
             data->debug(NONE, "Problem writing data to archive for %s", archive_entry_pathname(entry));
     }
@@ -101,6 +105,7 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
     if (fd >= 0)
         close(fd);
 
+    archive_write_finish_entry(a);
     archive_entry_free(entry);
 
     // done archiving current file, now check if it's a directory, in order to recurse
@@ -126,7 +131,7 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
             else
                 snprintf(nextpath, sizeof(buff)-1, "%s%c%s", pathname, PATH_NAME_SEPARATOR, item->d_name);
 
-            traverseDir(ap, nextpath);
+            traverseDir(a, nextpath);
         }
 
         closedir(dir);
