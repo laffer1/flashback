@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.26 2008/04/10 20:53:04 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.27 2008/04/11 23:44:47 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -89,6 +89,7 @@ void fbHttpResponse::run()
 {
      // we should probably check this during the request  while(!isStopping())
     char *path; // the virtual path 
+    char *querystring; // the ? part of the uri if it exists
     char *loc; // the location of a query string if any
     size_t pathlen; // length of path
     char **ap, *argv[1024];
@@ -113,8 +114,15 @@ void fbHttpResponse::run()
     if ( ( loc = strstr( path, "?" ) ) != NULL )
     {
         pathlen = strlen(path);
-
-        if ( strlen((loc + 1)) < pathlen )
+        querystring = (char *)malloc(pathlen + 1); // it's actually smaller than that.
+        if (querystring == NULL)
+        {
+            data->err(NONE,"Could not allocate memory");
+            internal();
+            goto CLEANUP;
+        }
+        strncpy( querystring, loc, pathlen );
+        if ( strlen(querystring) < pathlen )
         {
            // break it up into an argument vector.
 	   for (ap = argv; (*ap = strsep(&loc, ";")) != NULL;)
@@ -132,6 +140,8 @@ void fbHttpResponse::run()
                notfound();
            else if ( strcmp( path, "/settings" ) == 0 )
                notfound();
+
+            free(querystring);
         }
         else // can't be valid
            internal(); 
