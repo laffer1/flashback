@@ -1,4 +1,4 @@
-/* $Id: fbTime.cpp,v 1.4 2008/03/29 16:34:07 wyverex Exp $ */
+/* $Id: fbTime.cpp,v 1.5 2008/04/11 21:42:32 ctubbsii Exp $ */
 
 
 /**
@@ -61,7 +61,7 @@ fbTime::fbTime(fbTime& time):ticks(time.ticks), hour(0), min(0), sec(0)
 {
 	update();
 }
-	
+
 /*
  *  setTicks
  *  Sets the ticks to given time
@@ -119,7 +119,7 @@ void fbTime::hms(string& t)
 	t += ":";
 	t += (sec < 10 ? "0" : "");
 	ltostr(sec, t);
-}	
+}
 
 void fbTime::hm(string& t)
 {
@@ -133,7 +133,7 @@ void fbTime::hm(string& t)
 void fbTime::ltostr(long val, string& str)
 {
 	char buff[20];
-	sprintf(buff, "%ld", val);
+	snprintf(buff, sizeof(buff)-1, "%ld", val);
 	str += buff;
 }
 

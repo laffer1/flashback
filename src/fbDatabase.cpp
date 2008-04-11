@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.15 2008/04/11 05:16:57 ctubbsii Exp $ */
+/* $Id: fbDatabase.cpp,v 1.16 2008/04/11 21:42:32 ctubbsii Exp $ */
 
 #include "fbDatabase.h"
 
@@ -32,7 +32,7 @@ fbDatabase::~fbDatabase()
 bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt, int rv)
 {
 	char buff[1024];
-	sprintf(buff,"insert into backup (desc, date, time, repeatmode, repeatval, disk) values  (\'%s\',%ld,%ld,%d,%d,\'%s\');",
+	snprintf(buff, sizeof(buff)-1, "insert into backup (desc, date, time, repeatmode, repeatval, disk) values  (\'%s\',%ld,%ld,%d,%d,\'%s\');",
 		desc.c_str(), date.getJulian(), time.getTicks(), rt, rv, path.c_str());
 	string cmd = buff;
 
@@ -51,7 +51,7 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 {
 	char buff[1024];
-	sprintf(buff,"insert into restore (tarfile, path) values (\'%s\', \'%s\');", tarfile.c_str(), dest.c_str());
+	snprintf(buff, sizeof(buff)-1, "insert into restore (tarfile, path) values (\'%s\', \'%s\');", tarfile.c_str(), dest.c_str());
 	string cmd = buff;
 
 	errlog->debug(NONE, cmd);
@@ -68,7 +68,7 @@ bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 bool fbDatabase::addRepo(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile)
 {
 	char buff[1024];
-	sprintf(buff,"insert into repo (desc, date, time, path, tarfile) values (\'%s\', %ld, %ld, \'%s\', \'%s\');",
+	snprintf(buff, sizeof(buff)-1, "insert into repo (desc, date, time, path, tarfile) values (\'%s\', %ld, %ld, \'%s\', \'%s\');",
 		desc.c_str(), date.getJulian(), time.getTicks(), path.c_str(), tarfile.c_str());
 	string cmd = buff;
 
@@ -88,7 +88,7 @@ bool fbDatabase::queryBackups()
 	fbDate date;
 	fbTime time;
 
-	sprintf(buff,"select * from backup where date <= %ld AND time <= %ld;",
+	snprintf(buff, sizeof(buff)-1, "select * from backup where date <= %ld AND time <= %ld;",
 	   date.getJulian(), time.getTicks());
 
 	string cmd = buff;
@@ -218,7 +218,7 @@ bool fbDatabase::getRepoRow(string& desc, fbDate& date, fbTime& time, string& pa
 bool fbDatabase::deleteRow(const char* table, int id)
 {
 	char buff[1024];
-	sprintf(buff, "DELETE FROM %s WHERE ID = %d;", table, id);
+	snprintf(buff, sizeof(buff)-1, "DELETE FROM %s WHERE ID = %d;", table, id);
 	string cmd = buff;
 	return db.exe(cmd);
 }

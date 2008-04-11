@@ -1,4 +1,4 @@
-/* $Id: fbDate.cpp,v 1.8 2008/03/29 16:34:07 wyverex Exp $ */
+/* $Id: fbDate.cpp,v 1.9 2008/04/11 21:42:32 ctubbsii Exp $ */
 
 /**
  *  fbDate
@@ -150,7 +150,7 @@ void fbDate::my(string& d)
 void fbDate::ltostr(long val, string& str)
 {
 	char buff[20];
-	sprintf(buff, "%ld", val);
+	snprintf(buff, sizeof(buff)-1, "%ld", val);
 	str += buff;
 }
 

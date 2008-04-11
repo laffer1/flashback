@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.15 2008/04/11 05:16:57 ctubbsii Exp $ */
+/* $Id: fbScheduler.cpp,v 1.16 2008/04/11 21:42:32 ctubbsii Exp $ */
 
 
 
@@ -60,7 +60,7 @@ void fbScheduler::run()
 
 				//do the backup here!
 				char buff[1024];
-				sprintf(buff, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
+				snprintf(buff, sizeof(buff)-1, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
 				string msg = buff;
 				data->db->addRepo(desc, date, time, path, msg);
 				new fbBackup(data, path, msg);

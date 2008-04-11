@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.7 2008/04/11 06:16:17 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.8 2008/04/11 21:42:32 ctubbsii Exp $ */
 
 #include "fbBackup.h"
 
@@ -54,10 +54,11 @@ void fbBackup::run()
 void fbBackup::traverseDir(struct archive **ap, const char *pathname)
 {
     struct stat st;
-        struct archive_entry *entry = NULL;
-        int fd = 0;
-        int buff[10240];
-        int len = 0;
+    struct archive_entry *entry = NULL;
+    int fd = 0;
+    int buff[10240];
+    size_t len = 0;
+    int resp = 0;
 
     if (lstat(pathname, &st) < 0)
     {
@@ -88,7 +89,12 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
     // might want to check for success here
 
     while (S_ISREG(st.st_mode) && fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
-        archive_write_data(*ap, buff, len);
+    {
+        data->debug(NONE, "Wrote %i bytes from %s", len, archive_entry_pathname(entry));
+        resp = archive_write_data(*ap, buff, len);
+        if (resp != ARCHIVE_OK)
+            data->debug(NONE, "Problem writing data to archive for %s", archive_entry_pathname(entry));
+    }
 
     data->debug(NONE, "Archived file: %s", archive_entry_pathname(entry));
 
@@ -116,9 +122,9 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
                 continue;
 
             if (pathname[strlen(pathname)-1] == PATH_NAME_SEPARATOR)
-                sprintf(nextpath, "%s%s", pathname, item->d_name);
+                snprintf(nextpath, sizeof(buff)-1, "%s%s", pathname, item->d_name);
             else
-                sprintf(nextpath, "%s%c%s", pathname, PATH_NAME_SEPARATOR, item->d_name);
+                snprintf(nextpath, sizeof(buff)-1, "%s%c%s", pathname, PATH_NAME_SEPARATOR, item->d_name);
 
             traverseDir(ap, nextpath);
         }
