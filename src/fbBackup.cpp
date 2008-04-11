@@ -1,16 +1,16 @@
-/* $Id: fbBackup.cpp,v 1.5 2008/04/10 18:33:36 wyverex Exp $ */
+/* $Id: fbBackup.cpp,v 1.6 2008/04/11 05:09:29 ctubbsii Exp $ */
 
 #include "fbBackup.h"
 
 fbBackup::fbBackup(fbData* _data, string& src, string& dest):fbThread(_data), data(_data), path(src), filename(dest)
 {
-	data->debug(NONE,"fbBackup.this");
+	data->debug(NONE,"fbBackup.this %s -> %s", path.c_str(), filename.c_str());
 	startDelete();
 }
 
 fbBackup::~fbBackup()
 {
-	data->debug(NONE,"fbBackup.~this");
+	data->debug(NONE,"fbBackup.~this %s -> %s", path.c_str(), filename.c_str());
 }
 
 
@@ -19,6 +19,8 @@ void fbBackup::run()
     struct archive *a = NULL;
     bool goAhead = true;
     int resp = 0;
+
+    data->msg(NONE, "Backup begun: %s -> %s", path.c_str(), filename.c_str());
 
     a = archive_write_new();
     archive_write_set_format_ustar(a);
@@ -36,6 +38,8 @@ void fbBackup::run()
         traverseDir(&a, path.c_str());
 
     archive_write_finish(a);
+
+    data->msg(NONE, "Backup complete: %s -> %s", path.c_str(), filename.c_str());
 
     /*
 	string cmd = "tar -cf ";
@@ -56,63 +60,67 @@ void fbBackup::traverseDir(struct archive **ap, const char *pathname)
         int len = 0;
 
     if (lstat(pathname, &st) < 0)
-        data->err(NONE, "Can't lstat pathname: %s", pathname);
-    else
     {
+        data->err(NONE, "Can't lstat pathname: %s", pathname);
+        return;
+    }
 
-        entry = archive_entry_new();
-        archive_entry_set_pathname(entry, pathname);
-        fixAbsolutePaths(entry);
+    entry = archive_entry_new();
+    archive_entry_set_pathname(entry, pathname);
+    fixAbsolutePaths(entry);
 
-        if ((fd = open(pathname, O_RDONLY)) < 0)
+    if ((fd = open(pathname, O_RDONLY)) < 0)
+    {
+        data->err(NONE, "Can't open pathname for archiving: %d = open(%s)", fd, pathname);
+        archive_entry_set_size(entry, 0);
+    }
+
+    if (!S_ISREG(st.st_mode))
+    {
+        archive_entry_set_size(entry, 0);
+    }
+
+    archive_entry_copy_stat(entry, &st);
+    archive_write_header(*ap, entry);
+    // might want to check for success here
+
+    while (S_ISREG(st.st_mode) && fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
+        archive_write_data(*ap, buff, len);
+
+    data->debug(NONE, "Archived file: %s", archive_entry_pathname(entry));
+
+    if (fd >= 0)
+        close(fd);
+
+    archive_entry_free(entry);
+
+    // done archiving current file, now check if it's a directory, in order to recurse
+    if (S_ISDIR(st.st_mode))
+    {
+        DIR *dir = NULL;
+        struct dirent *item = NULL;
+        char nextpath[PATH_MAX+1]; // leave room for \0
+
+        if (!(dir = opendir(pathname)))
         {
-            data->err(NONE, "Can't open pathname for archiving: %d = open(%s)", pathname, fd);
-            archive_entry_set_size(entry, 0);
+            data->warn(NONE, "Can't descend into path %s", pathname);
+            return;
         }
 
-        if (!S_ISREG(st.st_mode))
-            archive_entry_set_size(entry, 0);
-
-        archive_entry_copy_stat(entry, &st);
-        archive_write_header(*ap, entry);
-        // might want to check for success here
-
-        while (S_ISREG(st.st_mode) && fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
-            archive_write_data(*ap, buff, len);
-
-        if (fd >= 0)
-            close(fd);
-
-        archive_entry_free(entry);
-
-        // done archiving current file, now check if it's a directory, in order to recurse
-        if (S_ISDIR(st.st_mode))
+        while ((item = readdir(dir)) != NULL)
         {
-            DIR *dir = NULL;
-            struct dirent *item = NULL;
-            char nextpath[PATH_MAX+1]; // leave room for \0
+            if (!strcmp(item->d_name, ".") || !strcmp(item->d_name, ".."))
+                continue;
 
-            if ((dir = opendir(pathname)))
-            {
-                data->warn(NONE, "Can't descend into path");
-                return;
-            }
+            if (pathname[strlen(pathname)-1] == PATH_NAME_SEPARATOR)
+                sprintf(nextpath, "%s%s", pathname, item->d_name);
+            else
+                sprintf(nextpath, "%s%c%s", pathname, PATH_NAME_SEPARATOR, item->d_name);
 
-            while ((item = readdir(dir)) != NULL)
-            {
-                if (!strcmp(item->d_name, ".") || !strcmp(item->d_name, ".."))
-                    continue;
-
-                if (pathname[strlen(pathname)-1] == PATH_NAME_SEPARATOR)
-                    sprintf(nextpath, "%s%s", pathname, item->d_name);
-                else
-                    sprintf(nextpath, "%s%c%s", pathname, PATH_NAME_SEPARATOR, item->d_name);
-
-                traverseDir(ap, nextpath);
-            }
-
-            closedir(dir);
+            traverseDir(ap, nextpath);
         }
+
+        closedir(dir);
     }
 }
 
@@ -121,7 +129,7 @@ void fbBackup::fixAbsolutePaths(struct archive_entry *entry)
 	const char *name = archive_entry_pathname(entry);
 
     // strip leading slashes
-	while (name[0] == '/')
+	while (name[0] == PATH_NAME_SEPARATOR)
         ++name;
 
     // check for zero string length

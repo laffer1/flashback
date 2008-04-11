@@ -1,4 +1,4 @@
-/* $Id: global.h,v 1.12 2008/04/10 18:33:36 wyverex Exp $ */
+/* $Id: global.h,v 1.13 2008/04/11 05:09:29 ctubbsii Exp $ */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -21,9 +21,11 @@
 		#include <windows.h>
 		#include <tchar.h>
 		#include <strsafe.h>
+		#define PATH_NAME_SEPARATOR '\\'
 	#else
 		#include <pthread.h>
 		#include <sys/stat.h>
+		#define PATH_NAME_SEPARATOR '/'
 	#endif
 
 #endif

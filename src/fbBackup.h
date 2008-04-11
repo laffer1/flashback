@@ -1,4 +1,4 @@
-/* $Id: fbBackup.h,v 1.5 2008/04/09 12:52:50 wyverex Exp $ */
+/* $Id: fbBackup.h,v 1.6 2008/04/11 05:09:29 ctubbsii Exp $ */
 
 #ifndef fbBACKUP_H
 #define fbBACKUP_H
@@ -12,12 +12,6 @@
 #include <limits.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#ifdef WIN32
-#define PATH_NAME_SEPARATOR '\\'
-#else
-#define PATH_NAME_SEPARATOR '/'
-#endif
 
 class fbBackup: public fbThread
 {
