@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.10 2008/03/30 17:27:29 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.11 2008/04/12 05:09:43 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -55,6 +55,7 @@ protected:
     bool running;  /// is the response thread running?
 
     void run();     /// heavy lifting
+    void dynamichead();  /// Print HTTP header for dynamic pages.
     void internal();  ///  500 internal server error
     void notfound(); /// 404 Not Found handler
     void header( string name, string value );  /// Create and write header for client

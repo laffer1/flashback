@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.27 2008/04/11 23:44:47 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.28 2008/04/12 05:09:43 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -133,15 +133,22 @@ void fbHttpResponse::run()
            loc[0] = '\0'; // whack the ?
            // it's path testing time
            if ( strcmp( path, "/current" ) == 0 )
-               notfound();
+           {
+               dynamichead();
+           }
            else if ( strcmp( path, "/schedule" ) == 0 )
-               notfound();
+           {
+               dynamichead();
+           }
            else if ( strcmp( path, "/restore" ) == 0 )
-               notfound();
+           {
+               dynamichead();
+           }
            else if ( strcmp( path, "/settings" ) == 0 )
-               notfound();
-
-            free(querystring);
+           {
+               dynamichead();
+           }
+           free(querystring);
         }
         else // can't be valid
            internal(); 
@@ -161,6 +168,16 @@ CLEANUP:
     shutdown();  // clean up 
 }
 
+void fbHttpResponse::dynamichead()
+{
+    status( "200", "OK" );
+    header( "Server", SERVERID );
+    headdate();
+    header( "Connection", "close");
+    header( "Content-Type", "text/html" );
+    header( "Content-Language", "en-US" );
+    client->write("\r\n"); // end header section
+}
 
 void fbHttpResponse::sendfile( const char * path )
 {
@@ -250,6 +267,11 @@ void fbHttpResponse::notfound()
     data->debug(NONE, "fbHttpServer.notfound");
 
     path = client->getPath();
+    if ( path == NULL )
+    {
+        internal();
+        return;
+    }
 
     status( "404", "Not Found" );
     header( "Server", SERVERID );
