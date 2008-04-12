@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.30 2008/04/12 21:24:38 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.31 2008/04/12 22:41:31 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -139,11 +139,12 @@ void fbHttpResponse::run()
            else if ( strcmp( path, "/schedule" ) == 0 )
            {
                dynamichead("Schedule Jobs");
-
+               data->addBackupJob(new string("backup test"), new fbDate, new fbTime, new string("/var/log/"));
            }
            else if ( strcmp( path, "/restore" ) == 0 )
            {
                dynamichead("Restore from Backup");
+               data->addRestoreJob(new string("something0.tar"), new string("/home/backups/something/"));
            }
            else if ( strcmp( path, "/settings" ) == 0 )
            {

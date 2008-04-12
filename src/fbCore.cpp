@@ -1,12 +1,10 @@
-/* $Id: fbCore.cpp,v 1.14 2008/04/09 15:13:43 wyverex Exp $ */
+/* $Id: fbCore.cpp,v 1.15 2008/04/12 22:41:30 laffer1 Exp $ */
 
 /**
 *  fbCore.cpp
 *  @author Byron Heads
 *  @date March 10, 2008
 */
-
-
 
 #include "global.h"
 #include "fbData.h"
