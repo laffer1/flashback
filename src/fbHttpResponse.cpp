@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.28 2008/04/12 05:09:43 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.29 2008/04/12 21:21:24 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -139,6 +139,7 @@ void fbHttpResponse::run()
            else if ( strcmp( path, "/schedule" ) == 0 )
            {
                dynamichead();
+
            }
            else if ( strcmp( path, "/restore" ) == 0 )
            {
@@ -168,7 +169,7 @@ CLEANUP:
     shutdown();  // clean up 
 }
 
-void fbHttpResponse::dynamichead()
+void fbHttpResponse::dynamichead( const char * title )
 {
     status( "200", "OK" );
     header( "Server", SERVERID );
@@ -177,6 +178,10 @@ void fbHttpResponse::dynamichead()
     header( "Content-Type", "text/html" );
     header( "Content-Language", "en-US" );
     client->write("\r\n"); // end header section
+
+    client->write("<html>\n<head>\n<title>");
+    client->write(title);
+    client->write("</title>\n</head>\n");
 }
 
 void fbHttpResponse::sendfile( const char * path )

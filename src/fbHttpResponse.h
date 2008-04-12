@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.11 2008/04/12 05:09:43 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.13 2008/04/12 21:25:08 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -44,25 +44,25 @@ class fbHttpResponse: public fbThread
 {
 public:
     fbHttpResponse(fbData* _data, fbClient * _client);   /// default constructor
-    ~fbHttpResponse();  /// default destructor
+    ~fbHttpResponse(); /// default destructor
 
-    void startup();  /// Start HTTP server
-    void shutdown();  /// Stop HTTP server
+    void startup();    /// Start HTTP server
+    void shutdown();   /// Stop HTTP server
 
 protected:
-    fbData *data;
-    fbClient *client;
-    bool running;  /// is the response thread running?
+    fbData *data;      /// The logging wrapper
+    fbClient *client;  /// The client connected via socket
+    bool running;      /// is the response thread running?
 
-    void run();     /// heavy lifting
-    void dynamichead();  /// Print HTTP header for dynamic pages.
+    void run();       /// heavy lifting
+    void dynamichead( char * title );  /// Print HTTP header for dynamic pages.
     void internal();  ///  500 internal server error
-    void notfound(); /// 404 Not Found handler
+    void notfound();  /// 404 Not Found handler
     void header( string name, string value );  /// Create and write header for client
     void status( string code, string msg );  /// write status code like 404 or 200 OK
     void headdate();  /// print HTTP date header.
     void sendfile( const char *filename );  /// send a file via webserver using path
-    const char * matchmimetype( const char *filename );
+    const char * matchmimetype( const char *filename ); /// Determine mime type
 };
 
 #endif
