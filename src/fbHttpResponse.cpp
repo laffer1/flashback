@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.34 2008/04/13 16:42:13 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.35 2008/04/13 20:27:10 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -201,6 +201,8 @@ CLEANUP:
 void fbHttpResponse::sanitizestr( char * str )
 {
     size_t len;
+    size_t resultlen;
+    char *result;
 
     if ( str == NULL )
        return;
@@ -212,7 +214,10 @@ void fbHttpResponse::sanitizestr( char * str )
         if ( str[i] == '+')
            str[i] = ' ';
     }
-    
+   
+    resultlen = len;
+    result = spc_decode_url(str, &resultlen);  
+    strncpy( str, result, len );
 }
 
 void fbHttpResponse::dynamichead( const char * title )

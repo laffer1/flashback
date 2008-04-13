@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.50 2008/04/09 00:37:06 wyverex Exp $
+# $Id: Makefile,v 1.51 2008/04/13 20:27:10 laffer1 Exp $
 #
 #Flashback make file
 #
@@ -11,7 +11,7 @@ LIBS=-lsqlite3 -larchive -lbz2 -lz
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
 	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o fbConfig.o \
-	fbBackup.o fbRestore.o
+	fbBackup.o fbRestore.o urldecode.o
 
 PREFIX= /usr/local
 DESTDIR=
