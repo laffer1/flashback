@@ -1,4 +1,4 @@
-/* $Id: global.h,v 1.13 2008/04/11 05:09:29 ctubbsii Exp $ */
+/* $Id: global.h,v 1.14 2008/04/13 22:45:46 ctubbsii Exp $ */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -12,6 +12,7 @@
 	#include <cstdio>
 	#include <fstream>
 	#include <vector>
+	#include <queue>
 	#include <csignal>
 	#include <cstdarg>
 

@@ -1,4 +1,4 @@
-/* $Id: fbConfig.cpp,v 1.11 2008/04/11 05:09:29 ctubbsii Exp $ */
+/* $Id: fbConfig.cpp,v 1.12 2008/04/13 22:45:46 ctubbsii Exp $ */
 
 #include "fbConfig.h"
 
@@ -108,7 +108,7 @@ int fbConfig::load(const char* filename)
     {
         myfile.close();
         // ERROR: error loading from config file
-        errlog->err(CONFIGFAILEDTOLOAD, "Cannot load from config file: %s", filename);
+        errlog->warn(CONFIGFAILEDTOLOAD, "Cannot load from config file: %s", filename);
         return -1;
     }
 
@@ -135,7 +135,7 @@ int fbConfig::save(const char* filename)
     if (myfile.fail())
     {
         // ERROR: error opening config file to save
-        errlog->err(CONFIGFAILEDTOSAVE, "error opening config file to save");
+        errlog->warn(CONFIGFAILEDTOSAVE, "error opening config file to save");
         return -1;
     }
     myfile << "WebServerAddr=" << addr << endl
@@ -145,7 +145,7 @@ int fbConfig::save(const char* filename)
     if (myfile.fail())
     {
         // ERROR: problem writing to config file
-        errlog->err(CONFIGFAILEDTOSAVE, "problem writing to config file");
+        errlog->warn(CONFIGFAILEDTOSAVE, "problem writing to config file");
         myfile.close();
         return -1;
     }

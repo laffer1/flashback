@@ -1,4 +1,4 @@
-/* $Id: fbBackup.h,v 1.7 2008/04/11 23:49:30 ctubbsii Exp $ */
+/* $Id: fbBackup.h,v 1.8 2008/04/13 22:45:46 ctubbsii Exp $ */
 
 #ifndef fbBACKUP_H
 #define fbBACKUP_H
@@ -16,17 +16,19 @@
 class fbBackup: public fbThread
 {
 public:
-	fbBackup(fbData* _data, string& src, string& dest);
+	fbBackup(fbData* _data, const string& src, const string& dest);
 	~fbBackup();
 
 private:
 	fbData* data;
-	string path;
-	string filename;
+	string backuppath;
+	string tarfile;
+	struct archive *a;
 
 	void run();
     void fixAbsolutePaths(struct archive_entry *entry);
-    void traverseDir(struct archive *a, const char *pathname);
+    void traverseDir(const string& pathname);
+    void addFile(const string& pathname, struct stat *st);
 };
 
 #endif

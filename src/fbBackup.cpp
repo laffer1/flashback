@@ -1,45 +1,36 @@
-/* $Id: fbBackup.cpp,v 1.9 2008/04/11 23:49:30 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.10 2008/04/13 22:45:46 ctubbsii Exp $ */
 
 #include "fbBackup.h"
 
-fbBackup::fbBackup(fbData* _data, string& src, string& dest):fbThread(_data), data(_data), path(src), filename(dest)
+fbBackup::fbBackup(fbData* _data, const string& src, const string& dest):fbThread(_data), data(_data), backuppath(src), tarfile(dest), a(NULL)
 {
-	data->debug(NONE,"fbBackup.this %s -> %s", path.c_str(), filename.c_str());
+	data->debug(NONE,"fbBackup.this %s -> %s", backuppath.c_str(), tarfile.c_str());
 	startDelete();
 }
 
 fbBackup::~fbBackup()
 {
-	data->debug(NONE,"fbBackup.~this %s -> %s", path.c_str(), filename.c_str());
+	data->debug(NONE,"fbBackup.~this %s -> %s", backuppath.c_str(), tarfile.c_str());
 }
 
 
 void fbBackup::run()
 {
-    struct archive *a = NULL;
-    bool goAhead = true;
-    int resp = 0;
-
-    data->msg(NONE, "Backup begun: %s -> %s", path.c_str(), filename.c_str());
+    data->msg(NONE, "Backup begun: %s -> %s", backuppath.c_str(), tarfile.c_str());
 
     a = archive_write_new();
     archive_write_set_format_ustar(a);
     // archive_write_set_bytes_per_block(a, 10240); // this is default
-    archive_write_set_compression_bzip2(a); // could also use gzip
+    // archive_write_set_compression_bzip2(a); // could also use gzip
 
-    resp = archive_write_open_filename(a, filename.c_str());
-    if (resp != ARCHIVE_OK)
-    {
-        data->err(NONE, "Unable to create backup file: %d", resp);
-        goAhead = false;
-    }
-
-    if (goAhead)
-        traverseDir(a, path.c_str());
+    if (archive_write_open_filename(a, tarfile.c_str()) != ARCHIVE_OK)
+        data->warn(NONE, "Unable to create backup file: %s", archive_error_string(a));
+    else
+        traverseDir(backuppath);
 
     archive_write_finish(a);
 
-    data->msg(NONE, "Backup complete: %s -> %s", path.c_str(), filename.c_str());
+    data->msg(NONE, "Backup complete: %s -> %s", backuppath.c_str(), tarfile.c_str());
 
     /*
 	string cmd = "tar -cf ";
@@ -51,39 +42,92 @@ void fbBackup::run()
 	*/
 }
 
-void fbBackup::traverseDir(struct archive *a, const char *pathname)
+void fbBackup::traverseDir(const string& pathname)
 {
     struct stat st;
+
+    if (lstat(pathname.c_str(), &st) < 0)
+    {
+        data->warn(NONE, "Can't lstat pathname: %s", pathname.c_str());
+        return;
+    }
+
+    // if it's a regular file, add it to the archive
+    if (S_ISREG(st.st_mode))
+        addFile(pathname, &st);
+
+    // otherwise, if it's a directory, traverse it
+    else if (S_ISDIR(st.st_mode))
+    {
+        DIR *dir;
+        struct dirent *item;
+        queue<string> morepaths;
+        string nextpath;
+
+        if (!(dir = opendir(pathname.c_str())))
+        {
+            data->warn(NONE, "Can't descend into path %s", pathname.c_str());
+            return;
+        }
+
+        data->debug(NONE, "Descending into path %s", pathname.c_str());
+
+        // get everything in this directory
+        while ((item = readdir(dir)) != NULL)
+        {
+            nextpath = pathname;
+
+            if (!strcmp(item->d_name, ".") || !strcmp(item->d_name, ".."))
+                continue;
+
+            // append a separator if one doesn't already exist
+            if (nextpath[nextpath.length()-1] != PATH_NAME_SEPARATOR)
+                nextpath += PATH_NAME_SEPARATOR;
+
+            // append name of directory entry
+            nextpath += item->d_name;
+
+            // add it to the queue to check later, if it doesn't exceed the maximum length
+            if (nextpath.length() < PATH_MAX)
+                morepaths.push(nextpath);
+        }
+        closedir(dir);
+
+        // while there is more in the directory, deal with it
+        while (!morepaths.empty())
+        {
+            traverseDir(morepaths.front());
+            morepaths.pop();
+        }
+    }
+}
+
+void fbBackup::addFile(const string& pathname, struct stat *st)
+{
     struct archive_entry *entry = NULL;
     int fd = 0;
     int buff[1024];
     ssize_t len = 0;
-    int resp = 0;
-
-    if (lstat(pathname, &st) < 0)
-    {
-        data->err(NONE, "Can't lstat pathname: %s", pathname);
-        return;
-    }
+    int resp;
 
     entry = archive_entry_new();
 
-    archive_entry_copy_stat(entry, &st);
+    archive_entry_copy_stat(entry, st);
 
-    archive_entry_set_pathname(entry, pathname);
+    archive_entry_set_pathname(entry, pathname.c_str());
     fixAbsolutePaths(entry);
 
-    if ((fd = open(pathname, O_RDONLY)) < 0)
+    if ((fd = open(pathname.c_str(), O_RDONLY)) < 0)
     {
-        data->err(NONE, "Can't open pathname for archiving: %d = open(%s)", fd, pathname);
+        data->warn(NONE, "Can't open pathname for archiving: %d = open(%s)", fd, pathname.c_str());
         archive_entry_set_size(entry, 0);
     }
 
-    if (!S_ISREG(st.st_mode))
+    /* if (!S_ISREG(st.st_mode))
     {
-        data->debug(NONE, "%s is NOT a regular file!", pathname);
+        data->debug(NONE, "%s is NOT a regular file!", pathname.c_str());
         archive_entry_set_size(entry, 0);
-    }
+    } */
 
     resp = archive_write_header(a, entry);
     if (resp != ARCHIVE_OK)
@@ -92,7 +136,7 @@ void fbBackup::traverseDir(struct archive *a, const char *pathname)
         return;
     }
 
-    while (S_ISREG(st.st_mode) && fd >= 0 && (len = read(fd, buff, 1024*sizeof(int))) > 0)
+    while (/* S_ISREG(st.st_mode) && */ fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
     {
         data->debug(NONE, "Wrote %i bytes from %s", len, archive_entry_pathname(entry));
         resp = archive_write_data(a, buff, len);
@@ -107,35 +151,6 @@ void fbBackup::traverseDir(struct archive *a, const char *pathname)
 
     archive_write_finish_entry(a);
     archive_entry_free(entry);
-
-    // done archiving current file, now check if it's a directory, in order to recurse
-    if (S_ISDIR(st.st_mode))
-    {
-        DIR *dir = NULL;
-        struct dirent *item = NULL;
-        char nextpath[PATH_MAX+1]; // leave room for \0
-
-        if (!(dir = opendir(pathname)))
-        {
-            data->warn(NONE, "Can't descend into path %s", pathname);
-            return;
-        }
-
-        while ((item = readdir(dir)) != NULL)
-        {
-            if (!strcmp(item->d_name, ".") || !strcmp(item->d_name, ".."))
-                continue;
-
-            if (pathname[strlen(pathname)-1] == PATH_NAME_SEPARATOR)
-                snprintf(nextpath, sizeof(buff)-1, "%s%s", pathname, item->d_name);
-            else
-                snprintf(nextpath, sizeof(buff)-1, "%s%c%s", pathname, PATH_NAME_SEPARATOR, item->d_name);
-
-            traverseDir(a, nextpath);
-        }
-
-        closedir(dir);
-    }
 }
 
 void fbBackup::fixAbsolutePaths(struct archive_entry *entry)
