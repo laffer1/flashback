@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.31 2008/04/12 22:41:31 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.32 2008/04/13 05:25:17 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -110,26 +110,29 @@ void fbHttpResponse::run()
         path = strdup("/index.html");
     }
 
+    data->debug(NONE, "Test for querystring");
     // Is this a built in command.. ? for forms
     if ( ( loc = strstr( path, "?" ) ) != NULL )
     {
         pathlen = strlen(path);
-        querystring = (char *)malloc(pathlen + 1); // it's actually smaller than that.
+        querystring = (char *) malloc(pathlen + 1); // it's actually smaller than that.
         if (querystring == NULL)
         {
             data->err(NONE,"Could not allocate memory");
             internal();
             goto CLEANUP;
         }
+        data->debug(NONE, "Copy the query");
         strncpy( querystring, loc, pathlen );
         if ( strlen(querystring) < pathlen )
         {
            // break it up into an argument vector.
-	   for (ap = argv; (*ap = strsep(&loc, ";")) != NULL;)
+	   for (ap = argv; (*ap = strsep(&querystring, ";")) != NULL;)
                    if (**ap != '\0')
                            if (++ap >= &argv[1024])
                                    break;
 
+           data->debug(NONE, "query in argv array");
            loc[0] = '\0'; // whack the ?
            // it's path testing time
            if ( strcmp( path, "/current" ) == 0 )
@@ -172,6 +175,7 @@ CLEANUP:
 
 void fbHttpResponse::dynamichead( const char * title )
 {
+    data->debug(NONE, "fbHttpResponse.dyamichead");
     status( "200", "OK" );
     header( "Server", SERVERID );
     headdate();
