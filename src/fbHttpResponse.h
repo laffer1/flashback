@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.14 2008/04/12 21:27:57 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.15 2008/04/13 16:42:13 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -63,6 +63,7 @@ protected:
     void headdate();  /// print HTTP date header.
     void sendfile( const char *filename );  /// send a file via webserver using path
     const char * matchmimetype( const char *filename ); /// Determine mime type
+    void sanitizestr( char *str );   /// clean up encoding of GET requestion
 };
 
 #endif

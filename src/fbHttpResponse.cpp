@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.33 2008/04/13 05:43:24 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.34 2008/04/13 16:42:13 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -127,7 +127,7 @@ void fbHttpResponse::run()
         if ( strlen(querystring) < pathlen )
         {
            // break it up into an argument vector.
-	   for (ap = argv; (*ap = strsep(&querystring, ";")) != NULL;)
+	   for (ap = argv; (*ap = strsep(&querystring, "&")) != NULL;)
                    if (**ap != '\0')
                            if (++ap >= &argv[1024])
                                    break;
@@ -145,14 +145,25 @@ void fbHttpResponse::run()
            {
                dynamichead("FlashBack :: Schedule Jobs");
 
-               for (int i = 0; i < 1024; i++) {
-                   client->write(argv[i]);
-                   client->write("<br />\n");
+               if (argv[0] != NULL)
+              {
+                   if ( strcmp( argv[0], "?show" ) == 0 )
+                   {
+                       client->write("<form method=\"get\" >\n");
+                       client->write("<fieldset>\n<p>Name: <input type=\"text\" name=\"name\" value=\"\" />\n");
+                       client->write("<br />Path: <input type=\"text\" name=\"path\" value=\"\" />\n");
+                       client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
+                       client->write("</form>\n");
+                   } 
+                   else 
+                   {
+                       client->write(argv[0]);
+                       client->write("<br />\n");
+                       //data->addBackupJob(new string("backup test"), new fbDate, new fbTime, new string("/var/log/"));
+                  }
               }
-
-               data->addBackupJob(new string("backup test"), new fbDate, new fbTime, new string("/var/log/"));
-
-               client->write("</html>\n");
+              client->write("</body>\n");
+              client->write("</html>\n");
            }
            else if ( strcmp( path, "/restore" ) == 0 )
            {
@@ -187,6 +198,23 @@ CLEANUP:
     shutdown();  // clean up 
 }
 
+void fbHttpResponse::sanitizestr( char * str )
+{
+    size_t len;
+
+    if ( str == NULL )
+       return;
+
+    len = strlen( str );
+
+    for (unsigned int i = 0; i < len; i++ )
+    {
+        if ( str[i] == '+')
+           str[i] = ' ';
+    }
+    
+}
+
 void fbHttpResponse::dynamichead( const char * title )
 {
     data->debug(NONE, "fbHttpResponse.dyamichead");
@@ -201,10 +229,11 @@ void fbHttpResponse::dynamichead( const char * title )
     client->write("<html>\n<head>\n\t<title>");
     client->write(title);
     client->write("</title>\n");
-    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"main.css\">");
-    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"buttons.css\">");
-    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"forms.css\">");
+    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"main.css\">\n");
+    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"buttons.css\">\n");
+    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"forms.css\">\n");
     client->write("</head>\n");
+    client->write("<body>\n");
 }
 
 void fbHttpResponse::sendfile( const char * path )
