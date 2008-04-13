@@ -1,13 +1,19 @@
 FlashBack is a file backup system for "Flash drives" and other media.
 
+Authors:
+Byron Heads
+Lucas Holt
+Chris Tubbs
+John Markus
+
 To compile, you must use GNU Make.  This will not work with BSD make.
 Tested on Linux (Ubuntu, Fedora), and MidnightBSD.
+
+Requires: sqlite3 and libarchive (both included with MidnightBSD 0.2)
 
 This code is licensed under a 2 clause BSD license, however it 
 currently uses code under other licenses.
 
-sqlite is public domain.
-
 urldecode.cpp contains public domain code from an O'Reilly book.
 
-$Id: README,v 1.6 2008/04/13 20:38:46 laffer1 Exp $
+$Id: README,v 1.7 2008/04/13 20:41:11 laffer1 Exp $
