@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.32 2008/04/13 05:25:17 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.33 2008/04/13 05:43:24 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -137,21 +137,35 @@ void fbHttpResponse::run()
            // it's path testing time
            if ( strcmp( path, "/current" ) == 0 )
            {
-               dynamichead("Current");
+               dynamichead("FlashBack :: Current Jobs");
+
+               client->write("</html>\n");
            }
            else if ( strcmp( path, "/schedule" ) == 0 )
            {
-               dynamichead("Schedule Jobs");
+               dynamichead("FlashBack :: Schedule Jobs");
+
+               for (int i = 0; i < 1024; i++) {
+                   client->write(argv[i]);
+                   client->write("<br />\n");
+              }
+
                data->addBackupJob(new string("backup test"), new fbDate, new fbTime, new string("/var/log/"));
+
+               client->write("</html>\n");
            }
            else if ( strcmp( path, "/restore" ) == 0 )
            {
-               dynamichead("Restore from Backup");
+               dynamichead("FlashBack :: Restore from Backup");
                data->addRestoreJob(new string("something0.tar"), new string("/home/backups/something/"));
+
+               client->write("</html>\n");
            }
            else if ( strcmp( path, "/settings" ) == 0 )
            {
-               dynamichead("Settings");
+               dynamichead("FlashBack :: Settings");
+
+               client->write("</html>\n");
            }
            free(querystring);
         }
@@ -184,9 +198,13 @@ void fbHttpResponse::dynamichead( const char * title )
     header( "Content-Language", "en-US" );
     client->write("\r\n"); // end header section
 
-    client->write("<html>\n<head>\n<title>");
+    client->write("<html>\n<head>\n\t<title>");
     client->write(title);
-    client->write("</title>\n</head>\n");
+    client->write("</title>\n");
+    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"main.css\">");
+    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"buttons.css\">");
+    client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"forms.css\">");
+    client->write("</head>\n");
 }
 
 void fbHttpResponse::sendfile( const char * path )
