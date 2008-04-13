@@ -1,5 +1,7 @@
 /* from 
 http://www.oreillynet.com/pub/a/network/excerpt/spcookbook_chap03/index2.html
+
+$Id: urldecode.cpp,v 1.2 2008/04/13 20:38:46 laffer1 Exp $
 */
 
 #include <stdlib.h>
