@@ -1,4 +1,4 @@
-/* $Id: fbData.cpp,v 1.13 2008/04/11 02:21:15 ctubbsii Exp $ */
+/* $Id: fbData.cpp,v 1.14 2008/04/14 20:33:04 ctubbsii Exp $ */
 
 #include "fbData.h"
 
@@ -16,11 +16,11 @@ fbData::fbData():errlog(NULL), db(NULL), config(NULL)
 
 fbData::~fbData()
 {
-	if(errlog) delete errlog;
+	debug(NONE, "fbData.~this");
 	if(db) delete db;
 	if(config) delete config;
 
-	debug(NONE, "fbData.~this");
+	if(errlog) delete errlog;
 	errlog = NULL;
 	db = NULL;
 	config = NULL;
