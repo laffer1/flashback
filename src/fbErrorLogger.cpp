@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.17 2008/04/11 02:21:15 ctubbsii Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.18 2008/04/14 20:36:50 ctubbsii Exp $ */
 
 /**
 *	fbErrorLogger
@@ -37,8 +37,8 @@ fbErrorLogger::fbErrorLogger(ostream* stream):out(stream), cs()
 */
 fbErrorLogger::~fbErrorLogger()
 {
-	if(out) delete out;
 	debug(NONE, "fbErrorLogger.~this");
+	if(out) delete out;
 	out = NULL;	/// < Null stream pointer
 }
 
