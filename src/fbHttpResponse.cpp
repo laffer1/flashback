@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.36 2008/04/15 01:05:40 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.37 2008/04/15 01:13:16 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -178,10 +178,11 @@ void fbHttpResponse::run()
                           client->write("<br />\n");
                           client->write(secondvar);
                           client->write("<br />\n");
+                          data->msg( NONE, "Scheduling job %s on %s", firstvar, secondvar );
                           // perform the backup.  firstvar is our name and secondvar is the path to backup
                           data->addBackupJob(new string(firstvar), new fbDate, new fbTime, new string(secondvar));
-                          free(firstvar);
-                          free(secondvar);
+                          //free(firstvar);
+                          //free(secondvar);
                       }
                       else
                       {
