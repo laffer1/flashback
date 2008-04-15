@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.37 2008/04/15 01:13:16 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.38 2008/04/15 01:54:04 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -146,6 +146,7 @@ void fbHttpResponse::run()
            else if ( strcmp( path, "/schedule" ) == 0 )
            {
                dynamichead("FlashBack :: Schedule Jobs");
+               client->write("<div id=\"container\">\n");
                client->write("<h2>Schedule Jobs</h2>\n");
                if (argv[0] != NULL)
               {
@@ -190,6 +191,12 @@ void fbHttpResponse::run()
                      }
                  }
               }
+              client->write("</div>\n");
+              client->write("<div class=\"clear\"></div>\n");
+              client->write("<hr />\n");
+		      client->write("<div id=\"footer\">");
+			  client->write("&#169; 2008 &#8211; Lucas Holt, Byron Heads, Chris Tubbs, and John Markus");
+		      client->write("</div>\n");
               client->write("</body>\n");
               client->write("</html>\n");
            }
@@ -265,8 +272,31 @@ void fbHttpResponse::dynamichead( const char * title )
     client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"main.css\">\n");
     client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"buttons.css\">\n");
     client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"forms.css\">\n");
+    client->write("<style type=\"text/css\">\n");
+	client->write("#goodies-bar { width: 780px; height: auto; margin: 1em auto; padding: 1em;}\n");
+	client->write("		#thebar { padding: 0px; width: 780px; margin: -10px auto 0 auto; border: 1px dotted #e3ebf1; background: #e3ebf1; text-align: center; float: left; -moz-border-radius: 7px; -webkit-border-radius: 7px; }\n");
+	client->write("		#thebar a { padding: 32px 0 0 0; background-repeat: no-repeat; overflow: hidden; height: 0px !important; height: /**/:32px; display: block; float: left; margin: 10px; }\n");
+	client->write("		#current a { background-image: url(\"current32.png\"); width: 141px; }\n");
+	client->write("		#schedule a { background-image: url(\"schedule32.png\"); width: 153px; }\n");
+	client->write("		#restore a { background-image: url(\"restore32.png\"); width: 137px; }\n");
+	client->write("		#settings a { background-image: url(\"settings32.png\"); width: 143px; }\n");
+	client->write("		#help a { background-image: url(\"help32.png\"); width: 93px; }\n");
+	client->write("</style>\n");
     client->write("</head>\n");
     client->write("<body>\n");
+    client->write("	<div id=\"header\">\n");
+    client->write("		<h1><a href=\"index.html\" title=\"FlashBack Homepage\">FlashBack: Data Backup Solution</a></h1>\n");
+	client->write("	</div>\n");
+	client->write("	<div id=\"goodies-bar\">\n");
+    client->write("		<div id=\"thebar\">\n");
+    client->write("			<div id=\"current\"><a href=\"/current?show\">Current</a></div>\n");
+	client->write("			<div id=\"schedule\"><a href=\"/schedule?show\">Schedule</a></div>\n");
+	client->write("			<div id=\"restore\"><a href=\"/restore?show\">Restore</a></div>\n");
+	client->write("			<div id=\"settings\"><a href=\"/settings?show\">Settings</a></div>\n");
+	client->write("			<div id=\"help\"><a href=\"help.html\">Help</a></div>\n");
+	client->write("		</div>\n");
+	client->write("	</div>\n");
+	client->write("	<div class="clear"></div>\n");
 }
 
 void fbHttpResponse::sendfile( const char * path )
