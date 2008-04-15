@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.38 2008/04/15 01:54:04 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.39 2008/04/15 01:56:01 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -296,7 +296,7 @@ void fbHttpResponse::dynamichead( const char * title )
 	client->write("			<div id=\"help\"><a href=\"help.html\">Help</a></div>\n");
 	client->write("		</div>\n");
 	client->write("	</div>\n");
-	client->write("	<div class="clear"></div>\n");
+	client->write("	<div class=\"clear\"></div>\n");
 }
 
 void fbHttpResponse::sendfile( const char * path )
