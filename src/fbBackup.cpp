@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.10 2008/04/13 22:45:46 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.11 2008/04/15 02:11:16 ctubbsii Exp $ */
 
 #include "fbBackup.h"
 
@@ -19,16 +19,25 @@ void fbBackup::run()
     data->msg(NONE, "Backup begun: %s -> %s", backuppath.c_str(), tarfile.c_str());
 
     a = archive_write_new();
+    data->debug(NONE, "a = archive_write_new()");
     archive_write_set_format_ustar(a);
     // archive_write_set_bytes_per_block(a, 10240); // this is default
-    // archive_write_set_compression_bzip2(a); // could also use gzip
+    archive_write_set_compression_bzip2(a); // could also use gzip
 
     if (archive_write_open_filename(a, tarfile.c_str()) != ARCHIVE_OK)
+    {
+        data->debug(NONE, "case1: archive_write_open_filename(a, \"%s\")", tarfile.c_str());
         data->warn(NONE, "Unable to create backup file: %s", archive_error_string(a));
+    }
     else
+    {
+        data->debug(NONE, "case2: archive_write_open_filename(a, \"%s\")", tarfile.c_str());
         traverseDir(backuppath);
+    }
 
     archive_write_finish(a);
+    data->debug(NONE, "archive_write_finish(a)");
+
 
     data->msg(NONE, "Backup complete: %s -> %s", backuppath.c_str(), tarfile.c_str());
 
@@ -46,16 +55,20 @@ void fbBackup::traverseDir(const string& pathname)
 {
     struct stat st;
 
+    data->debug(NONE, "traverseDir(\"%s\")", pathname.c_str());
     if (lstat(pathname.c_str(), &st) < 0)
     {
         data->warn(NONE, "Can't lstat pathname: %s", pathname.c_str());
         return;
     }
+    data->debug(NONE, "lstat(\"%s\", &st)", pathname.c_str());
 
     // if it's a regular file, add it to the archive
     if (S_ISREG(st.st_mode))
+    {
+        data->debug(NONE, "\t...is a regular file");
         addFile(pathname, &st);
-
+    }
     // otherwise, if it's a directory, traverse it
     else if (S_ISDIR(st.st_mode))
     {
@@ -104,17 +117,27 @@ void fbBackup::traverseDir(const string& pathname)
 
 void fbBackup::addFile(const string& pathname, struct stat *st)
 {
+    data->debug(NONE, "addFile(\"%s\", struct stat *st)", pathname.c_str());
     struct archive_entry *entry = NULL;
     int fd = 0;
     int buff[1024];
     ssize_t len = 0;
     int resp;
 
-    entry = archive_entry_new();
+    if ((entry = archive_entry_new()) == NULL)
+    {
+        data->warn(NONE, "Cannot allocate memory for archive_entry_new()");
+        return;
+    }
+
+    data->debug(NONE, "Allocated memory for archive_entry_new()");
 
     archive_entry_copy_stat(entry, st);
+    data->debug(NONE, "Completed archive_entry_copy_stat(entry, st)");
 
     archive_entry_set_pathname(entry, pathname.c_str());
+    data->debug(NONE, "Completed archive_entry_set_pathname(entry, \"%s\")", pathname.c_str());
+
     fixAbsolutePaths(entry);
 
     if ((fd = open(pathname.c_str(), O_RDONLY)) < 0)
