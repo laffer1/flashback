@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.35 2008/04/13 20:27:10 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.36 2008/04/15 01:05:40 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -93,6 +93,8 @@ void fbHttpResponse::run()
     char *loc; // the location of a query string if any
     size_t pathlen; // length of path
     char **ap, *argv[1024];
+    char *firstvar;
+    char *secondvar;
 
     if ( (path = client->getPath()) == NULL)
     {
@@ -144,7 +146,7 @@ void fbHttpResponse::run()
            else if ( strcmp( path, "/schedule" ) == 0 )
            {
                dynamichead("FlashBack :: Schedule Jobs");
-
+               client->write("<h2>Schedule Jobs</h2>\n");
                if (argv[0] != NULL)
               {
                    if ( strcmp( argv[0], "?show" ) == 0 )
@@ -157,10 +159,35 @@ void fbHttpResponse::run()
                    } 
                    else 
                    {
-                       client->write(argv[0]);
-                       client->write("<br />\n");
-                       //data->addBackupJob(new string("backup test"), new fbDate, new fbTime, new string("/var/log/"));
-                  }
+                       if ( argv[1] != NULL)
+                      {
+                          firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
+                          strcpy( firstvar, argv[0] );
+                          secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
+                          strcpy( secondvar, argv[1] );
+
+                          // hack out the variable name and = so we can get to the values.
+                          strtok( firstvar, "=" );
+                          firstvar = strtok( NULL, "=" );
+                          strtok( secondvar, "=" );
+                          secondvar = strtok( NULL, "=" );
+
+                          sanitizestr( firstvar );
+                          sanitizestr( secondvar );
+                          client->write(firstvar);
+                          client->write("<br />\n");
+                          client->write(secondvar);
+                          client->write("<br />\n");
+                          // perform the backup.  firstvar is our name and secondvar is the path to backup
+                          data->addBackupJob(new string(firstvar), new fbDate, new fbTime, new string(secondvar));
+                          free(firstvar);
+                          free(secondvar);
+                      }
+                      else
+                      {
+                          client->write("Bad parameters"); 
+                     }
+                 }
               }
               client->write("</body>\n");
               client->write("</html>\n");
