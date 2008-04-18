@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.51 2008/04/13 20:27:10 laffer1 Exp $
+# $Id: Makefile,v 1.52 2008/04/18 03:41:47 laffer1 Exp $
 #
 #Flashback make file
 #
@@ -72,6 +72,7 @@ install:
 	@echo "Installing Flashback"
 	mkdir -p ${DESTDIR}${DATABASEROOT}
 	mkdir -p ${DESTDIR}${DOCROOT}
+	mkdir -p ${DESTDIR}${PREFIX}/sbin
 	cp -R www ${DESTDIR}${DOCROOT}
 	cp README  ${DESTDIR}${DOCROOT}
 	cp flashback.db ${DESTDIR}${DATABASEROOT}
