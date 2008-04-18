@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.11 2008/04/15 02:11:16 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.12 2008/04/18 00:32:48 laffer1 Exp $ */
 
 #include "fbBackup.h"
 
@@ -35,7 +35,8 @@ void fbBackup::run()
         traverseDir(backuppath);
     }
 
-    archive_write_finish(a);
+   if ( archive_write_finish(a) != ARCHIVE_OK)
+       data->warn(NONE, "Unable to create backup file: %s", archive_error_string(a));
     data->debug(NONE, "archive_write_finish(a)");
 
 
