@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.39 2008/04/15 01:56:01 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.40 2008/04/18 04:04:17 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -140,8 +140,10 @@ void fbHttpResponse::run()
            if ( strcmp( path, "/current" ) == 0 )
            {
                dynamichead("FlashBack :: Current Jobs");
-
-               client->write("</html>\n");
+               client->write("<div id=\"container\">\n");
+               client->write("<h2>Current Jobs</h2>\n");
+               client->write("</div>\n");
+               dynamicfoot();
            }
            else if ( strcmp( path, "/schedule" ) == 0 )
            {
@@ -192,31 +194,29 @@ void fbHttpResponse::run()
                  }
               }
               client->write("</div>\n");
-              client->write("<div class=\"clear\"></div>\n");
-              client->write("<hr />\n");
-		      client->write("<div id=\"footer\">");
-			  client->write("&#169; 2008 &#8211; Lucas Holt, Byron Heads, Chris Tubbs, and John Markus");
-		      client->write("</div>\n");
-              client->write("</body>\n");
-              client->write("</html>\n");
+              dynamicfoot();
            }
            else if ( strcmp( path, "/restore" ) == 0 )
            {
                dynamichead("FlashBack :: Restore from Backup");
+               client->write("<div id=\"container\">\n");
+               client->write("<h2>Restore from Backup</h2>\n");
                data->addRestoreJob(new string("something0.tar"), new string("/home/backups/something/"));
-
-               client->write("</html>\n");
+               client->write("</div>\n");
+               dynamicfoot();
            }
            else if ( strcmp( path, "/settings" ) == 0 )
            {
                dynamichead("FlashBack :: Settings");
-
-               client->write("</html>\n");
+                client->write("<div id=\"container\">\n");
+               client->write("<h2>Settings</h2>\n");
+               client->write("</div>\n");
+               dynamicfoot();
            }
            free(querystring);
         }
         else // can't be valid
-           internal(); 
+           internal();
     }
     else  // Must be a file on the file system!
         sendfile(path);
@@ -249,10 +249,21 @@ void fbHttpResponse::sanitizestr( char * str )
         if ( str[i] == '+')
            str[i] = ' ';
     }
-   
+
     resultlen = len;
     result = spc_decode_url(str, &resultlen);  
     strncpy( str, result, len );
+}
+
+void fbHttpResponse::dynamicfoot()
+{
+     client->write("<div class=\"clear\"></div>\n");
+     client->write("<hr />\n");
+     client->write("<div id=\"footer\">");
+     client->write("&#169; 2008 &#8211; Lucas Holt, Byron Heads, Chris Tubbs, and John Markus");
+     client->write("</div>\n");
+     client->write("</body>\n");
+     client->write("</html>\n");
 }
 
 void fbHttpResponse::dynamichead( const char * title )
