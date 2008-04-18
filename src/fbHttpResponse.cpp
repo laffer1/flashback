@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.40 2008/04/18 04:04:17 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.41 2008/04/18 04:09:06 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -201,7 +201,49 @@ void fbHttpResponse::run()
                dynamichead("FlashBack :: Restore from Backup");
                client->write("<div id=\"container\">\n");
                client->write("<h2>Restore from Backup</h2>\n");
-               data->addRestoreJob(new string("something0.tar"), new string("/home/backups/something/"));
+               if (argv[0] != NULL)
+               {
+                   if ( strcmp( argv[0], "?show" ) == 0 )
+                   {
+                       client->write("<form method=\"get\" >\n");
+                       client->write("<fieldset>\n<p>File: <input type=\"text\" name=\"file\" value=\"\" />\n");
+                       client->write("<br />Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
+                       client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
+                       client->write("</form>\n");
+                   } 
+                   else 
+                   {
+                       if ( argv[1] != NULL)
+                      {
+                          firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
+                          strcpy( firstvar, argv[0] );
+                          secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
+                          strcpy( secondvar, argv[1] );
+
+                          // hack out the variable name and = so we can get to the values.
+                          strtok( firstvar, "=" );
+                          firstvar = strtok( NULL, "=" );
+                          strtok( secondvar, "=" );
+                          secondvar = strtok( NULL, "=" );
+
+                          sanitizestr( firstvar );
+                          sanitizestr( secondvar );
+                          client->write(firstvar);
+                          client->write("<br />\n");
+                          client->write(secondvar);
+                          client->write("<br />\n");
+                          data->msg( NONE, "Restore %s to %s", firstvar, secondvar );
+                          // firstvar is our file name and secondvar is the path to restore to
+                          data->addRestoreJob(new string(firstvar), new string(secondvar));
+                          //free(firstvar);
+                          //free(secondvar);
+                      }
+                      else
+                      {
+                          client->write("Bad parameters"); 
+                     }
+                 }
+              }
                client->write("</div>\n");
                dynamicfoot();
            }
