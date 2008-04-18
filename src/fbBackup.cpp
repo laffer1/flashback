@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.12 2008/04/18 00:32:48 laffer1 Exp $ */
+/* $Id: fbBackup.cpp,v 1.13 2008/04/18 01:14:51 laffer1 Exp $ */
 
 #include "fbBackup.h"
 
@@ -121,7 +121,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
     data->debug(NONE, "addFile(\"%s\", struct stat *st)", pathname.c_str());
     struct archive_entry *entry = NULL;
     int fd = 0;
-    int buff[1024];
+    int buff[1024 * 64];
     ssize_t len = 0;
     int resp;
 
@@ -133,25 +133,45 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
 
     data->debug(NONE, "Allocated memory for archive_entry_new()");
 
-    archive_entry_copy_stat(entry, st);
-    data->debug(NONE, "Completed archive_entry_copy_stat(entry, st)");
-
     archive_entry_set_pathname(entry, pathname.c_str());
     data->debug(NONE, "Completed archive_entry_set_pathname(entry, \"%s\")", pathname.c_str());
 
+    if (S_ISLNK(st->st_mode)) {
+    /* we have us a symlink */
+        int linklen;
+        char linkdata[PATH_MAX];
+
+        linklen = readlink(pathname.c_str(), linkdata, PATH_MAX);
+
+        if (linklen < 0) 
+        {
+            data->warn(NONE, "syscall failed");
+            return;
+        }
+
+        linkdata[linklen] = 0;
+
+        archive_entry_set_symlink(entry, linkdata);
+    }
+  
+    if (st->st_flags != 0) 
+        archive_entry_set_fflags(entry, st->st_flags, 0);
+    
+    archive_entry_copy_stat(entry, st);
+    data->debug(NONE, "Completed archive_entry_copy_stat(entry, st)");
+
     fixAbsolutePaths(entry);
 
-    if ((fd = open(pathname.c_str(), O_RDONLY)) < 0)
+    if (!S_ISREG(st->st_mode))
+    {
+        data->debug(NONE, "%s is NOT a regular file!", pathname.c_str());
+        archive_entry_set_size(entry, 0);
+    }
+    else if ((fd = open(pathname.c_str(), O_RDONLY)) < 0)
     {
         data->warn(NONE, "Can't open pathname for archiving: %d = open(%s)", fd, pathname.c_str());
         archive_entry_set_size(entry, 0);
     }
-
-    /* if (!S_ISREG(st.st_mode))
-    {
-        data->debug(NONE, "%s is NOT a regular file!", pathname.c_str());
-        archive_entry_set_size(entry, 0);
-    } */
 
     resp = archive_write_header(a, entry);
     if (resp != ARCHIVE_OK)
@@ -160,20 +180,32 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
         return;
     }
 
-    while (/* S_ISREG(st.st_mode) && */ fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
+    if (archive_entry_size(entry) > 0) {
+        len = read(fd, buff, sizeof(buff));
+    
+        while (len > 0) {
+             resp = archive_write_data(a, buff, len);
+             if (resp != ARCHIVE_OK)
+                data->debug(NONE, "Problem writing data to archive for %s", archive_entry_pathname(entry));
+            len = read(fd, buff, sizeof(buff));
+        }
+    }
+/*
+    while ( fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
     {
         data->debug(NONE, "Wrote %i bytes from %s", len, archive_entry_pathname(entry));
         resp = archive_write_data(a, buff, len);
         if (resp != ARCHIVE_OK)
             data->debug(NONE, "Problem writing data to archive for %s", archive_entry_pathname(entry));
     }
-
+*/
     data->debug(NONE, "Archived file: %s", archive_entry_pathname(entry));
 
     if (fd >= 0)
         close(fd);
 
     archive_write_finish_entry(a);
+  //  archive_write_finish(a);
     archive_entry_free(entry);
 }
 
