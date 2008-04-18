@@ -62,6 +62,8 @@ bugs:
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+/* hack for Mac OS X which undefs herror with posix source on */
+#define _DARWIN_C_SOURCE 1
 #include <netdb.h>
 #endif
 

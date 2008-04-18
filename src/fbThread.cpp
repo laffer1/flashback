@@ -1,4 +1,4 @@
-/* $Id: fbThread.cpp,v 1.18 2008/04/07 13:20:47 wyverex Exp $ */
+/* $Id: fbThread.cpp,v 1.19 2008/04/18 03:33:55 laffer1 Exp $ */
 
 /**
 *	fbThread.cpp
@@ -7,6 +7,7 @@
 *	@date March 5, 2008
 */
 
+#include <sys/param.h>
 #include "fbThread.h"
 
 /**
@@ -294,7 +295,9 @@ void fbThread::_yield()
 #ifdef Win32
 	Yield();
 #else
+#ifndef NeXTBSD
 	pthread_yield();
+#endif
 #endif
 }
 
