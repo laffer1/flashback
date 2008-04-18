@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.18 2008/04/14 20:36:50 ctubbsii Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.19 2008/04/18 02:43:10 laffer1 Exp $ */
 
 /**
 *	fbErrorLogger
@@ -68,6 +68,7 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, const char* str)
 		*out << date.c_str() << '\t' << level.c_str() << '\t' << static_cast<int>(code) <<
 			(code == NONE ? "" : "\t") << desc.c_str() << '\t' << str <<  endl;
 
+		out->flush(); 
 		//kill on errors
 		if(lvl == ERR) exit((int)code);
 	}
