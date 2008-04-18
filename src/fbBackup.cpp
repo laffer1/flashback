@@ -1,5 +1,6 @@
-/* $Id: fbBackup.cpp,v 1.13 2008/04/18 01:14:51 laffer1 Exp $ */
+/* $Id: fbBackup.cpp,v 1.14 2008/04/18 02:32:03 laffer1 Exp $ */
 
+#include <sys/param.h>
 #include "fbBackup.h"
 
 fbBackup::fbBackup(fbData* _data, const string& src, const string& dest):fbThread(_data), data(_data), backuppath(src), tarfile(dest), a(NULL)
@@ -64,8 +65,8 @@ void fbBackup::traverseDir(const string& pathname)
     }
     data->debug(NONE, "lstat(\"%s\", &st)", pathname.c_str());
 
-    // if it's a regular file, add it to the archive
-    if (S_ISREG(st.st_mode))
+    // if it's a regular file or symlink, add it to the archive
+    if (S_ISREG(st.st_mode)  || S_ISLNK(st. st_mode))
     {
         data->debug(NONE, "\t...is a regular file");
         addFile(pathname, &st);
@@ -137,7 +138,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
     data->debug(NONE, "Completed archive_entry_set_pathname(entry, \"%s\")", pathname.c_str());
 
     if (S_ISLNK(st->st_mode)) {
-    /* we have us a symlink */
+        /* we have us a symlink */
         int linklen;
         char linkdata[PATH_MAX];
 
@@ -150,13 +151,14 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
         }
 
         linkdata[linklen] = 0;
-
         archive_entry_set_symlink(entry, linkdata);
     }
-  
+
+#ifdef BSD
     if (st->st_flags != 0) 
         archive_entry_set_fflags(entry, st->st_flags, 0);
-    
+#endif
+
     archive_entry_copy_stat(entry, st);
     data->debug(NONE, "Completed archive_entry_copy_stat(entry, st)");
 
@@ -182,7 +184,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
 
     if (archive_entry_size(entry) > 0) {
         len = read(fd, buff, sizeof(buff));
-    
+
         while (len > 0) {
              resp = archive_write_data(a, buff, len);
              if (resp != ARCHIVE_OK)
@@ -190,15 +192,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
             len = read(fd, buff, sizeof(buff));
         }
     }
-/*
-    while ( fd >= 0 && (len = read(fd, buff, sizeof(buff)) > 0))
-    {
-        data->debug(NONE, "Wrote %i bytes from %s", len, archive_entry_pathname(entry));
-        resp = archive_write_data(a, buff, len);
-        if (resp != ARCHIVE_OK)
-            data->debug(NONE, "Problem writing data to archive for %s", archive_entry_pathname(entry));
-    }
-*/
+
     data->debug(NONE, "Archived file: %s", archive_entry_pathname(entry));
 
     if (fd >= 0)
