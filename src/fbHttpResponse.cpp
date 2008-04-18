@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.41 2008/04/18 04:09:06 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.42 2008/04/18 04:50:54 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -142,6 +142,11 @@ void fbHttpResponse::run()
                dynamichead("FlashBack :: Current Jobs");
                client->write("<div id=\"container\">\n");
                client->write("<h2>Current Jobs</h2>\n");
+               client->write("<pre>");
+               string  bl = data->db->getBackupList();
+               client->write(bl);
+               //delete bl;
+               client->write("</pre>");
                client->write("</div>\n");
                dynamicfoot();
            }

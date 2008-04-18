@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.h,v 1.10 2008/04/11 02:21:15 ctubbsii Exp $ */
+/* $Id: fbDatabase.h,v 1.11 2008/04/18 04:50:54 laffer1 Exp $ */
 
 #ifndef fbDATABASE_H
 #define fbDATABASE_H
@@ -25,6 +25,8 @@ public:
 	fbDatabase(fbErrorLogger* log, const char* path);
 	~fbDatabase();
 
+	string & getBackupList(); /// Get a list of pending and current backups.
+
 	/// Backup SQL
 	bool addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt = ONCE, int rv = 0);
 	bool queryBackups();
@@ -36,7 +38,7 @@ public:
 	bool getRestoreRow(string& tarfile, string& path, int* id);
 	bool queryRestore();
 
-	//Repo SQL
+	///Repo SQL
 	bool addRepo(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile);
 	bool getRepoRow(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile, int* id);
 	bool queryRepo();

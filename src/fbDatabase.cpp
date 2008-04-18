@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.16 2008/04/11 21:42:32 ctubbsii Exp $ */
+/* $Id: fbDatabase.cpp,v 1.17 2008/04/18 04:50:54 laffer1 Exp $ */
 
 #include "fbDatabase.h"
 
@@ -131,6 +131,34 @@ bool fbDatabase::queryRepo()
 	return true;
 }
 
+string & fbDatabase::getBackupList()
+{
+	string *out;
+	errlog->debug(NONE, "fbDatabase:  Getting List");
+	string cmd = "select * from backup;";
+	errlog->debug(NONE, cmd);
+	db.query(cmd);
+	out = new string;
+
+	for ( int i = 0; i < db.rows(); i++ )
+	{
+		 int index =  db.cols() * i;
+		out->append(db.table[index++].c_str()); // id
+		out->append("\t");
+		out->append(db.table[index++].c_str()); //date
+		out->append("\t");
+		out->append(db.table[index++].c_str()); // time
+		out->append("\t");
+		out->append(db.table[index++].c_str()); // rt
+		out->append("\t");
+		out->append(db.table[index++].c_str()); // rv
+		out->append("\t");
+		out->append(db.table[index++].c_str()); // path
+		out->append("\n");
+	}
+	db.queryDone();
+	return *out;
+}
 
 bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& path,
 		Repeat_type* rt, int* rv, int* id)
