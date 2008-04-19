@@ -1,4 +1,4 @@
-/* $Id: fbDatabase.cpp,v 1.17 2008/04/18 04:50:54 laffer1 Exp $ */
+/* $Id: fbDatabase.cpp,v 1.18 2008/04/19 20:37:29 laffer1 Exp $ */
 
 #include "fbDatabase.h"
 
@@ -50,7 +50,7 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 
 bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 {
-	char buff[1024];
+	char buff[4096];
 	snprintf(buff, sizeof(buff)-1, "insert into restore (tarfile, path) values (\'%s\', \'%s\');", tarfile.c_str(), dest.c_str());
 	string cmd = buff;
 
