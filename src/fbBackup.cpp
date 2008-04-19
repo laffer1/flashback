@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.15 2008/04/18 03:10:06 laffer1 Exp $ */
+/* $Id: fbBackup.cpp,v 1.16 2008/04/19 19:28:45 ctubbsii Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -117,7 +117,7 @@ void fbBackup::traverseDir(const string& pathname)
     data->debug(NONE, "lstat(\"%s\", &st)", pathname.c_str());
 
     // if it's a regular file or symlink, add it to the archive
-    if (S_ISREG(st.st_mode)  || S_ISLNK(st. st_mode))
+    if (S_ISREG(st.st_mode)  || S_ISLNK(st.st_mode))
     {
         data->debug(NONE, "\t...is a regular file");
         addFile(pathname, &st);
@@ -176,6 +176,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
     int buff[1024 * 64];
     ssize_t len = 0;
     int resp;
+    char *ent_path = strdup(pathname.c_str());
 
     if ((entry = archive_entry_new()) == NULL)
     {
@@ -185,8 +186,11 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
 
     data->debug(NONE, "Allocated memory for archive_entry_new()");
 
-    archive_entry_set_pathname(entry, pathname.c_str());
-    data->debug(NONE, "Completed archive_entry_set_pathname(entry, \"%s\")", pathname.c_str());
+
+    archive_entry_set_pathname(entry, ent_path);
+    data->debug(NONE, "Completed archive_entry_set_pathname(entry, \"%s\")", ent_path);
+    fixPath(entry);
+    data->debug(NONE, "Fixed path to read: \"%s\")", archive_entry_pathname(entry));
 
     if (S_ISLNK(st->st_mode)) {
         /* we have us a symlink */
@@ -195,7 +199,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
 
         linklen = readlink(pathname.c_str(), linkdata, PATH_MAX);
 
-        if (linklen < 0) 
+        if (linklen < 0)
         {
             data->warn(NONE, "syscall failed");
             return;
@@ -206,14 +210,12 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
     }
 
 #ifdef BSD
-    if (st->st_flags != 0) 
+    if (st->st_flags != 0)
         archive_entry_set_fflags(entry, st->st_flags, 0);
 #endif
 
     archive_entry_copy_stat(entry, st);
     data->debug(NONE, "Completed archive_entry_copy_stat(entry, st)");
-
-    fixAbsolutePaths(entry);
 
     if (!S_ISREG(st->st_mode))
     {
@@ -229,7 +231,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
     resp = archive_write_header(a, entry);
     if (resp != ARCHIVE_OK)
     {
-        data->debug(NONE, "Problem writing header for %s", archive_entry_pathname(entry));
+        data->debug(NONE, "Problem writing header for %s", pathname.c_str());
         return;
     }
 
@@ -252,11 +254,22 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
     archive_write_finish_entry(a);
   //  archive_write_finish(a);
     archive_entry_free(entry);
+    free(ent_path);
 }
 
-void fbBackup::fixAbsolutePaths(struct archive_entry *entry)
+void fbBackup::fixPath(struct archive_entry *entry)
 {
 	const char *name = archive_entry_pathname(entry);
+	const char *root = backuppath.c_str();
+
+    // trim off parts of name that correspond to original directory
+    // tree. so, if we archive '/var/log', then '/var/log/messages'
+    // will be archived as 'messages'
+	while (name[0] == root[0])
+	{
+	    ++name;
+	    ++root;
+	}
 
     // strip leading slashes
 	while (name[0] == PATH_NAME_SEPARATOR)

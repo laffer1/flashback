@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.15 2008/04/12 22:41:30 laffer1 Exp $ */
+/* $Id: fbCore.cpp,v 1.16 2008/04/19 19:28:45 ctubbsii Exp $ */
 
 /**
 *  fbCore.cpp
@@ -50,10 +50,10 @@ void core()
 	// Shutdown Detector
 	signal(SIGTERM, sigterm_handler);
 
-	data.addBackupJob(new string("backup test"), new fbDate, new fbTime, new string("/var/log/"));
-	
+	// data.addBackupJob(new string("backup test"), new fbDate, new fbTime, new string("/var/log/"));
+
 	//data.addRestoreJob(new string("something0.tar"), new string("/home/backups/something/"));
-	
+
 
 
 	//core loop
@@ -61,9 +61,9 @@ void core()
 	{
 		//what was the plan for here???
 #ifdef Win32
-		Sleep(1000 * 60);
+		Sleep(1000 * 30);
 #else
-		sleep(60);
+		sleep(30);
 #endif
 	}
 
