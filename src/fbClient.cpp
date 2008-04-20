@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.18 2008/03/29 22:19:29 wyverex Exp $ */
+/* $Id: fbClient.cpp,v 1.19 2008/04/20 04:02:34 laffer1 Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -33,15 +33,19 @@
  * @date March 8, 2008
  */
 
+
+/**
+*	fbClient
+*	Default client  constructor
+*	@note Initilize all member vars
+*/
 fbClient::fbClient(fbData* _data, int sock ):data(_data)
 {
     data->debug(NONE, "fbClient.this");
     if ( sock == ETCPACCEPTFAIL )
     { 
-       /* handle this ? */
-	   //data->warn(ERRORCODE, "Message");
         data->debug(NONE, "fbClient.this Invalid client socket descriptor.");
-        clientfp = NULL; // weŕe screwed.
+        clientfp = NULL; // we're screwed.
     } 
     else
     {
@@ -53,6 +57,10 @@ fbClient::fbClient(fbData* _data, int sock ):data(_data)
     }
 }
 
+/**
+*	fbClient
+*	Default client destructor
+*/
 fbClient::~fbClient()
 {
     data->debug(NONE, "fbClient.~this");
@@ -65,14 +73,19 @@ fbClient::~fbClient()
         delete path;
 }
 
+
+/**
+*	parseHeaders
+*	Read the HTTP headers
+*/
 void fbClient::parseHeaders()
 {
-    char *reqstr = NULL;
-    char *tmp = NULL;
-    char *tmp2 = NULL;
+    char *reqstr = NULL;  // the request as a string (uri)
+    char *tmp = NULL;    // a working variable to "hack" out the space seperated string
+    char *tmp2 = NULL;  // a copy of the request to work on
 
     reqstr = (char *)calloc( MAX_REQUEST,  sizeof(char));
-    
+
     tmp2 = reqstr;
 
     // To grab the first line  GET / HTTP/1.0 ... etc
@@ -99,11 +112,11 @@ void fbClient::parseHeaders()
     {
          if ( begins_with( tmp, "http://" ) == 1 )
          {
-          
+             // in theory this could be set but it's not in practice with HTTP 1.0
          }
          else if ( begins_with( tmp, "https://" ) == 1 )
          {
-
+             // in theory this could be set but not in http 1.0
          }
          else // relative url
          {
@@ -117,11 +130,15 @@ void fbClient::parseHeaders()
 }
 
 
+/**
+*	begins_with
+*      Does a string start with another string (aka a substring at the beginning)
+*/
 int fbClient::begins_with( const char * str1, const char * str2 )
 {
-    size_t str2len;
-    size_t str1len;
-    unsigned int i;
+    size_t str2len;  // the length of the second string
+    size_t str1len;  // the length of the first string
+    unsigned int i;  // result of comparison
 
     str2len = strlen( str2 );
     str1len = strlen( str1 );
@@ -139,16 +156,32 @@ int fbClient::begins_with( const char * str1, const char * str2 )
 }
 
 
+/**
+*	getHost
+*	the requesting host
+*	@note call free on this value
+*/
 char * fbClient::getHost()
 {
     return strdup(host->c_str());
 }
 
+
+/**
+*	getPath
+*       the path of the request (after the host)
+*	@note call free on the return value
+*/
 char * fbClient::getPath()
 {
     return strdup(path->c_str());
 }
 
+
+/**
+*	write
+*	write a string to client
+*/
 void fbClient::write( string val )
 {
     fprintf( clientfp, "%s", val.c_str() );
@@ -156,6 +189,10 @@ void fbClient::write( string val )
        data->warn( NONE, "fbClient.write() Error writing on socket" ); 
 }
 
+/**
+*	write
+*	write a single character to client
+*/
 void fbClient::write( int c )
 {
     fputc( c, clientfp );
@@ -165,6 +202,10 @@ void fbClient::write( int c )
 }
  
 
+/**
+*	close
+*       close the file descriptor/client connection
+*/
 void fbClient::close()
 {
     fclose( clientfp );
