@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.14 2008/03/29 17:22:29 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.15 2008/04/20 03:11:05 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -66,26 +66,26 @@ class fbClient
 {
 public:
     fbClient(fbData* _data, int sock );   /// Default Constructor
-    ~fbClient();  /// Destructor
+    ~fbClient();                                     /// Destructor
 
-    void parseHeaders();  /// Parse the HTTP headers on the client connection.
-    int begins_with( const char * str1, const char * str2 );
+    void parseHeaders();          /// Parse the HTTP headers on the client connection.
+    int begins_with( const char * str1, const char * str2 );  /// determine if string starts with something
 
-    char * getPath();
-    char * getHost();
-    void write( string val );
-    void write( int c );
-    void close();
+    char * getPath();                             /// get the client path (like what's after the server address)
+    char * getHost();                             /// hostname it sent
+    void write( string val );                    /// write a string to the client
+    void write( int c );                            /// write a character to the client
+    void close();                                    /// terminate the client connection.
 
 protected:
-     fbData* data;
-     FILE *clientfp;
+     fbData* data;                                 /// the reference to data
+     FILE *clientfp;                                /// a file pointer on top of the socket with client
     /* HTTP request stuff */
-    enum HTTP_VERSION httpver;
-    enum HTTP_TYPE httptype;
-    enum HTTP_PROTOCOL httpproto;
-    string *host;
-    string *path;
+    enum HTTP_VERSION httpver;     /// http version
+    enum HTTP_TYPE httptype;          /// request type like GET or POST
+    enum HTTP_PROTOCOL httpproto;  /// ssl or "regular"
+    string *host;                                  /// the server host of the request (if we did named hosting)
+    string *path;                                  /// the URL (NOT URI)
 };
 
 #endif
