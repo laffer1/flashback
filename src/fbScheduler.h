@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.h,v 1.5 2008/04/09 12:52:50 wyverex Exp $ */
+/* $Id: fbScheduler.h,v 1.6 2008/04/20 15:36:48 wyverex Exp $ */
 
 #ifndef fbSCHEDULER_H
 #define fbSCHEDULER_H
@@ -7,6 +7,7 @@
 #include "fbThread.h"
 #include "fbData.h"
 #include "fbBackup.h"
+#include "fbRestore.h"
 
 //#include <ctime>
 
@@ -19,16 +20,14 @@
 class fbScheduler: public fbThread
 {
 public:
-	fbScheduler(fbData* _data);
-	~fbScheduler();
+	fbScheduler(fbData* _data); ///< creates this
+	~fbScheduler();	
 
-	void startup();
-	void shutdown();
+	void startup();  ///< starts this thread
+	void shutdown(); ///< stops this thread
 
 private:
-	fbData* data;
-	void run();
+	fbData* data;  ///< access to logger, SQL, and config
+	void run();  ///< thread run function
 };
-
 #endif
-

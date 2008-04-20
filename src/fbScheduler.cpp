@@ -1,9 +1,9 @@
-/* $Id: fbScheduler.cpp,v 1.17 2008/04/20 02:43:26 laffer1 Exp $ */
+/* $Id: fbScheduler.cpp,v 1.18 2008/04/20 15:36:48 wyverex Exp $ */
 
 
 
 #include "fbScheduler.h"
-#define bk_path "/var/flashback/"
+#define bk_path "/var/flashback/" ///< set path to backup location... this should be comming from config...
 
 
 fbScheduler::fbScheduler(fbData* _data):fbThread(_data), data(_data)
@@ -59,7 +59,7 @@ void fbScheduler::run()
 				repeat, repeatval);
 
 				//do the backup here!
-				char buff[1024];
+				char buff[1024*4];
 				snprintf(buff, sizeof(buff)-1, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
 				string msg = buff;
 				data->db->addRepo(desc, date, time, path, msg);
@@ -115,8 +115,10 @@ void fbScheduler::run()
 				data->msg(NONE, "Restoring: %d %s: %s", index, desc.c_str(), path.c_str());
 
 				//do the restore here!
-
-				//test repeat!
+				//			                   tar file,   path
+				new fbRestore(data, desc, path);
+	
+				//remove row
 				data->db->deleteRow("restore", index);
 
 			}
@@ -126,5 +128,3 @@ void fbScheduler::run()
 		_sleep(60);
 	}
 }
-
-
