@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.43 2008/04/20 02:43:26 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.44 2008/04/20 02:51:41 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -404,6 +404,11 @@ void fbHttpResponse::dynamichead( const char * title )
     client->write("	<div class=\"clear\"></div>\n");
 }
 
+
+/**
+*	sendfile
+*	Send a static file to the client. (html, css, image, etc)
+*/
 void fbHttpResponse::sendfile( const char * path )
 {
     FILE *fp;           // the file to send to the client
@@ -484,10 +489,16 @@ void fbHttpResponse::sendfile( const char * path )
     data->debug(NONE, "fbHttpResponse.sendfile() done writing file");
 }
 
+
+/**
+*       notfound
+*	Generate a 404 not found page for cases where the file does not exist that is requested.
+*	@note Can be called from almost anywhere, but no HTTP message can be sent before the call.
+*/
 void fbHttpResponse::notfound()
 {
-    string r;  // response for client
-    char *path;
+    string r;         // response for client
+    char *path;    // The path the client wanted.
 
     data->debug(NONE, "fbHttpServer.notfound");
 
@@ -521,6 +532,11 @@ void fbHttpResponse::notfound()
         free( path );
 }
 
+
+/**
+*	internal
+*	For cases where a 404 wont' do.  Seriously, this is when we screwed up bad.
+*/
 void fbHttpResponse::internal()
 {
     data->debug(NONE, "fbHttpServer.internal");
@@ -533,10 +549,15 @@ void fbHttpResponse::internal()
     client->write("\r\n");;
 }
 
-// ok so it's invalid for .9... 
+/**
+*	status
+*	Send a status code like 404, 200 ok, etc.
+*	@note Invalid for HTTP .9
+*/
 void fbHttpResponse::status( string code, string msg )
 {
-    string r;
+    string r;  // response to client
+
     r.append( "HTTP/1.0 " );
     r.append( code );
     r.append( " " );
@@ -545,9 +566,16 @@ void fbHttpResponse::status( string code, string msg )
     client->write(r);
 }
 
+
+/**
+*	header
+*	Generate an HTTP header from input
+*	@note name and vlaue must be valid strings
+*/
 void fbHttpResponse::header( string name, string value )
 {
-    string r;
+    string r;  // response to client.
+
     r.append(name);
     r.append(": ");
     r.append(value);
@@ -555,12 +583,17 @@ void fbHttpResponse::header( string name, string value )
     client->write(r);
 }
 
+
+/**
+*	headdate
+*	Write a date header using HTTP 1.1 guidelines which are OK in HTTP 1.0
+*/
 void fbHttpResponse::headdate()
 {
-    struct tm *tm;
-    time_t now;
-    char date[50];
-    string r;
+    struct tm *tm;  // formated time right now
+    time_t now;     //  time right now
+    char date[50];  // a string representation of the date in GMT
+    string r;           // response to client
 
     now = time( 0 );
     tm = gmtime( &now ); /* HTTP 1.1 spec rev 06 sez GMT only */
@@ -569,21 +602,26 @@ void fbHttpResponse::headdate()
     header( "Date", r );
 }
 
+
+/**
+*	matchmimetype
+*	Guess at the mime type by the file extension.
+*	@note not 100% accurate and dependant on a structure of types that must be updated.
+*/
 const char * fbHttpResponse::matchmimetype( const char *filename )
 {
-    size_t len;
-    size_t extlen;
-    int i;
+    size_t len;       // length of filename
+    size_t extlen;  // lenghth of file extension
 
     len = strlen(filename);
 
-    for ( i = 0; i < MIMECOUNT; i++ )
+    for ( int i = 0; i < MIMECOUNT; i++ )
     {
         extlen = strlen( mime[i][0] );
         if (strcasecmp( mime[i][0], 
                  filename + (len - extlen)) == 0)
-            return mime[i][1]; 
+            return mime[i][1];
     }
 
-    return "text/plain"; 
+    return "text/plain";
 }
