@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.16 2008/04/19 19:28:45 ctubbsii Exp $ */
+/* $Id: fbCore.cpp,v 1.17 2008/04/20 06:40:47 ctubbsii Exp $ */
 
 /**
 *  fbCore.cpp
@@ -12,7 +12,7 @@
 #include "fbScheduler.h"
 #include "fbHttpServer.h"
 
-bool FlashBackRunning;
+volatile bool FlashBackRunning;
 void sigterm_handler(int s);
 
 /**
