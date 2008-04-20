@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.45 2008/04/20 02:54:31 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.46 2008/04/20 04:05:19 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -559,9 +559,6 @@ void fbHttpResponse::status( string code, string msg )
 {
     string r;  // response to client
 
-    if ( code == NULL || msg == NULL )
-        return;
-
     r.append( "HTTP/1.0 " );
     r.append( code );
     r.append( " " );
@@ -579,9 +576,6 @@ void fbHttpResponse::status( string code, string msg )
 void fbHttpResponse::header( string name, string value )
 {
     string r;  // response to client.
-
-   if ( name == NULL || value == NULL )
-       return;
 
     r.append(name);
     r.append(": ");
