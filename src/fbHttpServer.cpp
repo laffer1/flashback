@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.16 2008/04/07 14:11:08 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.17 2008/04/20 03:06:59 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -27,11 +27,23 @@
 #include "fbHttpServer.h"
 #include "fbSocket.h"
 
-fbHttpServer:: fbHttpServer(fbData* _data):fbThread(_data), data(_data), servsock(NULL)//, running(false)
+
+/**
+*	fbHttpServer
+*	Default constructor
+*	@note Initilize all member vars
+*/
+fbHttpServer:: fbHttpServer(fbData* _data):fbThread(_data), data(_data), servsock(NULL)
 {
     data->debug(NONE, "fbHttpServer.this");
 }
 
+
+/**
+*	fbHttpServer
+*	Default  Destructor
+*	@note Initilize all member vars
+*/
 fbHttpServer::~fbHttpServer()
 {
     if (servsock != NULL)
@@ -43,6 +55,11 @@ fbHttpServer::~fbHttpServer()
     data->debug(NONE, "fbHttpServer.~this");
 }
 
+
+/**
+*	startup
+*       Begin web server operation
+*/
 void fbHttpServer::startup()
 {
     data->debug(NONE, "fbHttpServer.startup");
@@ -56,17 +73,27 @@ void fbHttpServer::startup()
     start();
 }
 
+
+/**
+*	shutdown
+*	halt the webserver
+*/
 void fbHttpServer::shutdown()
 {
     if (isRunning())
      	stop();
-    //running = false; // stop it gracefully
 }
 
+
+/**
+*	run
+*       Handle all client requests.
+*	@note main loop spawns threads for each request.
+*/
 void fbHttpServer::run()
 {
-    fbClient *client;
-    fbHttpResponse *resp;
+    fbClient *client;              // a new client to deal with
+    fbHttpResponse *resp;  // a new HttpResponse to tell the client what to do.
 
     data->debug(NONE, "fbHttpServer.run");
 
