@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.16 2008/04/11 21:42:32 ctubbsii Exp $ */
+/* $Id: fbScheduler.cpp,v 1.17 2008/04/20 02:43:26 laffer1 Exp $ */
 
 
 
@@ -112,7 +112,7 @@ void fbScheduler::run()
 			ret = data->db->getRestoreRow(desc, path, &index);
 			if(ret)
 			{
-				data->debug(NONE, "Restoring: %d %s: %s", index, desc.c_str(), path.c_str());
+				data->msg(NONE, "Restoring: %d %s: %s", index, desc.c_str(), path.c_str());
 
 				//do the restore here!
 

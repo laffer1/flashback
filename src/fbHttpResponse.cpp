@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.42 2008/04/18 04:50:54 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.43 2008/04/20 02:43:26 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -52,11 +52,23 @@ static const char *  mime[][2] = {
     { NULL, NULL }
 };
 
+
+/**
+*	fbHttpResponse
+*	Default Server response to client constructor
+*	@note Initilize all member vars
+*/
 fbHttpResponse:: fbHttpResponse(fbData * _data, fbClient * _client): fbThread(_data), data(_data),   client(_client), running(false)
 {
     data->debug(NONE, "fbHttpResponse.this");
 }
 
+
+/**
+*	fbHttpResponse
+*	Default server response to client destructor
+*	@note This object deletes itself as part of the intereaction with fbThread
+*/
 fbHttpResponse::~fbHttpResponse()
 {
     if (running)
@@ -65,6 +77,11 @@ fbHttpResponse::~fbHttpResponse()
     data->debug(NONE, "fbHttpResponse.~this");
 }
 
+
+/**
+*	startup
+*	Used to begin execution of the run loop on the thread.
+*/
 void fbHttpResponse::startup()
 {
     data->debug(NONE, "fbHttpResponse.startup");
@@ -74,9 +91,14 @@ void fbHttpResponse::startup()
 
     running = true;
     startDelete();
-    
 }
 
+
+/**
+*	shutdown
+*	Prepares for an exit from the main run loop.  Occurs at client
+*      tear down.
+*/
 void fbHttpResponse::shutdown()
 {
     if (!running) return;
@@ -85,17 +107,23 @@ void fbHttpResponse::shutdown()
     running = false; // stop it gracefully
 }
 
+
+/**
+*	run
+*	The main execution point.  This is where the magic happens.  Client
+*      receives HTML and HTTP response from this run.
+*/
 void fbHttpResponse::run()
 {
-     // we should probably check this during the request  while(!isStopping())
-    char *path; // the virtual path 
-    char *querystring; // the ? part of the uri if it exists
-    char *loc; // the location of a query string if any
-    size_t pathlen; // length of path
-    char **ap, *argv[1024];
-    char *firstvar;
-    char *secondvar;
+    char *path;                     // the virtual path 
+    char *querystring;          // the ? part of the uri if it exists
+    char *loc;                       // the location of a query string if any
+    size_t pathlen;               // length of path
+    char **ap, *argv[1024];  // an argument array generated from the querystring
+    char *firstvar;               // the first variable in the query string
+    char *secondvar;          // the second var in the query string
 
+    // no path and we have a big problem.
     if ( (path = client->getPath()) == NULL)
     {
         internal();
@@ -280,11 +308,18 @@ CLEANUP:
     shutdown();  // clean up 
 }
 
+
+/**
+*	sanitizestr
+*	Convert special encodings into real characters.
+*      + becomes a space, etc.
+*	@note Modifies input string
+*/
 void fbHttpResponse::sanitizestr( char * str )
 {
-    size_t len;
-    size_t resultlen;
-    char *result;
+    size_t len;           // length of input string
+    size_t resultlen;   // length of output string
+    char *result;        // the result
 
     if ( str == NULL )
        return;
@@ -302,6 +337,11 @@ void fbHttpResponse::sanitizestr( char * str )
     strncpy( str, result, len );
 }
 
+
+/**
+*	dynamicfoot
+*	print the HTML footer on dynamic urls (? types)
+*/
 void fbHttpResponse::dynamicfoot()
 {
      client->write("<div class=\"clear\"></div>\n");
@@ -313,6 +353,13 @@ void fbHttpResponse::dynamicfoot()
      client->write("</html>\n");
 }
 
+
+/**
+*	dynamichead
+*	Print the HTTP and HTML header on the dynamic responses
+*      from the webserver.
+*	@note Gets us to the body of the HTML document.
+*/
 void fbHttpResponse::dynamichead( const char * title )
 {
     data->debug(NONE, "fbHttpResponse.dyamichead");
@@ -331,30 +378,30 @@ void fbHttpResponse::dynamichead( const char * title )
     client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"buttons.css\">\n");
     client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"forms.css\">\n");
     client->write("<style type=\"text/css\">\n");
-	client->write("#goodies-bar { width: 780px; height: auto; margin: 1em auto; padding: 1em;}\n");
-	client->write("		#thebar { padding: 0px; width: 780px; margin: -10px auto 0 auto; border: 1px dotted #e3ebf1; background: #e3ebf1; text-align: center; float: left; -moz-border-radius: 7px; -webkit-border-radius: 7px; }\n");
-	client->write("		#thebar a { padding: 32px 0 0 0; background-repeat: no-repeat; overflow: hidden; height: 0px !important; height: /**/:32px; display: block; float: left; margin: 10px; }\n");
-	client->write("		#current a { background-image: url(\"current32.png\"); width: 141px; }\n");
-	client->write("		#schedule a { background-image: url(\"schedule32.png\"); width: 153px; }\n");
-	client->write("		#restore a { background-image: url(\"restore32.png\"); width: 137px; }\n");
-	client->write("		#settings a { background-image: url(\"settings32.png\"); width: 143px; }\n");
-	client->write("		#help a { background-image: url(\"help32.png\"); width: 93px; }\n");
-	client->write("</style>\n");
+    client->write("#goodies-bar { width: 780px; height: auto; margin: 1em auto; padding: 1em;}\n");
+    client->write("#thebar { padding: 0px; width: 780px; margin: -10px auto 0 auto; border: 1px dotted #e3ebf1; background: #e3ebf1; text-align: center; float: left; -moz-border-radius: 7px; -webkit-border-radius: 7px; }\n");
+    client->write("#thebar a { padding: 32px 0 0 0; background-repeat: no-repeat; overflow: hidden; height: 0px !important; height: /**/:32px; display: block; float: left; margin: 10px; }\n");
+    client->write("#current a { background-image: url(\"current32.png\"); width: 141px; }\n");
+    client->write("#schedule a { background-image: url(\"schedule32.png\"); width: 153px; }\n");
+    client->write("#restore a { background-image: url(\"restore32.png\"); width: 137px; }\n");
+    client->write("#settings a { background-image: url(\"settings32.png\"); width: 143px; }\n");
+    client->write("#help a { background-image: url(\"help32.png\"); width: 93px; }\n");
+    client->write("</style>\n");
     client->write("</head>\n");
     client->write("<body>\n");
     client->write("	<div id=\"header\">\n");
     client->write("		<h1><a href=\"index.html\" title=\"FlashBack Homepage\">FlashBack: Data Backup Solution</a></h1>\n");
-	client->write("	</div>\n");
-	client->write("	<div id=\"goodies-bar\">\n");
+    client->write("	</div>\n");
+    client->write("	<div id=\"goodies-bar\">\n");
     client->write("		<div id=\"thebar\">\n");
     client->write("			<div id=\"current\"><a href=\"/current?show\">Current</a></div>\n");
-	client->write("			<div id=\"schedule\"><a href=\"/schedule?show\">Schedule</a></div>\n");
-	client->write("			<div id=\"restore\"><a href=\"/restore?show\">Restore</a></div>\n");
-	client->write("			<div id=\"settings\"><a href=\"/settings?show\">Settings</a></div>\n");
-	client->write("			<div id=\"help\"><a href=\"help.html\">Help</a></div>\n");
-	client->write("		</div>\n");
-	client->write("	</div>\n");
-	client->write("	<div class=\"clear\"></div>\n");
+    client->write("			<div id=\"schedule\"><a href=\"/schedule?show\">Schedule</a></div>\n");
+    client->write("			<div id=\"restore\"><a href=\"/restore?show\">Restore</a></div>\n");
+    client->write("			<div id=\"settings\"><a href=\"/settings?show\">Settings</a></div>\n");
+    client->write("			<div id=\"help\"><a href=\"help.html\">Help</a></div>\n");
+    client->write("		</div>\n");
+    client->write("	</div>\n");
+    client->write("	<div class=\"clear\"></div>\n");
 }
 
 void fbHttpResponse::sendfile( const char * path )
