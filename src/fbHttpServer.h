@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.h,v 1.9 2008/03/29 18:25:13 wyverex Exp $ */
+/* $Id: fbHttpServer.h,v 1.10 2008/04/20 03:03:06 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -42,17 +42,16 @@ class fbHttpServer: public fbThread
 {
 public:
     fbHttpServer(fbData* _data);   /// default constructor
-    ~fbHttpServer();  /// default destructor
+    ~fbHttpServer();                      /// default destructor
 
-    void startup();  /// Start HTTP server
-    void shutdown();  /// Stop HTTP server
+    void startup();                          /// Start HTTP server
+    void shutdown();                      /// Stop HTTP server
 
 protected:
-    fbData *data;
-    fbSocket *servsock;
-    //bool running;
+    fbData *data;                           /// A reference to the data object from its parent
+    fbSocket *servsock;                 /// the socket reference to get client requests
 
-    void run();
+    void run();                               /// The main loop (once it ends so does the thread)
 };
 
 #endif
