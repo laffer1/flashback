@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.44 2008/04/20 02:51:41 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.45 2008/04/20 02:54:31 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -372,7 +372,8 @@ void fbHttpResponse::dynamichead( const char * title )
     client->write("\r\n"); // end header section
 
     client->write("<html>\n<head>\n\t<title>");
-    client->write(title);
+    if (title != NULL)
+        client->write(title);
     client->write("</title>\n");
     client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"main.css\">\n");
     client->write("\t<link rel=\"stylesheet\" type=\"text/css\" href=\"buttons.css\">\n");
@@ -558,6 +559,9 @@ void fbHttpResponse::status( string code, string msg )
 {
     string r;  // response to client
 
+    if ( code == NULL || msg == NULL )
+        return;
+
     r.append( "HTTP/1.0 " );
     r.append( code );
     r.append( " " );
@@ -575,6 +579,9 @@ void fbHttpResponse::status( string code, string msg )
 void fbHttpResponse::header( string name, string value )
 {
     string r;  // response to client.
+
+   if ( name == NULL || value == NULL )
+       return;
 
     r.append(name);
     r.append(": ");
@@ -612,6 +619,9 @@ const char * fbHttpResponse::matchmimetype( const char *filename )
 {
     size_t len;       // length of filename
     size_t extlen;  // lenghth of file extension
+
+    if (filename == NULL)
+        return "text/plain";
 
     len = strlen(filename);
 
