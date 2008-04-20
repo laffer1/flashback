@@ -1,4 +1,4 @@
-/* $Id: fbErrorLogger.cpp,v 1.19 2008/04/18 02:43:10 laffer1 Exp $ */
+/* $Id: fbErrorLogger.cpp,v 1.20 2008/04/20 15:29:11 wyverex Exp $ */
 
 /**
 *	fbErrorLogger
@@ -15,7 +15,7 @@
 /**
 *	fbErrorLogger
 *	Stream error Logger
-*	@param stream stream for error logger to output too
+*	@param stream stream for error logger to output too, ref
 *	@note Stream copied into out stream
 */
 fbErrorLogger::fbErrorLogger(ostream& stream):out(&stream), cs()
@@ -24,6 +24,12 @@ fbErrorLogger::fbErrorLogger(ostream& stream):out(&stream), cs()
 	debug(NONE, "fbErrorLogger.this");
 }
 
+/**
+*	fbErrorLogger
+*	Stream error Logger
+*	@param stream stream for error logger to output too, pointer
+*	@note Stream copied into out stream
+*/
 fbErrorLogger::fbErrorLogger(ostream* stream):out(stream), cs()
 {
 	*out << endl;
@@ -67,7 +73,8 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, const char* str)
 		/// print error message
 		*out << date.c_str() << '\t' << level.c_str() << '\t' << static_cast<int>(code) <<
 			(code == NONE ? "" : "\t") << desc.c_str() << '\t' << str <<  endl;
-
+			
+		// ?? since when does endl not flush the stream?
 		out->flush(); 
 		//kill on errors
 		if(lvl == ERR) exit((int)code);
@@ -100,12 +107,20 @@ void fbErrorLogger::print(ERROR_LEVEL lvl, ERROR_CODES code, string& str)
 		*out << date << '\t' << level << '\t' << static_cast<int>(code) <<
 			(code == NONE ? "" : "\t") << desc << '\t' << str <<  endl;
 
+		//forgot flush here, though I thought endl flushs....
+		out->flush(); 
+			
 		//kill on errors
 		if(lvl == ERR) exit((int)code);
 	}
 }
 
-
+/**
+*	errordate
+*	Appends the date and time to input string
+*	@param date String refrence to append date/time to
+*	@note hour:min	m/d/y
+*/
 void fbErrorLogger::errordate(string& date)
 {
 	fbDate d;
@@ -114,6 +129,13 @@ void fbErrorLogger::errordate(string& date)
 	date += '\t';
 	d.mdy(date);
 }
+
+
+/**  
+*	@note The auto error code generaton stuff has basiclly been abandoned at this point
+*		I had planned to modifiy this to load Error Strings from a file so we could do more
+*		the just english... not enough time...
+*/
 
 /**
 *	errorlevel
@@ -190,27 +212,46 @@ void fbErrorLogger::errordesc(ERROR_CODES code, string& desc)
 	}
 }
 
+/**
+*	err
+*	Sends an error message to the Log
+*	@param code Pre written Error Codes
+*	@param str Error Message string
+*	@param ... variable param list, alows to build error message like printf
+*/
 void fbErrorLogger::err(ERROR_CODES code, const char* str, ...)
 {
-	va_list list;
-	char buff[1024];
+	va_list list;  
+	char buff[1024*4];  //maybe make the buffer size a const...?
 	string mesg;
 
-	va_start(list, str);
-	vsnprintf(buff, sizeof(buff)-1, str, list);
+	va_start(list, str);  //build the list
+	vsnprintf(buff, sizeof(buff)-1, str, list);  //build the string
 	va_end(list);
 
-	print(ERR, code, buff);
+	print(ERR, code, buff); //pass it on to print
 }
+
+/**
+*	err
+*	String based error function, can't build complex messages like previos function	
+*/
 void fbErrorLogger::err(ERROR_CODES code, string& str)
 {
 	print(ERR, code, str);
 }
 
+/**
+*	warn
+*	Sends an warnings to the Log
+*	@param code Pre written Error Codes
+*	@param str Error Message string
+*	@param ... variable param list, alows to build error message like printf
+*/
 void fbErrorLogger::warn(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[1024];
+	char buff[1024*4];
 	string mesg;
 
 	va_start(list, str);
@@ -219,15 +260,27 @@ void fbErrorLogger::warn(ERROR_CODES code, const char* str, ...)
 
 	print(WARN, code, buff);
 }
+
+/**
+*	warn
+*	String based error function, can't build complex messages like previos function	
+*/
 void fbErrorLogger::warn(ERROR_CODES code, string& str)
 {
 	print(WARN, code, str);
 }
 
+/**
+*	err
+*	Sends an message to the Log
+*	@param code Pre written Error Codes, prolly doesn't need
+*	@param str Error Message string
+*	@param ... variable param list, alows to build error message like printf
+*/
 void fbErrorLogger::msg(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[1024];
+	char buff[1024*4];
 	string mesg;
 
 	va_start(list, str);
@@ -236,15 +289,27 @@ void fbErrorLogger::msg(ERROR_CODES code, const char* str, ...)
 
 	print(INFO, code, buff);
 }
+
+/**
+*	msg
+*	String based error function, can't build complex messages like previos function	
+*/
 void fbErrorLogger::msg(ERROR_CODES code, string& str)
 {
 	print(INFO, code, str);
 }
 
+/**
+*	err
+*	Sends an debug message to the Log
+*	@param code Pre written Error Codes, prolly doesn't need
+*	@param str Error Message string
+*	@param ... variable param list, alows to build error message like printf
+*/
 void fbErrorLogger::debug(ERROR_CODES code, const char* str, ...)
 {
 	va_list list;
-	char buff[1024];
+	char buff[1024*4];
 	string mesg;
 
 	va_start(list, str);
@@ -253,9 +318,12 @@ void fbErrorLogger::debug(ERROR_CODES code, const char* str, ...)
 
 	print(DBUG, code, buff);
 }
+
+/**
+*	debug
+*	String based error function, can't build complex messages like previos function	
+*/
 void fbErrorLogger::debug(ERROR_CODES code, string& str)
 {
 	print(DBUG, code, str);
 }
-
-
