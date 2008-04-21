@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.16 2008/04/19 19:28:45 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.17 2008/04/21 15:02:35 ctubbsii Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -239,8 +239,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
         len = read(fd, buff, sizeof(buff));
 
         while (len > 0) {
-             resp = archive_write_data(a, buff, len);
-             if (resp != ARCHIVE_OK)
+             if (archive_write_data(a, buff, len) < 0)
                 data->debug(NONE, "Problem writing data to archive for %s", archive_entry_pathname(entry));
             len = read(fd, buff, sizeof(buff));
         }
