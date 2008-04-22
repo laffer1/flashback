@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.46 2008/04/20 04:05:19 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.47 2008/04/22 17:23:10 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -238,20 +238,72 @@ void fbHttpResponse::run()
                {
                    if ( strcmp( argv[0], "?show" ) == 0 )
                    {
-                       client->write("<form method=\"get\" >\n");
-                       client->write("<fieldset>\n<p>File: <input type=\"text\" name=\"file\" value=\"\" />\n");
-                       client->write("<br />Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
-                       client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
-                       client->write("</form>\n");
+                       client->write("<form method=\"get\" >\n<fieldset>\n");
+                       //client->write("<p>File: <input type=\"text\" name=\"file\" value=\"\" />\n");
+                       //client->write("<br />Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
+                       //client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
+                       //client->write("</form>\n");
+			client->write("Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
+			client->write("</fieldset>\n");
+			
+			bool ret;
+			string desc, path, tarfile, d, t;
+			fbDate date;
+			fbTime time;
+			int id;
+
+			data->queryRepo();
+			client->write("<table width=780px>\n");
+
+			client->write("\t<tr>\n");
+			client->write("\t\t<td>\n\t\t\t ID \n\t\t</td>\n");
+			client->write("\t\t<td width=25%>\n\t\t\t Name \n\t\t</td>\n");
+			client->write("\t\t<td width=25%>\n\t\t\t Path \n\t\t</td>\n");
+			client->write("\t\t<td>\n\t\t\t Date \n\t\t</td>\n");
+			client->write("\t\t<td>\n\t\t\t Time \n\t\t</td>\n");
+			client->write("\t\t<td>\n\t\t\t Restore \n\t\t</td>\n");
+			client->write("\t</tr>\n");
+
+			do
+			{
+				ret = data->db->getRepoRow(desc, date, time, path, tarfile, &id);
+				if(ret)
+				{
+					client->write("\t<tr>\n");
+
+					client->write("\t\t<td>\n\t\t\t %d \n\t\t</td>\n", id);
+					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", desc.c_str());
+					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", path.c_str());
+
+					d = "";
+					date.mdy(d);
+					t = "";
+					time.hms(t);
+
+					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", d.c_str());
+					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", t.c_str());
+
+					client->write("\t\t<td>\n\t\t\t <input type=\"submit\" name=\"file\" value=\"%s\" /> \n\t\t</td>\n", tarfile.c_str());
+					client->write("\t</tr>\n");
+				}
+
+			}while(ret);
+			client->write("</table>\n</form>\n");
+
+
                    } 
                    else 
                    {
                        if ( argv[1] != NULL)
                       {
+			  //Had to switch first var and second var... hope this works! -B
+
                           firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
                           strcpy( firstvar, argv[0] );
                           secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
                           strcpy( secondvar, argv[1] );
+
+
 
                           // hack out the variable name and = so we can get to the values.
                           strtok( firstvar, "=" );
@@ -261,13 +313,16 @@ void fbHttpResponse::run()
 
                           sanitizestr( firstvar );
                           sanitizestr( secondvar );
-                          client->write(firstvar);
-                          client->write("<br />\n");
+          
                           client->write(secondvar);
                           client->write("<br />\n");
-                          data->msg( NONE, "Restore %s to %s", firstvar, secondvar );
+     	                  client->write(firstvar);
+                          client->write("<br />\n");
+
+                          data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
                           // firstvar is our file name and secondvar is the path to restore to
-                          data->addRestoreJob(new string(firstvar), new string(secondvar));
+                          data->addRestoreJob( new string(secondvar), new string(firstvar) );
+
                           //free(firstvar);
                           //free(secondvar);
                       }

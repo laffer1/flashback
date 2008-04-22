@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.17 2008/04/20 06:40:47 ctubbsii Exp $ */
+/* $Id: fbCore.cpp,v 1.18 2008/04/22 17:23:10 wyverex Exp $ */
 
 /**
 *  fbCore.cpp
@@ -24,6 +24,11 @@ void core()
 {
 	//Local Settings Object
 	fbData data;
+
+	//data.debug(NONE, "Testing %s %d %f", "1",2,3.0f);
+	//data.msg(NONE, "Testing %s %d %f", "1",2,3.0f);
+	//data.warn(NONE, "Testing %s %d %f", "1",2,3.0f);
+	//data.err(NONE, "Testing %s %d %f", "1",2,3.0f);
 
 	data.debug(NONE, "Running Debug Mode");  //should only show in debug mode!
 	data.msg(NONE, "Flashback Started");

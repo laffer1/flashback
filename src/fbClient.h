@@ -1,4 +1,4 @@
-/* $Id: fbClient.h,v 1.15 2008/04/20 03:11:05 laffer1 Exp $ */
+/* $Id: fbClient.h,v 1.16 2008/04/22 17:23:10 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -23,6 +23,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
+/*
+*	Added client write va_list version...
+*	-Byron
+*/
 
 #ifndef FBCLIENT_H
 #define FBCLIENT_H
@@ -75,6 +80,7 @@ public:
     char * getHost();                             /// hostname it sent
     void write( string val );                    /// write a string to the client
     void write( int c );                            /// write a character to the client
+    void write( const char* str, ... );		    /// write string to client, using vfprintf..
     void close();                                    /// terminate the client connection.
 
 protected:

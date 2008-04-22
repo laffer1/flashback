@@ -1,4 +1,4 @@
-/* $Id: fbClient.cpp,v 1.19 2008/04/20 04:02:34 laffer1 Exp $ */
+/* $Id: fbClient.cpp,v 1.20 2008/04/22 17:23:10 wyverex Exp $ */
 
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
@@ -201,6 +201,22 @@ void fbClient::write( int c )
 
 }
  
+/**
+*	write
+*	write a string to client using va_list input
+*/
+void fbClient::write(const char* str, ...)
+{
+    va_list list;  
+
+    va_start(list, str);  //build the list
+    vfprintf( clientfp, str, list);
+    va_end(list);
+
+    if (ferror( clientfp) )
+       data->warn( NONE, "fbClient.write() (va_list) Error writing on socket" );
+
+}
 
 /**
 *	close
