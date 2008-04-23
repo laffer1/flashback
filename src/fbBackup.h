@@ -1,4 +1,4 @@
-/* $Id: fbBackup.h,v 1.10 2008/04/23 00:41:11 ctubbsii Exp $ */
+/* $Id: fbBackup.h,v 1.11 2008/04/23 01:42:26 ctubbsii Exp $ */
 /*
  * Copyright (c) 2008 Chris Tubbs
  * All rights reserved.
@@ -15,7 +15,6 @@
 #include <archive_entry.h>
 #include <dirent.h>
 #include <limits.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/param.h>
 

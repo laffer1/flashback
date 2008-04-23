@@ -1,4 +1,4 @@
-/* $Id: global.h,v 1.14 2008/04/13 22:45:46 ctubbsii Exp $ */
+/* $Id: global.h,v 1.15 2008/04/23 01:42:26 ctubbsii Exp $ */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H
@@ -15,6 +15,9 @@
 	#include <queue>
 	#include <csignal>
 	#include <cstdarg>
+    #include <sys/stat.h>
+    #include <sys/types.h>
+    #include <unistd.h>
 
 	using namespace std;
 
