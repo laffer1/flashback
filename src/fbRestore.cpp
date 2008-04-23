@@ -1,4 +1,4 @@
-/* $Id: fbRestore.cpp,v 1.7 2008/04/23 00:41:11 ctubbsii Exp $ */
+/* $Id: fbRestore.cpp,v 1.8 2008/04/23 00:53:30 ctubbsii Exp $ */
 /*
  * Copyright (c) 2008 Chris Tubbs
  * All rights reserved.
@@ -30,7 +30,7 @@ void fbRestore::run()
     data->msg(NONE, "Restore begun: %s -> %s", tarfile.c_str(), restorepath.c_str());
 
     /* don't restore if certain requirements are not met */
-    if (restorepath == NULL || tarfile == NULL || !restorepath.length() || !tarfile.length())
+    if (!restorepath.length() || !tarfile.length())
     {
         data->warn(NONE, "Invalid restore attempted (restore source or destination empty)");
         return;

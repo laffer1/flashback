@@ -1,4 +1,4 @@
-/* $Id: fbRestore.h,v 1.3 2008/04/23 00:41:11 ctubbsii Exp $ */
+/* $Id: fbRestore.h,v 1.4 2008/04/23 00:53:30 ctubbsii Exp $ */
 /*
  * Copyright (c) 2008 Chris Tubbs
  * All rights reserved.
@@ -22,8 +22,8 @@ public:
 
 private:
 	fbData* data;
-	string filename;
-	string path;
+	string tarfile;
+	string restorepath;
 
 	void run();
 

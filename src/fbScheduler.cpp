@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.18 2008/04/20 15:36:48 wyverex Exp $ */
+/* $Id: fbScheduler.cpp,v 1.19 2008/04/23 00:53:30 ctubbsii Exp $ */
 
 
 
@@ -60,7 +60,7 @@ void fbScheduler::run()
 
 				//do the backup here!
 				char buff[1024*4];
-				snprintf(buff, sizeof(buff)-1, "%s%ld%ld%d.tar", bk_path, date.getJulian(), time.getTicks(), index);
+				snprintf(buff, sizeof(buff)-1, "%s%ld%ld%d.tar.bz2", bk_path, date.getJulian(), time.getTicks(), index);
 				string msg = buff;
 				data->db->addRepo(desc, date, time, path, msg);
 				new fbBackup(data, path, msg);
@@ -117,7 +117,7 @@ void fbScheduler::run()
 				//do the restore here!
 				//			                   tar file,   path
 				new fbRestore(data, desc, path);
-	
+
 				//remove row
 				data->db->deleteRow("restore", index);
 

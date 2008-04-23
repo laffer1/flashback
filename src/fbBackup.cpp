@@ -1,4 +1,4 @@
-/* $Id: fbBackup.cpp,v 1.18 2008/04/23 00:41:11 ctubbsii Exp $ */
+/* $Id: fbBackup.cpp,v 1.19 2008/04/23 00:53:30 ctubbsii Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -76,7 +76,7 @@ void fbBackup::run()
     data->msg(NONE, "Backup begun: %s -> %s", backuppath.c_str(), tarfile.c_str());
 
     /* don't back up if certain requirements are not met */
-    if (backuppath == NULL || tarfile == NULL || !backuppath.length() || !tarfile.length())
+    if (!backuppath.length() || !tarfile.length())
     {
         data->warn(NONE, "Invalid backup attempted (backup source or destination empty)");
         return;
