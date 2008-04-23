@@ -1,4 +1,4 @@
-/* $Id: fbCore.cpp,v 1.19 2008/04/23 00:58:39 ctubbsii Exp $ */
+/* $Id: fbCore.cpp,v 1.20 2008/04/23 01:21:42 ctubbsii Exp $ */
 
 /**
 *  fbCore.cpp
@@ -64,11 +64,11 @@ void core()
 	//core loop
 	while(FlashBackRunning)
 	{
-		//poll database for pending jobs (every 30 seconds)
+		//check for exit (every 10 seconds)
 #ifdef Win32
-		Sleep(1000 * 30);
+		Sleep(1000 * 10);
 #else
-		sleep(30);
+		sleep(10);
 #endif
 	}
 

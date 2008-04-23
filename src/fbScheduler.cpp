@@ -1,4 +1,4 @@
-/* $Id: fbScheduler.cpp,v 1.19 2008/04/23 00:53:30 ctubbsii Exp $ */
+/* $Id: fbScheduler.cpp,v 1.20 2008/04/23 01:21:42 ctubbsii Exp $ */
 
 
 
@@ -124,7 +124,7 @@ void fbScheduler::run()
 			}
 		}while(ret);
 
-		//sleep 15 mins! 60 * 15
-		_sleep(60);
+		//sleep 10 seconds
+		_sleep(10);
 	}
 }
