@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.53 2008/04/19 19:28:45 ctubbsii Exp $
+# $Id: Makefile,v 1.54 2008/04/23 07:46:12 ctubbsii Exp $
 #
 #Flashback make file
 #
@@ -44,7 +44,8 @@ debug:
 	make flashback DEBUG=yes
 
 clean:
-	rm -f bin/flashback bin/flashback_d bin/flashback.exe bin/flashback_d.exe *.o
+	rm -rf bin/
+	rm -f *.o
 
 #windows
 win32:
