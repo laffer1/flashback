@@ -1,5 +1,10 @@
-/* $Id: fbRestore.h,v 1.2 2008/04/07 10:34:45 ctubbsii Exp $ */
-
+/* $Id: fbRestore.h,v 1.3 2008/04/23 00:41:11 ctubbsii Exp $ */
+/*
+ * Copyright (c) 2008 Chris Tubbs
+ * All rights reserved.
+ * Do whatever you want with this code.
+ *
+*/
 #ifndef fbRESTORE_H
 #define fbRESTORE_H
 

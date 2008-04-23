@@ -1,5 +1,10 @@
-/* $Id: fbBackup.h,v 1.9 2008/04/19 19:28:45 ctubbsii Exp $ */
-
+/* $Id: fbBackup.h,v 1.10 2008/04/23 00:41:11 ctubbsii Exp $ */
+/*
+ * Copyright (c) 2008 Chris Tubbs
+ * All rights reserved.
+ * Do whatever you want with this code.
+ *
+*/
 #ifndef fbBACKUP_H
 #define fbBACKUP_H
 
@@ -12,6 +17,7 @@
 #include <limits.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/param.h>
 
 class fbBackup: public fbThread
 {

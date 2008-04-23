@@ -1,5 +1,10 @@
-/* $Id: fbConfig.h,v 1.7 2008/04/07 14:00:57 laffer1 Exp $ */
-
+/* $Id: fbConfig.h,v 1.8 2008/04/23 00:41:11 ctubbsii Exp $ */
+/*
+ * Copyright (c) 2008 Chris Tubbs
+ * All rights reserved.
+ * Do whatever you want with this code.
+ *
+*/
 #ifndef FBCONFIG_H
 #define FBCONFIG_H
 

@@ -1,5 +1,10 @@
-/* $Id: fbConfig.cpp,v 1.12 2008/04/13 22:45:46 ctubbsii Exp $ */
-
+/* $Id: fbConfig.cpp,v 1.13 2008/04/23 00:41:11 ctubbsii Exp $ */
+/*
+ * Copyright (c) 2008 Chris Tubbs
+ * All rights reserved.
+ * Do whatever you want with this code.
+ *
+*/
 #include "fbConfig.h"
 
 /**
@@ -11,10 +16,9 @@
  */
 fbConfig::fbConfig(fbErrorLogger* err): port(0), errlog(err), dirty(true)
 {
-    loadDefaults(); // assume defaults
+    loadDefaults(); /* assume defaults */
     if (load() < 0)
     {
-    // INFO: can't load settings from default config file, using defaults
         errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
         dirty = true;
     }
@@ -26,13 +30,12 @@ fbConfig::fbConfig(fbErrorLogger* err): port(0), errlog(err), dirty(true)
 
 fbConfig::fbConfig(fbErrorLogger* err, const char* filename): port(0), errlog(err), dirty(true)
 {
-    loadDefaults(); // assume defaults
+    loadDefaults(); /* assume defaults */
     if (load(filename) < 0)
     {
-        // INFO: can't load settings from explicit config file, using defaults
         errlog->warn(CONFIGFAILEDTOLOAD, "using defaults");
     }
-    dirty = true; // save to default config file regardless
+    dirty = true; /* save to default config file regardless */
 
     errlog->debug(NONE, "fbConfig.this");
 }
@@ -107,13 +110,12 @@ int fbConfig::load(const char* filename)
     if (myfile.fail() && !myfile.eof())
     {
         myfile.close();
-        // ERROR: error loading from config file
         errlog->warn(CONFIGFAILEDTOLOAD, "Cannot load from config file: %s", filename);
         return -1;
     }
 
     myfile.close();
-    // INFO: successfully loaded some settings. remaining settings from defaults
+    /* successfully loaded some settings. remaining settings from defaults */
     errlog->msg(NONE, "Successfully loaded settings from config file: %s", filename);
     return 0;
 }
@@ -134,7 +136,6 @@ int fbConfig::save(const char* filename)
     errlog->debug(NONE, "Attempting to save config file: %s", filename);
     if (myfile.fail())
     {
-        // ERROR: error opening config file to save
         errlog->warn(CONFIGFAILEDTOSAVE, "error opening config file to save");
         return -1;
     }
@@ -144,7 +145,6 @@ int fbConfig::save(const char* filename)
         << "DBPath=" << dbpath << endl;
     if (myfile.fail())
     {
-        // ERROR: problem writing to config file
         errlog->warn(CONFIGFAILEDTOSAVE, "problem writing to config file");
         myfile.close();
         return -1;
@@ -163,8 +163,8 @@ void fbConfig::setWebServerAddr(const string& strAddr)
 
 void fbConfig::setWebServerPort(const string& strPort)
 {
-    //istringstream s(strPort);
-    //s >> port;
+    /* istringstream s(strPort);
+       s >> port; */
     port = atol(strPort.c_str());
     dirty = true;
 }
@@ -172,7 +172,10 @@ void fbConfig::setWebServerPort(const string& strPort)
 void fbConfig::setWebServerPort(int intPort)
 {
     dirty = true;
-    port = intPort; // may need checking for validity
+    if (intPort>1024 && intPort<65536)
+        port = intPort;
+    else
+        errlog->warn(NONE, "Attempt to set port outside of valid range: %d", intPort);
 }
 
 void fbConfig::setWebServerRootPath(const string& strPath)
