@@ -7,9 +7,12 @@ Chris Tubbs
 John Markus
 
 To compile, you must use GNU Make.  This will not work with BSD make.
-Tested on Linux (Ubuntu, Fedora), and MidnightBSD.
+Tested on Linux (Ubuntu, Fedora), FreeBSD, and MidnightBSD.
 
 Requires: sqlite3 and libarchive (both included with MidnightBSD 0.2)
+
+FreeBSD includes libarchive with recent versions, you can install
+sqlite3 from ports.
 
 This code is licensed under a 2 clause BSD license, however it 
 currently uses code under other licenses.
@@ -19,4 +22,4 @@ urldecode.cpp contains public domain code from an O'Reilly book.
 Get libarchive from:
 http://people.freebsd.org/~kientzle/libarchive/
 
-$Id: README,v 1.8 2008/04/18 03:21:54 laffer1 Exp $
+$Id: README,v 1.9 2009/04/15 19:09:29 laffer1 Exp $
