@@ -1,4 +1,4 @@
-/* $Id: fbHttpServer.cpp,v 1.17 2008/04/20 03:06:59 laffer1 Exp $ */
+/* $Id: fbHttpServer.cpp,v 1.18 2009/05/17 02:46:43 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -100,7 +100,7 @@ void fbHttpServer::run()
     while(!isStopping())
     {
         data->debug(NONE, "fbHttpServer.run() wait for client connection");
-	client = servsock->nextClient();
+        client = servsock->nextClient();
         client->parseHeaders();
         data->debug(NONE, "fbHttpServer.run() Create response object");
         resp = new fbHttpResponse( data, client ); /*  This class calles delete on itself */

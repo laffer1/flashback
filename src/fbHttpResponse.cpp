@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.47 2008/04/22 17:23:10 wyverex Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.48 2009/05/17 02:46:43 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -122,6 +122,11 @@ void fbHttpResponse::run()
     char **ap, *argv[1024];  // an argument array generated from the querystring
     char *firstvar;               // the first variable in the query string
     char *secondvar;          // the second var in the query string
+    char *var3;
+    char *var4;
+    char *var5;
+    char *var6;
+    char *var7;
 
     // no path and we have a big problem.
     if ( (path = client->getPath()) == NULL)
@@ -184,41 +189,107 @@ void fbHttpResponse::run()
                client->write("<div id=\"container\">\n");
                client->write("<h2>Schedule Jobs</h2>\n");
                if (argv[0] != NULL)
-              {
+               {
                    if ( strcmp( argv[0], "?show" ) == 0 )
                    {
+                       fbDate *sdate = new fbDate();
+                       fbTime *stime = new fbTime();
+                       
                        client->write("<form method=\"get\" >\n");
                        client->write("<fieldset>\n<p>Name: <input type=\"text\" name=\"name\" value=\"\" />\n");
                        client->write("<br />Path: <input type=\"text\" name=\"path\" value=\"\" />\n");
+                       client->write("<br />Month/Day/Year: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"month\" value=\"");
+                       char *tmp;
+                       asprintf(&tmp, "%d", sdate->getMonth());
+                       client->write(tmp);
+                       free(tmp);
+                       client->write("\" />/<input type=\"text\" size=\"2\" maxlength=\"2\" name=\"day\" value=\"\" />/<input type=\"text\" maxlength=\"4\" size=\"4\" name=\"year\" value=\"\" />\n");
+                       client->write("<br />Time: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"hour\" value=\"\" />:<input size=\"2\" maxlength=\"2\" type=\"text\" name=\"min\" value=\"\" />\n");
                        client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
                        client->write("</form>\n");
+                       
+                       delete sdate;
+                       delete stime;
                    } 
                    else 
                    {
                        if ( argv[1] != NULL)
                       {
+                          // name
                           firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
                           strcpy( firstvar, argv[0] );
+                          // path
                           secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
                           strcpy( secondvar, argv[1] );
+                          // Month
+                          var3 = (char *) calloc(strlen(argv[2]) +1, sizeof(char));
+                          strcpy( var3, argv[2] );
+                          // Day
+                          var4 = (char *) calloc(strlen(argv[3]) +1, sizeof(char));
+                          strcpy( var4, argv[3] );
+                          // Year
+                          var5 = (char *) calloc(strlen(argv[4]) +1, sizeof(char));
+                          strcpy( var5, argv[2] );
+                          // Hour
+                          var6 = (char *) calloc(strlen(argv[5]) +1, sizeof(char));
+                          strcpy( var6, argv[2] );
+                          // Minute
+                          var7 = (char *) calloc(strlen(argv[6]) +1, sizeof(char));
+                          strcpy( var7, argv[2] );
 
                           // hack out the variable name and = so we can get to the values.
                           strtok( firstvar, "=" );
                           firstvar = strtok( NULL, "=" );
                           strtok( secondvar, "=" );
                           secondvar = strtok( NULL, "=" );
-
+                          strtok( var3, "=" );
+                          var3 = strtok( NULL, "=" );
+                          strtok( var4, "=" );
+                          var4 = strtok( NULL, "=" );
+                          strtok( var5, "=" );
+                          var5 = strtok( NULL, "=" );
+                          strtok( var6, "=" );
+                          var6 = strtok( NULL, "=" );
+                          strtok( var7, "=" );
+                          var7 = strtok( NULL, "=" );
+                          
                           sanitizestr( firstvar );
                           sanitizestr( secondvar );
+                          sanitizestr( var3 );
+                          sanitizestr( var4 );
+                          sanitizestr( var5 );
+                          sanitizestr( var6 );
+                          sanitizestr( var7 );
+                          
                           client->write(firstvar);
                           client->write("<br />\n");
                           client->write(secondvar);
                           client->write("<br />\n");
                           data->msg( NONE, "Scheduling job %s on %s", firstvar, secondvar );
+                          
+                          fbDate *sdate = new fbDate ( // month, day, year
+                                                    (int)strtol(var3, (char **)NULL, 10), 
+                                                    (int)strtol(var4, (char **)NULL, 10),
+                                                    (int)strtol(var5, (char **)NULL, 10) );
+                          
+                          fbTime *stime = new fbTime( // hour : min : second
+                                                    (int)strtol(var6, (char **)NULL, 10),
+                                                    (int)strtol(var7, (char **)NULL, 10),
+                                                    0);
+                          
                           // perform the backup.  firstvar is our name and secondvar is the path to backup
-                          data->addBackupJob(new string(firstvar), new fbDate, new fbTime, new string(secondvar));
+                          data->addBackupJob(new string(firstvar), sdate, stime, new string(secondvar));
+                          
+                          delete sdate;
+                          delete stime;
+                          
                           //free(firstvar);
                           //free(secondvar);
+                          free(var3);
+                          free(var4);
+                          free(var5);
+                          free(var6);
+                          free(var7);
                       }
                       else
                       {
@@ -239,97 +310,87 @@ void fbHttpResponse::run()
                    if ( strcmp( argv[0], "?show" ) == 0 )
                    {
                        client->write("<form method=\"get\" >\n<fieldset>\n");
-                       //client->write("<p>File: <input type=\"text\" name=\"file\" value=\"\" />\n");
-                       //client->write("<br />Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
-                       //client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
-                       //client->write("</form>\n");
-			client->write("Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
-			client->write("</fieldset>\n");
+                       client->write("Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
+                       client->write("</fieldset>\n");
 			
-			bool ret;
-			string desc, path, tarfile, d, t;
-			fbDate date;
-			fbTime time;
-			int id;
+                       bool ret;
+                       string desc, path, tarfile, d, t;
+                       fbDate date;
+                       fbTime time;
+                       int id;
 
-			data->queryRepo();
-			client->write("<table width=780px>\n");
+                       data->queryRepo();
+                       client->write("<table width=780px>\n");
 
-			client->write("\t<tr>\n");
-			client->write("\t\t<td>\n\t\t\t ID \n\t\t</td>\n");
-			client->write("\t\t<td width=25%>\n\t\t\t Name \n\t\t</td>\n");
-			client->write("\t\t<td width=25%>\n\t\t\t Path \n\t\t</td>\n");
-			client->write("\t\t<td>\n\t\t\t Date \n\t\t</td>\n");
-			client->write("\t\t<td>\n\t\t\t Time \n\t\t</td>\n");
-			client->write("\t\t<td>\n\t\t\t Restore \n\t\t</td>\n");
-			client->write("\t</tr>\n");
+                       client->write("\t<tr>\n");
+                       client->write("\t\t<td>\n\t\t\t ID \n\t\t</td>\n");
+                       client->write("\t\t<td>\n\t\t\t Name \n\t\t</td>\n");
+                       client->write("\t\t<td>\n\t\t\t Path \n\t\t</td>\n");
+                       client->write("\t\t<td>\n\t\t\t Date \n\t\t</td>\n");
+                       client->write("\t\t<td>\n\t\t\t Time \n\t\t</td>\n");
+                       client->write("\t\t<td>\n\t\t\t Restore \n\t\t</td>\n");
+                       client->write("\t</tr>\n");
 
-			do
-			{
-				ret = data->db->getRepoRow(desc, date, time, path, tarfile, &id);
-				if(ret)
-				{
-					client->write("\t<tr>\n");
+                       do
+                       {
+                           ret = data->db->getRepoRow(desc, date, time, path, tarfile, &id);
+                           if(ret)
+                           {
+                               client->write("\t<tr>\n");
 
-					client->write("\t\t<td>\n\t\t\t %d \n\t\t</td>\n", id);
-					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", desc.c_str());
-					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", path.c_str());
+                               client->write("\t\t<td>\n\t\t\t %d \n\t\t</td>\n", id);
+                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", desc.c_str());
+                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", path.c_str());
 
-					d = "";
-					date.mdy(d);
-					t = "";
-					time.hms(t);
+                               d = "";
+                               date.mdy(d);
+                               t = "";
+                               time.hms(t);
 
-					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", d.c_str());
-					client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", t.c_str());
+                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", d.c_str());
+                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", t.c_str());
 
-					client->write("\t\t<td>\n\t\t\t <input type=\"submit\" name=\"file\" value=\"%s\" /> \n\t\t</td>\n", tarfile.c_str());
-					client->write("\t</tr>\n");
-				}
+                               client->write("\t\t<td>\n\t\t\t <input type=\"submit\" name=\"file\" value=\"%s\" /> \n\t\t</td>\n", tarfile.c_str());
+                               client->write("\t</tr>\n");
+                           }
 
-			}while(ret);
-			client->write("</table>\n</form>\n");
-
-
-                   } 
+                       } while(ret);
+                       client->write("</table>\n</form>\n");
+                   }
                    else 
                    {
                        if ( argv[1] != NULL)
-                      {
-			  //Had to switch first var and second var... hope this works! -B
+                       {
+                           firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
+                           strcpy( firstvar, argv[0] );
+                           secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
+                           strcpy( secondvar, argv[1] );
 
-                          firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
-                          strcpy( firstvar, argv[0] );
-                          secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
-                          strcpy( secondvar, argv[1] );
+                           // hack out the variable name and = so we can get to the values.
+                           strtok( firstvar, "=" );
+                           firstvar = strtok( NULL, "=" );
+                           strtok( secondvar, "=" );
+                           secondvar = strtok( NULL, "=" );
 
-
-
-                          // hack out the variable name and = so we can get to the values.
-                          strtok( firstvar, "=" );
-                          firstvar = strtok( NULL, "=" );
-                          strtok( secondvar, "=" );
-                          secondvar = strtok( NULL, "=" );
-
-                          sanitizestr( firstvar );
-                          sanitizestr( secondvar );
+                           sanitizestr( firstvar );
+                           sanitizestr( secondvar );
           
-                          client->write(secondvar);
-                          client->write("<br />\n");
-     	                  client->write(firstvar);
-                          client->write("<br />\n");
+                           client->write(secondvar);
+                           client->write("<br />\n");
+                           client->write(firstvar);
+                           client->write("<br />\n");
 
-                          data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
-                          // firstvar is our file name and secondvar is the path to restore to
-                          data->addRestoreJob( new string(secondvar), new string(firstvar) );
+                            data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
+                            // firstvar is our file name and secondvar is the path to restore to
+                            data->addRestoreJob( new string(secondvar), new string(firstvar) );
 
-                          //free(firstvar);
-                          //free(secondvar);
-                      }
-                      else
-                      {
-                          client->write("Bad parameters"); 
-                     }
+                            //free(firstvar);
+                            //free(secondvar);
+                       }
+                       else
+                       {
+                           client->write("Bad parameters"); 
+                       }
                  }
               }
                client->write("</div>\n");
