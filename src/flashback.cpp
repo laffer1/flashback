@@ -1,4 +1,4 @@
-/* $Id: flashback.cpp,v 1.19 2008/03/29 23:18:03 wyverex Exp $ */
+/* $Id: flashback.cpp,v 1.20 2009/05/17 00:05:57 laffer1 Exp $ */
 
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
@@ -102,16 +102,16 @@ int main(int argc, char** args)
 {
 #ifdef Debug
 	cout << "Running in Debug Mode!" << endl;
-#endif  //this was an else... thats why debug wasn't working!
+#endif
 
 	/* In UNIX programming, a daemon MUST let go of the terminal it is 
-           running on.  Otherwise, when you log out, the process dies.
-           The solution is to fork a copy of yourself and then disconnect
-           ties to the original terminal like stdin, stdout, stderr
-           The windows alternative would be whatever one must do to
-           get a "service" in a microsoft product.
-        */
-	// TODO: make this Windows friendly	
+       running on.  Otherwise, when you log out, the process dies.
+       
+       The solution is to fork a copy of yourself and then disconnect
+       ties to the original terminal like stdin, stdout, stderr
+       The windows alternative would be whatever one must do to
+       get a "service" in a microsoft product.
+	*/
 
 
 	int pid = fork();

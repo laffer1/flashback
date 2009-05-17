@@ -7,27 +7,58 @@
 		<link rel="stylesheet" type="text/css" href="main.css">
 		<link rel="stylesheet" type="text/css" href="buttons.css">
 		<link rel="stylesheet" type="text/css" href="forms.css">
+		<style type="text/css">
+		#goodies-bar { width: 780px; height: auto; margin: 1em auto; padding: 1em;}
+		#thebar { padding: 0px; width: 780px; margin: -10px auto 0 auto; border: 1px dotted #e3ebf1; background: #e3ebf1; text-align: center; float: left; -moz-border-radius: 7px; -webkit-border-radius: 7px; }
+		#thebar a { padding: 32px 0 0 0; background-repeat: no-repeat; overflow: hidden; height: 0px !important; height: /**/:32px; display: block; float: left; margin: 10px; }
+		#current a { background-image: url("current32.png"); width: 141px; }
+		#schedule a { background-image: url("schedule32.png"); width: 153px; }
+		#restore a { background-image: url("restore32.png"); width: 137px; }
+		#settings a { background-image: url("settings32.png"); width: 143px; }
+		#help a { background-image: url("help32.png"); width: 93px; }
+		</style>
 	</head>
-
+	
 	<body>
-		<div id="header">
-			<h1>FlashBack</h1>
+	<div id="header">
+		<h1><a href="index.html" title="FlashBack Homepage">FlashBack: Data Backup Solution</a></h1>
+	</div>
+	<div id="goodies-bar">
+		<div id="thebar">
+			<div id="current"><a href="/current?show">Current</a></div>
+			<div id="schedule"><a href="/schedule?show">Schedule</a></div>
+			<div id="restore"><a href="/restore?show">Restore</a></div>
+			<div id="settings"><a href="/settings?show">Settings</a></div>
+			<div id="help"><a href="help.html">Help</a></div>
 		</div>
-		<div id="goodies-front">
-		<div id="frontpage">
-			<div id="current"><a href="/current?show" title="Browse Current Backups">Current</a></div>
-			<div id="schedule"><a href="/schedule?show" title="Set a Backup Schedule">Schedule</a></div>
-
-			<div id="restore"><a href="/restore?show" title="Restore From a Previous Backup">Restore</a></div>
-			<div id="settings"><a href="/settings?show" title="Configure Backup Settings">Settings</a></div>
-			<div id="help"><a href="help/" title="Help Using FlashBack">Help</a></div>
-		</div>
-		<div style="clear: both;"></div>
-		</div>
-		<hr>
-
-		<div id="footer">
-			&#169; 2008 &#8211; Lucas Holt, Byron Heads, Chris Tubbs, and John Markus
-		</div>
+	</div>
+	<div class="clear"></div>
+	<h2>Help</h2>
+	
+	<h3>Schedule a backup job</h3>
+	
+	<p>To begin backing up files, click &quot;Schedule&quot; and then type a name for the backup
+	and a path to backup.  This can be a file or folder.</p>
+	
+	<p>Future versions will allow you to set the time and date</p>
+	
+	<h3>Restore from backup</h3>
+	
+	<p>Click on the job with the name you selected.</p>
+	
+	<h3>Current</h3>
+	
+	<p>The current option shows you the jobs pending or active</p>
+	
+	<h3>Settings</h3>
+	
+	<p>Todo</p>
+	
+	</div>
+	
+	<div class="clear"></div>
+	<hr />
+	<div id="footer">&#169; 2008 &#8211; Lucas Holt, Byron Heads, Chris Tubbs, and John Markus</div>
+	
 	</body>
 </html>
