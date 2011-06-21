@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.48 2009/05/17 02:46:43 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.49 2011/06/21 02:36:42 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -36,7 +36,7 @@
 
 #define MIMECOUNT 12
 
-static const char *  mime[][2] = { 
+static const char * mime[][2] = { 
     { ".html", "text/html" },
     { ".htm", "text/htm" },
     { ".png", "image/png" },
@@ -127,6 +127,7 @@ void fbHttpResponse::run()
     char *var5;
     char *var6;
     char *var7;
+    char *rpath;
 
     // no path and we have a big problem.
     if ( (path = client->getPath()) == NULL)
@@ -159,6 +160,7 @@ void fbHttpResponse::run()
         }
         data->debug(NONE, "Copy the query");
         strncpy( querystring, loc, pathlen );
+	querystring[pathlen] = '\0';
         if ( strlen(querystring) < pathlen )
         {
            // break it up into an argument vector.
@@ -410,7 +412,18 @@ void fbHttpResponse::run()
            internal();
     }
     else  // Must be a file on the file system!
-        sendfile(path);
+    {
+        rpath = (char *) malloc(PATH_MAX * sizeof(char));
+        if (realpath(path, rpath) == NULL) {
+	    notfound();
+        } else if (strstr(rpath, FBCONFIG_DEFAULT_WEBROOT) == NULL) {
+            // base path didn't exist in rpath, just 404 it
+	    notfound();
+        } else {
+            sendfile(rpath);
+        }
+        free(rpath);
+    }
 
 CLEANUP:
     data->debug(NONE, "fbHttpResponse.run() free path memory");
