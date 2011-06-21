@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.cpp,v 1.49 2011/06/21 02:36:42 laffer1 Exp $ */
+/* $Id: fbHttpResponse.cpp,v 1.50 2011/06/21 12:39:36 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -127,7 +127,6 @@ void fbHttpResponse::run()
     char *var5;
     char *var6;
     char *var7;
-    char *rpath;
 
     // no path and we have a big problem.
     if ( (path = client->getPath()) == NULL)
@@ -413,16 +412,7 @@ void fbHttpResponse::run()
     }
     else  // Must be a file on the file system!
     {
-        rpath = (char *) malloc(PATH_MAX * sizeof(char));
-        if (realpath(path, rpath) == NULL) {
-	    notfound();
-        } else if (strstr(rpath, FBCONFIG_DEFAULT_WEBROOT) == NULL) {
-            // base path didn't exist in rpath, just 404 it
-	    notfound();
-        } else {
-            sendfile(rpath);
-        }
-        free(rpath);
+        sendfile(path);
     }
 
 CLEANUP:
@@ -572,25 +562,32 @@ void fbHttpResponse::sendfile( const char * path )
         return;
     }
 
+    if (strstr(resolved, data->getWebServerRootPath().c_str()) == NULL) 
+    {
+        free(resolved);
+        notfound();
+        return;
+    }
+
     /* Find out if it's a symlink */
     if ( lstat( resolved, &st ) == -1 )
-   {
-       /* since the system call failed, let's assume we can't read the file. */
-       free(resolved);
-       notfound();
-       return;
-   }
-   else
-   {
-       if (S_ISLNK(st.st_mode) )
-       { 
-          // this means it's a symlink which we don't support.
-         // TODO: permissions error instead?
+    {
+         /* since the system call failed, let's assume we can't read the file. */
          free(resolved);
-          notfound();
-          return;
-       }
-   }
+         notfound();
+         return;
+    }
+    else
+    {
+         if (S_ISLNK(st.st_mode) )
+         { 
+             // this means it's a symlink which we don't support.
+             // TODO: permissions error instead?
+             free(resolved);
+             notfound();
+             return;
+         }
+    }
 
     if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
         //data->msg(NONE, "fbHttpResponse: Unable to open file");
