@@ -1,4 +1,4 @@
-/* $Id: fbHttpResponse.h,v 1.18 2008/04/20 02:57:13 laffer1 Exp $ */
+/* $Id: fbHttpResponse.h,v 1.19 2011/06/21 12:45:03 laffer1 Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -31,7 +31,7 @@
 #include "fbThread.h"
 #include "urldecode.h"
 
-#define SERVERID "FlashBack/1.0"
+#define SERVERID "FlashBack/1.1"
 
 using namespace std;
 
