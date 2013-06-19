@@ -1,4 +1,3 @@
-/* $Id: fbBackup.cpp,v 1.19 2008/04/23 00:53:30 ctubbsii Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *

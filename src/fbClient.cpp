@@ -1,5 +1,3 @@
-/* $Id: fbClient.cpp,v 1.20 2008/04/22 17:23:10 wyverex Exp $ */
-
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *

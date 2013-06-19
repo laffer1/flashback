@@ -53,6 +53,7 @@ bugs:
 #include <string.h>
 #include <strings.h> /* bzero */
 #include <errno.h>
+#include <stdbool.h>
 
 #ifdef Win32
 #include <winsock2.h>

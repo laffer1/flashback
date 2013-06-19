@@ -1,6 +1,3 @@
-/* $Id: fbTime.h,v 1.4 2008/03/29 16:25:35 wyverex Exp $ */
-
-
 #ifndef fbTIME_H
 #define fbTIME_H
 
@@ -77,4 +74,3 @@ private:
 };
 
 #endif
-

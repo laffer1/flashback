@@ -1,5 +1,3 @@
-/* $Id */
-
 /**
 *  fbDiskDetector.cpp
 *  Detects changesin disk or mount points

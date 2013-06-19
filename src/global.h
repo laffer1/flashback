@@ -1,5 +1,3 @@
-/* $Id: global.h,v 1.15 2008/04/23 01:42:26 ctubbsii Exp $ */
-
 #ifndef GLOBAL_H
 #define GLOBAL_H
 

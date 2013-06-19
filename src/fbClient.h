@@ -1,4 +1,3 @@
-/* $Id: fbClient.h,v 1.16 2008/04/22 17:23:10 wyverex Exp $ */
 /*-
  * Copyright (C) 2008 Lucas Holt. All rights reserved.
  *
@@ -63,7 +62,7 @@ enum HTTP_PROTOCOL
 /**
  * fbClient
  * Client connted via socket for use with HTTP.
-* Stores HTTP Request and state of this www user.
+ * Stores HTTP Request and state of this www user.
  * @author Lucas Holt
  * @date March 8, 2008
  */

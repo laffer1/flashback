@@ -47,8 +47,6 @@ public:
 	/// Generic SQL
 	bool deleteRow(const char* table, int id);
 
-
-
 private:
 	fbErrorLogger* errlog;
 	fbCriticalSection cs;

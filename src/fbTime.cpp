@@ -1,6 +1,3 @@
-/* $Id: fbTime.cpp,v 1.5 2008/04/11 21:42:32 ctubbsii Exp $ */
-
-
 /**
  *  fbTime
  *   Time manager
@@ -106,8 +103,6 @@ void fbTime::update()
 	sec = ticks % 60;
 	min = (ticks - (hour * 3600) - sec) / 60;
 }
-
-
 
 void fbTime::hms(string& t)
 {
