@@ -120,14 +120,14 @@ int main(int argc, char** args)
 		// DIDNT WORK
 		case -1:
 #ifdef Debug
-			cout << "Failed to fork" << endl;
+			std::cout << "Failed to fork" << endl;
 #endif
 			perror("fork");
 			return -1;
 			break;
 		case 0:
 #ifdef Debug
-			cout << "Starting Deamon.." << endl;
+			std::cout << "Starting Deamon.." << endl;
 #endif
 			// close unneeded file descriptors
 			fclose(stdout);
@@ -145,7 +145,7 @@ int main(int argc, char** args)
 		// parent process returns value > 0 upon success (child id)
 		default:
 #ifdef Debug
-			cout << "Deamon running.." << pid << endl;
+			std::cout << "Deamon running.." << pid << endl;
 #endif
 			break;
 	}
