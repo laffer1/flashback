@@ -5,7 +5,7 @@
 #
 
 CC=g++
-CFLAGS= -pthread -Wall -pedantic -D_FILE_OFFSET_BITS=64
+CFLAGS= -pthread -Wall -pedantic -D_FILE_OFFSET_BITS=64 -D__BSD_VISIBLE=1
 BINNAME=bin/flashback
 LIBS=-lsqlite3 -larchive -lbz2 -lz
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
