@@ -31,7 +31,7 @@
 #include "fbThread.h"
 #include "urldecode.h"
 
-#define SERVERID "FlashBack/1.1"
+#define SERVERID "FlashBack/1.2"
 
 using namespace std;
 
