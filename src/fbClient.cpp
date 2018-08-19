@@ -62,13 +62,18 @@ fbClient::fbClient(fbData* _data, int sock ):data(_data)
 fbClient::~fbClient()
 {
     data->debug(NONE, "fbClient.~this");
-    if (clientfp != NULL)
-        close();
 
-    if ( host != NULL );
+    if (clientfp != NULL) {
+        close();
+    }
+
+    if ( host != NULL ) {
         delete host;
-    if ( path != NULL )
+    }
+
+    if ( path != NULL ) {
         delete path;
+    }
 }
 
 
