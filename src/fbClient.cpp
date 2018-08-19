@@ -66,8 +66,8 @@ fbClient::~fbClient()
         close();
 
     if ( host != NULL );
-        delete host;;
-    if ( path != NULL );
+        delete host;
+    if ( path != NULL )
         delete path;
 }
 
