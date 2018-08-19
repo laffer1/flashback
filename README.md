@@ -24,3 +24,12 @@ urldecode.cpp contains public domain code from an O'Reilly book.
 
 Get libarchive from:
 http://people.freebsd.org/~kientzle/libarchive/
+
+
+===
+
+FlashBack is available as a package in MidnightBSD.
+mport install flashback
+
+https://www.midnightbsd.org/cgi-bin/viewvc.cgi/mports/trunk/sysutils/flashback/
+
