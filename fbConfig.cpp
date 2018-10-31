@@ -190,22 +190,22 @@ void fbConfig::setDBPath(const string& strPath)
     dbpath = strPath;
 }
 
-const string& fbConfig::getWebServerAddr()
+string& fbConfig::getWebServerAddr()
 {
     return addr;
 }
 
-const int fbConfig::getWebServerPort()
+int fbConfig::getWebServerPort()
 {
     return port;
 }
 
-const string& fbConfig::getWebServerRootPath()
+string& fbConfig::getWebServerRootPath()
 {
     return webroot;
 }
 
-const string& fbConfig::getDBPath()
+string& fbConfig::getDBPath()
 {
     return dbpath;
 }

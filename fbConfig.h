@@ -47,10 +47,10 @@ public:
 	void setWebServerRootPath(const string& strPath);
 	void setDBPath(const string& strPath);
 
-	const string& getWebServerAddr();
-	const int   getWebServerPort();
-	const string& getWebServerRootPath();
-	const string& getDBPath();
+	string& getWebServerAddr();
+	int   getWebServerPort();
+	string& getWebServerRootPath();
+	string& getDBPath();
 
 private:
     int load(const char *filename);
