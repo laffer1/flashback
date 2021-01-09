@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'make all' 
+                sh 'gmake all' 
             }
         }
     }
