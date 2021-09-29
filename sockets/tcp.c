@@ -160,7 +160,7 @@ socketdesc opentcp( bool server, char * address, int port )
     if ((cons[ncons].address = (char *) calloc( addresslen+1, sizeof(char) )) == NULL)
         return ETCPGENERIC;  /* could not allocate memory :( */
     
-    strncpy( cons[ncons].address, address, addresslen -1 ); /* sizeof the buffer -1 */
+    strncpy( cons[ncons].address, address, addresslen ); /* sizeof the buffer -1 */
     cons[ncons].address[addresslen] = '\0';
 
     /* create an endpoint for communication */
