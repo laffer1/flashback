@@ -76,7 +76,7 @@ install:
 	mkdir -p ${DESTDIR}${DOCROOT}
 	mkdir -p ${DESTDIR}${PREFIX}/sbin
 	cp -R www ${DESTDIR}${DOCROOT}
-	cp README  ${DESTDIR}${DOCROOT}
+	cp README.md  ${DESTDIR}${DOCROOT}
 	cp flashback.db ${DESTDIR}${DATABASEROOT}
 	cp bin/flashback ${DESTDIR}${PREFIX}/sbin/flashback
 	chmod 755 ${DESTDIR}${PREFIX}/sbin/flashback
@@ -88,7 +88,7 @@ dinstall: uninstall
 	mkdir -p ${DESTDIR}${DATABASEROOT}
 	mkdir -p ${DESTDIR}${DOCROOT}
 	cp -R www ${DESTDIR}${DOCROOT}
-	cp README  ${DESTDIR}${DOCROOT}
+	cp README.md  ${DESTDIR}${DOCROOT}
 	cp flashback.db ${DESTDIR}${DATABASEROOT}
 	cp bin/flashback_d ${DESTDIR}${PREFIX}/sbin/flashback
 	chmod 755 ${DESTDIR}${PREFIX}/sbin/flashback
