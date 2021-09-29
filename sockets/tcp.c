@@ -64,7 +64,12 @@ bugs:
 #include <netinet/in.h>
 #include <arpa/inet.h>
 /* hack for Mac OS X which undefs herror with posix source on */
+#ifdef __APPLE__
 #define _DARWIN_C_SOURCE 1
+#endif
+#ifdef __linux__
+#define __USE_MISC 1
+#endif
 #include <netdb.h>
 #endif
 
