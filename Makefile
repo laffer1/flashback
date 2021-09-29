@@ -4,7 +4,8 @@
 #
 #
 
-CC=c++
+CC=cc
+CXX=c++
 CFLAGS= -pthread -Wall -pedantic -D_FILE_OFFSET_BITS=64 -D__BSD_VISIBLE=1
 BINNAME=bin/flashback
 LIBS=-lsqlite3 -larchive -lbz2 -lz
@@ -58,13 +59,13 @@ win32debug:
 #real part of the make
 flashback: ${OBJECTS}
 	mkdir -p bin
-	${CC} ${CFLAGS} ${OBJECTS} ${LIBS} -o ${BINNAME}
+	${CXX} ${CFLAGS} ${OBJECTS} ${LIBS} -o ${BINNAME}
 
 %.o: %.cpp
 	${CC} ${CFLAGS} -c -o $@ $<
 
 %.o: %.cpp %.h
-	${CC} ${CFLAGS} -c -o $@ $<
+	${CXX} ${CFLAGS} -c -o $@ $<
 
 %.o: sockets/%.c
 	${CC} ${CFLAGS} -c -o $@ $<
