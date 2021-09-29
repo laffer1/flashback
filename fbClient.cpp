@@ -92,7 +92,11 @@ void fbClient::parseHeaders()
     tmp2 = reqstr;
 
     // To grab the first line  GET / HTTP/1.0 ... etc
-    fgets( reqstr, MAX_REQUEST, clientfp ); 
+    char * firstLinePtr = fgets( reqstr, MAX_REQUEST, clientfp );
+    if (firstLinePtr == NULL) {
+	httptype = NOTSUPPORTED;
+	return;
+    }
 
     tmp = strsep( &tmp2, " \t" );  // SP in HTTP spec
 
