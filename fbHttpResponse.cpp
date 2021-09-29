@@ -201,9 +201,11 @@ void fbHttpResponse::run()
                        client->write("<br />Path: <input type=\"text\" name=\"path\" value=\"\" />\n");
                        client->write("<br />Month/Day/Year: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"month\" value=\"");
                        char *tmp;
-                       asprintf(&tmp, "%d", sdate->getMonth());
-                       client->write(tmp);
-                       free(tmp);
+                       int bytes = asprintf(&tmp, "%d", sdate->getMonth());
+		       if (bytes != -1) {
+                       	client->write(tmp);
+                       	free(tmp);
+		       }
                        client->write("\" />/<input type=\"text\" size=\"2\" maxlength=\"2\" name=\"day\" value=\"\" />/<input type=\"text\" maxlength=\"4\" size=\"4\" name=\"year\" value=\"\" />\n");
                        client->write("<br />Time: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"hour\" value=\"\" />:<input size=\"2\" maxlength=\"2\" type=\"text\" name=\"min\" value=\"\" />\n");
                        client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
@@ -553,10 +555,10 @@ void fbHttpResponse::sendfile( const char * path )
         internal();
         return;
     }
-    realpath(realp.c_str(), resolved);
+    char * pathptr = realpath(realp.c_str(), resolved);
 
    /* The file is not there */
-    if (!*resolved)
+    if (pathptr == NULL || !*resolved)
     {
         notfound();
         return;
