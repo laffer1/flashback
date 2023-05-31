@@ -127,6 +127,7 @@ void fbHttpResponse::run()
     char *var5;
     char *var6;
     char *var7;
+    size_t arglen;
 
     // no path and we have a big problem.
     if ( (path = client->getPath()) == NULL)
@@ -216,29 +217,36 @@ void fbHttpResponse::run()
                    } 
                    else 
                    {
-                       if ( argv[1] != NULL)
+                      if ( argv[1] != NULL)
                       {
                           // name
-                          firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
-                          strcpy( firstvar, argv[0] );
+			  arglen = strlen(argv[0]);
+                          firstvar = (char *) calloc(arglen +1, sizeof(char));
+                          strncpy( firstvar, argv[0], arglen );
                           // path
-                          secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
-                          strcpy( secondvar, argv[1] );
+			  arglen = strlen(argv[1]);
+                          secondvar = (char *) calloc(arglen +1, sizeof(char));
+                          strncpy( secondvar, argv[1], arglen );
                           // Month
-                          var3 = (char *) calloc(strlen(argv[2]) +1, sizeof(char));
-                          strcpy( var3, argv[2] );
+			  arglen = strlen(argv[2]);
+                          var3 = (char *) calloc(arglen +1, sizeof(char));
+                          strncpy( var3, argv[2], arglen );
                           // Day
-                          var4 = (char *) calloc(strlen(argv[3]) +1, sizeof(char));
-                          strcpy( var4, argv[3] );
+			  arglen = strlen(argv[3]);
+                          var4 = (char *) calloc(arglen +1, sizeof(char));
+                          strncpy( var4, argv[3], arglen );
                           // Year
-                          var5 = (char *) calloc(strlen(argv[4]) +1, sizeof(char));
-                          strcpy( var5, argv[2] );
+			  arglen = strlen(argv[4]);
+                          var5 = (char *) calloc(arglen +1, sizeof(char));
+                          strncpy( var5, argv[4], arglen );
                           // Hour
-                          var6 = (char *) calloc(strlen(argv[5]) +1, sizeof(char));
-                          strcpy( var6, argv[2] );
+			  arglen = strlen(argv[5]);
+                          var6 = (char *) calloc(arglen +1, sizeof(char));
+                          strncpy( var6, argv[5], arglen );
                           // Minute
-                          var7 = (char *) calloc(strlen(argv[6]) +1, sizeof(char));
-                          strcpy( var7, argv[2] );
+			  arglen = strlen(argv[6]);
+                          var7 = (char *) calloc(arglen +1, sizeof(char));
+                          strncpy( var7, argv[6], arglen );
 
                           // hack out the variable name and = so we can get to the values.
                           strtok( firstvar, "=" );
