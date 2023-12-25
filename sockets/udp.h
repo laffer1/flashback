@@ -14,7 +14,7 @@ file describes function prototypes for the UDP protocol implementation.
 #ifndef UDPH
 #define UDPH
 
-#include "bool.h"
+#include <stdbool.h>
 
 typedef int socketdesc; /* similar to a file descriptor.. an index for
                            created connections */

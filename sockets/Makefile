@@ -4,7 +4,7 @@
 #class: cs224
 #class time: 11am MWF
 
-CC=g++
+CC=c++
 CFLAGS=-Wall 
 
 all: clean tcp.o udp.o daytimec daytimes echos echoc

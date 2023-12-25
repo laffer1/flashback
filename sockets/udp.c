@@ -130,7 +130,7 @@ socketdesc openudp( bool server, char * address, int port )
     bcopy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
 
     /* for servers, we need to bind and listen for later use */
-    if ( server == TRUE )
+    if ( server == true )
     {
         /* bind the socket for use */
         if (bind( cons[ncons].sockfd, 
