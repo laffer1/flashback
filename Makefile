@@ -18,22 +18,22 @@ DESTDIR=
 DOCROOT= ${PREFIX}/share/flashback
 DATABASEROOT= /var/flashback
 
-ifdef DEBUG
+.ifdef DEBUG
 CFLAGS += -DDebug -g
 BINNAME=bin/flashback_d
-else
+.else
 CFLAGS += -O2
-endif
+.endif
 
-ifdef WIN32
+.ifdef WIN32
 CFLAGS += -DWin32
-ifdef DEBUG
+.ifdef DEBUG
 BINNAME=bin\flashback_d.exe
-else
+.else
 BINNAME=bin\flashback.exe
-endif
+.endif
 LIBS=-lws2_32
-endif
+.endif
 
 #nix
 all: clean release
