@@ -279,7 +279,7 @@ long int recvudp( socketdesc sd, char * msg, int len, char * address )
 
     /* copy the address into the output variable */
     if ( address )
-        strcpy( address, he->h_addr_list[0] );
+        strncpy( address, he->h_addr_list[0], (he->h_length) );
 
     return (long) n;
 }

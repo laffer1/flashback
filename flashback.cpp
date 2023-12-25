@@ -136,7 +136,9 @@ int main(int argc, char** args)
 
 			// safety features *
 			setsid(); // become session leader
-			chdir("/"); // change wrkdir to root
+			if (chdir("/") == -1) { // change wrkdir to root
+				return 1;
+			}
 			umask(0); // clear file mode creation mask
 
 			//Call Flashback Start

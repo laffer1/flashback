@@ -43,7 +43,7 @@ void fbRestore::run()
     /* create new archive structure and set reading options */
     a = archive_read_new();
     archive_read_support_format_tar(a);
-    archive_read_support_compression_bzip2(a);
+    archive_read_support_filter_bzip2(a);
 
     /* read the archive from the file */
     if (archive_read_open_filename(a, tarfile.c_str(), 10240))
@@ -108,7 +108,8 @@ void fbRestore::run()
     } /* end else */
 
     /* close the archive and clean up data structures */
-    archive_read_finish(a);
+    if (archive_read_free(a) == ARCHIVE_FATAL)
+	    data->warn(NONE, "Unable to free resources after Archive operation");
 
     data->msg(NONE, "Restore complete: %s -> %s", tarfile.c_str(), restorepath.c_str());
 }

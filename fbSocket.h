@@ -29,7 +29,9 @@
 #define FBSOCKET_H
 
 #include "global.h"
+extern "C" {
 #include "sockets/tcp.h"
+}
 #include "fbData.h"
 #include "fbClient.h"
 

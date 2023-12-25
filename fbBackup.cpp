@@ -85,7 +85,7 @@ void fbBackup::run()
     a = archive_write_new();
     data->debug(NONE, "a = archive_write_new()");
     archive_write_set_format_ustar(a);
-    archive_write_set_compression_bzip2(a);
+    archive_write_add_filter_bzip2(a);
 
     /* open a new archive */
     if (archive_write_open_filename(a, tarfile.c_str()) != ARCHIVE_OK)
@@ -101,7 +101,7 @@ void fbBackup::run()
     }
 
     /* clean up the archive neatly */
-    if ( archive_write_finish(a) != ARCHIVE_OK)
+    if ( archive_write_free(a) != ARCHIVE_OK)
        data->warn(NONE, "Unable to create backup file: %s", archive_error_string(a));
     data->debug(NONE, "archive_write_finish(a)");
 

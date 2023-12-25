@@ -17,6 +17,8 @@ Requires: sqlite3 and libarchive (both included with MidnightBSD 0.2)
 FreeBSD includes libarchive with recent versions, you can install
 sqlite3 from ports.
 
+On Ubuntu, you must install the dev package for sqlite3, libbz2 and libarchive
+
 This code is licensed under a 2 clause BSD license, however it
 currently uses code under other licenses.
 
@@ -31,5 +33,7 @@ http://people.freebsd.org/~kientzle/libarchive/
 FlashBack is available as a package in MidnightBSD.
 mport install flashback
 
-https://www.midnightbsd.org/cgi-bin/viewvc.cgi/mports/trunk/sysutils/flashback/
+https://github.com/MidnightBSD/mports/tree/master/sysutils/flashback
 
+Source code available at
+https://github.com/laffer1/flashback
