@@ -98,6 +98,8 @@ void fbTime::setTicksLocal()
 void fbTime::update()
 {
 	ticks %= 86400;
+	if (ticks < 0)
+		ticks += 86400;
 
 	hour = ticks / 3600;
 	sec = ticks % 60;

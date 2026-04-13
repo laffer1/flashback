@@ -129,26 +129,26 @@ bool fbSQL::isConnected()
 *  exectues an command on the database
 *  @param command SQL command to send to DB
 */
-int fbSQL::exe(string& cmd)
+bool fbSQL::exe(string& cmd)
 {
-int ret = 0;
+	int ret = 0;
 	char* errmsg;
 	// lock so two commands can't be sent at once
 	fbLock lock(cs);
 
 	// send command
 	errlog->debug(NONE, cmd);
-	ret = sqlite3_exec(db, cmd.c_str(), NULL, 0 , &errmsg);
+	ret = sqlite3_exec(db, cmd.c_str(), NULL, 0, &errmsg);
 
 	// test if okay
 	if(ret != SQLITE_OK)
 	{
 		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3 error code: %s", errmsg);
 		sqlite3_free(errmsg);
+		return false;
 	}
 
-	//done, after return
-	return ret;
+	return true;
 }
 
 
@@ -185,6 +185,7 @@ int fbSQL::query(string& cmd)
 	{	//error, report warning
 		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3 error code: %s", errmsg);
 		sqlite3_free(errmsg);
+		qCS.unlock();
 		return ret;
 	}
 

@@ -32,7 +32,7 @@ public:
 
 	bool isConnected();  /// < are we connected
 
-	int exe(string& cmd);  /// < new command method
+	bool exe(string& cmd);  /// < new command method
 	int query(string& cmd);  /// < runs a query, locks qCS()
 	void queryDone(); /// < unlock query
 
