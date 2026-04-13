@@ -194,7 +194,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
     data->debug(NONE, "addFile(\"%s\", struct stat *st)", pathname.c_str());
     struct archive_entry *entry = NULL;
     int fd = 0;
-    int buff[1024 * 64];
+    char buff[1024 * 64];
     ssize_t len = 0;
     int resp;
     char *ent_path = strdup(pathname.c_str());
@@ -263,6 +263,8 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
         data->debug(NONE, "Problem writing header for %s", pathname.c_str());
         archive_entry_free(entry);
         free(ent_path);
+        if (fd >= 0)
+            close(fd);
         return;
     }
 

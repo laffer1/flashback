@@ -39,8 +39,8 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 	errlog->debug(NONE, cmd);
 	if(!db.exe(cmd))
 	{
-		return false;
 		errlog->warn(UNKNOWN, "Failed to add Backup Job..");
+		return false;
 	}
 
 //backup (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);
@@ -57,8 +57,8 @@ bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 	errlog->debug(NONE, cmd);
 	if(!db.exe(cmd))
 	{
-		return false;
 		errlog->warn(UNKNOWN, "Failed to add Restore Job..");
+		return false;
 	}
 
 //restore (ID INTEGER PRIMARY KEY, tarfile TEXT, path TEXT);
@@ -75,8 +75,8 @@ bool fbDatabase::addRepo(string& desc, fbDate& date, fbTime& time, string& path,
 	errlog->debug(NONE, cmd);
 	if(!db.exe(cmd))
 	{
-		return false;
 		errlog->warn(UNKNOWN, "Failed to add Restore Job..");
+		return false;
 	}
 //repo (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, path TEXT, tarfile TEXT);
 	return true;
@@ -131,33 +131,32 @@ bool fbDatabase::queryRepo()
 	return true;
 }
 
-string & fbDatabase::getBackupList()
+string fbDatabase::getBackupList()
 {
-	string *out;
+	string out;
 	errlog->debug(NONE, "fbDatabase:  Getting List");
 	string cmd = "select * from backup;";
 	errlog->debug(NONE, cmd);
 	db.query(cmd);
-	out = new string;
 
 	for ( int i = 0; i < db.rows(); i++ )
 	{
 		 int index =  db.cols() * i;
-		out->append(db.table[index++].c_str()); // id
-		out->append("\t");
-		out->append(db.table[index++].c_str()); //date
-		out->append("\t");
-		out->append(db.table[index++].c_str()); // time
-		out->append("\t");
-		out->append(db.table[index++].c_str()); // rt
-		out->append("\t");
-		out->append(db.table[index++].c_str()); // rv
-		out->append("\t");
-		out->append(db.table[index++].c_str()); // path
-		out->append("\n");
+		out.append(db.table[index++].c_str()); // id
+		out.append("\t");
+		out.append(db.table[index++].c_str()); //date
+		out.append("\t");
+		out.append(db.table[index++].c_str()); // time
+		out.append("\t");
+		out.append(db.table[index++].c_str()); // rt
+		out.append("\t");
+		out.append(db.table[index++].c_str()); // rv
+		out.append("\t");
+		out.append(db.table[index++].c_str()); // path
+		out.append("\n");
 	}
 	db.queryDone();
-	return *out;
+	return out;
 }
 
 bool fbDatabase::getBackupRow(string& desc, fbDate& date, fbTime& time, string& path,

@@ -37,7 +37,7 @@
 *	Default client  constructor
 *	@note Initilize all member vars
 */
-fbClient::fbClient(fbData* _data, int sock ):data(_data)
+fbClient::fbClient(fbData* _data, int sock ):data(_data), host(NULL), path(NULL)
 {
     data->debug(NONE, "fbClient.this");
     if ( sock == ETCPACCEPTFAIL )
@@ -170,6 +170,8 @@ int fbClient::begins_with( const char * str1, const char * str2 )
 */
 char * fbClient::getHost()
 {
+    if (host == NULL)
+        return NULL;
     return strdup(host->c_str());
 }
 
@@ -181,6 +183,8 @@ char * fbClient::getHost()
 */
 char * fbClient::getPath()
 {
+    if (path == NULL)
+        return NULL;
     return strdup(path->c_str());
 }
 

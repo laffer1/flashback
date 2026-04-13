@@ -25,7 +25,7 @@ public:
 	fbDatabase(fbErrorLogger* log, const char* path);
 	~fbDatabase();
 
-	string & getBackupList(); /// Get a list of pending and current backups.
+	string getBackupList(); /// Get a list of pending and current backups.
 
 	/// Backup SQL
 	bool addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt = ONCE, int rv = 0);

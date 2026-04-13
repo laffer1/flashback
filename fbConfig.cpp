@@ -81,25 +81,25 @@ int fbConfig::load(const char* filename)
         getline(myfile, s, '\n');
         if (myfile.fail()) break;
 
-        if ((i = s.find("WebServerAddr=",0) != string::npos))
+        if ((i = s.find("WebServerAddr=",0)) != string::npos)
         {
-            setWebServerAddr(s.substr((int)i+13));
-            errlog->debug(NONE, "Loaded WebServerAddr=%s", s.substr((int)i+13).c_str());
+            setWebServerAddr(s.substr((int)i+14));
+            errlog->debug(NONE, "Loaded WebServerAddr=%s", s.substr((int)i+14).c_str());
         }
-        else if ((i = s.find("WebServerPort=",0) != string::npos))
+        else if ((i = s.find("WebServerPort=",0)) != string::npos)
         {
-            setWebServerPort(s.substr((int)i+13));
-            errlog->debug(NONE, "Loaded WebServerPort=%s", s.substr((int)i+13).c_str());
+            setWebServerPort(s.substr((int)i+14));
+            errlog->debug(NONE, "Loaded WebServerPort=%s", s.substr((int)i+14).c_str());
         }
-        else if ((i = s.find("WebServerRootPath=",0) != string::npos))
+        else if ((i = s.find("WebServerRootPath=",0)) != string::npos)
         {
-            setWebServerRootPath(s.substr((int)i+17));
-            errlog->debug(NONE, "Loaded WebServerRootPath=%s", s.substr((int)i+17).c_str());
+            setWebServerRootPath(s.substr((int)i+18));
+            errlog->debug(NONE, "Loaded WebServerRootPath=%s", s.substr((int)i+18).c_str());
         }
-        else if ((i = s.find("DBPath=",0) != string::npos))
+        else if ((i = s.find("DBPath=",0)) != string::npos)
         {
-            setDBPath(s.substr((int)i+6));
-            errlog->debug(NONE, "Loaded DBPath=%s", s.substr((int)i+6).c_str());
+            setDBPath(s.substr((int)i+7));
+            errlog->debug(NONE, "Loaded DBPath=%s", s.substr((int)i+7).c_str());
         }
         else
         {
@@ -123,7 +123,7 @@ int fbConfig::load(const char* filename)
 int fbConfig::save()
 {
     int i = 0;
-    if ((i = save(FBCONFIG_DEFAULT_CONFIGFILE)))
+    if ((i = save(FBCONFIG_DEFAULT_CONFIGFILE)) == 0)
         dirty = false;
     return i;
 }

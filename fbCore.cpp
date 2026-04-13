@@ -12,7 +12,7 @@
 #include "fbScheduler.h"
 #include "fbHttpServer.h"
 
-volatile bool FlashBackRunning;
+volatile sig_atomic_t FlashBackRunning;
 void sigterm_handler(int s);
 
 /**

@@ -136,6 +136,6 @@ void fbScheduler::run()
 		}while(ret);
 
 		//sleep 10 seconds
-		_sleep(10);
+		sleep(10);
 	}
 }

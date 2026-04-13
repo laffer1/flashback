@@ -217,7 +217,8 @@ void fbHttpResponse::run()
                    } 
                    else 
                    {
-                      if ( argv[1] != NULL)
+                      if ( argv[1] != NULL && argv[2] != NULL && argv[3] != NULL
+                           && argv[4] != NULL && argv[5] != NULL && argv[6] != NULL)
                       {
                           // name
 			  arglen = strlen(argv[0]);
@@ -418,7 +419,10 @@ void fbHttpResponse::run()
            free(querystring);
         }
         else // can't be valid
+        {
+           free(querystring);
            internal();
+        }
     }
     else  // Must be a file on the file system!
     {
@@ -462,8 +466,12 @@ void fbHttpResponse::sanitizestr( char * str )
     }
 
     resultlen = len;
-    result = spc_decode_url(str, &resultlen);  
+    result = spc_decode_url(str, &resultlen);
+    if (result == NULL)
+        return;
     strncpy( str, result, len );
+    str[len] = '\0';
+    free(result);
 }
 
 
