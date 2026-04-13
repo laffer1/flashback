@@ -8,6 +8,7 @@
 */
 
 #include <sys/param.h>
+#include <sched.h>
 #include "fbThread.h"
 
 /**
@@ -295,9 +296,7 @@ void fbThread::_yield()
 #ifdef Win32
 	Yield();
 #else
-#ifndef NeXTBSD
-	pthread_yield();
-#endif
+	sched_yield();
 #endif
 }
 

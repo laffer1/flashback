@@ -47,7 +47,7 @@ fbClient::fbClient(fbData* _data, int sock ):data(_data), host(NULL), path(NULL)
     } 
     else
     {
-        if ( ( clientfp = fdopen( sock, "a+" ) ) == NULL )
+        if ( ( clientfp = fdopen( sock, "r+" ) ) == NULL )
         {
             /* log/handle */
             data->debug(NONE, "fbClient.this  Could not convert file descriptor to FILE *");

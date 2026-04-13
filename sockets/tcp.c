@@ -45,8 +45,6 @@ bugs:
     to it since accept() calls are not affected.
 */
 
-#define _POSIX_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -57,19 +55,13 @@ bugs:
 
 #ifdef Win32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #define socklen_t int
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-/* hack for Mac OS X which undefs herror with posix source on */
-#ifdef __APPLE__
-#define _DARWIN_C_SOURCE 1
-#endif
-#ifdef __linux__
-#define __USE_MISC 1
-#endif
 #include <netdb.h>
 #endif
 
@@ -139,7 +131,6 @@ void inittcp( void )
 */
 socketdesc opentcp( bool server, char * address, int port )
 {
-    struct hostent *he; /* for DNS/hostname/ip lookups */
     size_t addresslen;     /* length of address string param */
     int on; /* Should we use socket reuse */
 
@@ -187,23 +178,25 @@ socketdesc opentcp( bool server, char * address, int port )
     cons[ncons].sa.sin_port = htons(cons[ncons].port);
 
     /* lookup the hostname or DNS name (or set the ip address) */
-    if ((he = gethostbyname(cons[ncons].address)) == NULL) {
-#ifdef Win32
-		//not sure what herror is doing?
-		WSAGetLastError();  /// < gets the last error code as int
-#else
-        herror(cons[ncons].address);
-#endif
-        free(cons[ncons].address); /* dont leak */
-        return ETCPBADADDRESS;
-    }
+    {
+        struct addrinfo hints, *res;
+        int gai_err;
 
-    /* copy the ip found or listed in BIG ENDIAN SAFE byte order */
-#ifdef Win32
-	memcpy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
-#else
-    bcopy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
-#endif
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+
+        if ((gai_err = getaddrinfo(cons[ncons].address, NULL, &hints, &res)) != 0) {
+            fprintf(stderr, "%s: %s\n", cons[ncons].address, gai_strerror(gai_err));
+            free(cons[ncons].address);
+            return ETCPBADADDRESS;
+        }
+
+        memcpy(&(cons[ncons].sa).sin_addr,
+               &((struct sockaddr_in *)res->ai_addr)->sin_addr,
+               sizeof(struct in_addr));
+        freeaddrinfo(res);
+    }
 
     /* for servers, we need to bind and listen for later use */
     if ( server == true )
