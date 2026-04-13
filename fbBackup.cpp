@@ -193,7 +193,7 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
 {
     data->debug(NONE, "addFile(\"%s\", struct stat *st)", pathname.c_str());
     struct archive_entry *entry = NULL;
-    int fd = 0;
+    int fd = -1;
     char buff[1024 * 64];
     ssize_t len = 0;
     int resp;
