@@ -36,9 +36,9 @@ public:
 	void _yield();		/// < thread yieids for other threads to run
 	
 private:
-	bool _running;		/// < is thread running
-	bool _stopping;		/// < did we get a stop?
-	bool _paused;		/// < has the thread been paused
+	volatile bool _running;		/// < is thread running
+	volatile bool _stopping;	/// < did we get a stop?
+	volatile bool _paused;		/// < has the thread been paused
 	fbData* data;	/// < Threads Error Logger
 
 #ifdef Win32

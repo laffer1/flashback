@@ -87,7 +87,7 @@ bool fbCriticalSection::tryLock()
 	if(!TryEnterCriticalSection(&hCriticalSection))
 		return false;
 #else
-	if(!pthread_mutex_trylock(&hMutex))
+	if(pthread_mutex_trylock(&hMutex) != 0)
 		return false;
 #endif
 	_locked = true;

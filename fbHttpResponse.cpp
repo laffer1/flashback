@@ -36,6 +36,22 @@
 
 #define MIMECOUNT 12
 
+static string htmlEscape(const char *s)
+{
+    string out;
+    for (; *s; s++) {
+        switch (*s) {
+            case '&':  out += "&amp;";  break;
+            case '<':  out += "&lt;";   break;
+            case '>':  out += "&gt;";   break;
+            case '"':  out += "&quot;"; break;
+            case '\'': out += "&#39;";  break;
+            default:   out += *s;
+        }
+    }
+    return out;
+}
+
 static const char * mime[][2] = { 
     { ".html", "text/html" },
     { ".htm", "text/htm" },
@@ -137,7 +153,7 @@ void fbHttpResponse::run()
     }
 
     data->debug(NONE, "fbHttpResponse.run");
-    data->msg(NONE, path); // log webserver request
+    data->msg(NONE, "%s", path); // log webserver request
 
     /* deal with / and /index it should access our default index.html */
     if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 ) 
@@ -265,43 +281,46 @@ void fbHttpResponse::run()
                           strtok( var7, "=" );
                           var7 = strtok( NULL, "=" );
                           
-                          sanitizestr( firstvar );
-                          sanitizestr( secondvar );
-                          sanitizestr( var3 );
-                          sanitizestr( var4 );
-                          sanitizestr( var5 );
-                          sanitizestr( var6 );
-                          sanitizestr( var7 );
-                          
-                          client->write(firstvar);
-                          client->write("<br />\n");
-                          client->write(secondvar);
-                          client->write("<br />\n");
-                          data->msg( NONE, "Scheduling job %s on %s", firstvar, secondvar );
-                          
-                          fbDate *sdate = new fbDate ( // month, day, year
-                                                    (int)strtol(var3, (char **)NULL, 10), 
-                                                    (int)strtol(var4, (char **)NULL, 10),
-                                                    (int)strtol(var5, (char **)NULL, 10) );
-                          
-                          fbTime *stime = new fbTime( // hour : min : second
-                                                    (int)strtol(var6, (char **)NULL, 10),
-                                                    (int)strtol(var7, (char **)NULL, 10),
-                                                    0);
-                          
-                          // perform the backup.  firstvar is our name and secondvar is the path to backup
-                          data->addBackupJob(new string(firstvar), sdate, stime, new string(secondvar));
-                          
-                          delete sdate;
-                          delete stime;
-                          
-                          //free(firstvar);
-                          //free(secondvar);
-                          free(var3);
-                          free(var4);
-                          free(var5);
-                          free(var6);
-                          free(var7);
+                          if (firstvar == NULL || secondvar == NULL || var3 == NULL ||
+                              var4 == NULL || var5 == NULL || var6 == NULL || var7 == NULL)
+                          {
+                              client->write("Bad parameters");
+                          }
+                          else
+                          {
+                              sanitizestr( firstvar );
+                              sanitizestr( secondvar );
+                              sanitizestr( var3 );
+                              sanitizestr( var4 );
+                              sanitizestr( var5 );
+                              sanitizestr( var6 );
+                              sanitizestr( var7 );
+
+                              client->write(firstvar);
+                              client->write("<br />\n");
+                              client->write(secondvar);
+                              client->write("<br />\n");
+                              data->msg( NONE, "Scheduling job %s on %s", firstvar, secondvar );
+
+                              fbDate *sdate = new fbDate ( // month, day, year
+                                                        (int)strtol(var3, (char **)NULL, 10),
+                                                        (int)strtol(var4, (char **)NULL, 10),
+                                                        (int)strtol(var5, (char **)NULL, 10) );
+
+                              fbTime *stime = new fbTime( // hour : min : second
+                                                        (int)strtol(var6, (char **)NULL, 10),
+                                                        (int)strtol(var7, (char **)NULL, 10),
+                                                        0);
+
+                              // addBackupJob takes ownership of sdate and stime and deletes them
+                              data->addBackupJob(new string(firstvar), sdate, stime, new string(secondvar));
+
+                              free(var3);
+                              free(var4);
+                              free(var5);
+                              free(var6);
+                              free(var7);
+                          }
                       }
                       else
                       {
@@ -384,20 +403,24 @@ void fbHttpResponse::run()
                            strtok( secondvar, "=" );
                            secondvar = strtok( NULL, "=" );
 
-                           sanitizestr( firstvar );
-                           sanitizestr( secondvar );
-          
-                           client->write(secondvar);
-                           client->write("<br />\n");
-                           client->write(firstvar);
-                           client->write("<br />\n");
+                           if (firstvar == NULL || secondvar == NULL)
+                           {
+                               client->write("Bad parameters");
+                           }
+                           else
+                           {
+                               sanitizestr( firstvar );
+                               sanitizestr( secondvar );
 
-                            data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
-                            // firstvar is our file name and secondvar is the path to restore to
-                            data->addRestoreJob( new string(secondvar), new string(firstvar) );
+                               client->write(secondvar);
+                               client->write("<br />\n");
+                               client->write(firstvar);
+                               client->write("<br />\n");
 
-                            //free(firstvar);
-                            //free(secondvar);
+                               data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
+                               // firstvar is our file name and secondvar is the path to restore to
+                               data->addRestoreJob( new string(secondvar), new string(firstvar) );
+                           }
                        }
                        else
                        {
@@ -580,7 +603,7 @@ void fbHttpResponse::sendfile( const char * path )
         return;
     }
 
-    if (strstr(resolved, data->getWebServerRootPath().c_str()) == NULL) 
+    if (strncmp(resolved, data->getWebServerRootPath().c_str(), data->getWebServerRootPath().length()) != 0)
     {
         free(resolved);
         notfound();
@@ -666,7 +689,7 @@ void fbHttpResponse::notfound()
     r.append( "<html>\n<head>\n\t<title>404 Not Found</title>\n</head>\n");
     r.append("<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on the server.</p>\n");
     r.append("<p>Invalid path: ");
-    r.append(path);
+    r.append(htmlEscape(path));
     r.append("</p>\n<hr><p>");
     r.append(SERVERID);
     r.append("</p>\n</body>\n</html>\n");

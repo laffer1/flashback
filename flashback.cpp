@@ -139,7 +139,7 @@ int main(int argc, char** args)
 			if (chdir("/") == -1) { // change wrkdir to root
 				return 1;
 			}
-			umask(0); // clear file mode creation mask
+			umask(027); // restrict file creation: owner rw, group r, others none
 
 			//Call Flashback Start
 			core();

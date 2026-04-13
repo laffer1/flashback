@@ -2,6 +2,19 @@
 
 #include "fbDatabase.h"
 
+static string sqlEscape(const string& s)
+{
+    string out;
+    out.reserve(s.size());
+    for (size_t i = 0; i < s.size(); i++) {
+        if (s[i] == '\'')
+            out += "''";
+        else
+            out += s[i];
+    }
+    return out;
+}
+
 /**
 *  fbDatabase
 *  main database access object
@@ -33,7 +46,7 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 {
 	char buff[1024];
 	snprintf(buff, sizeof(buff)-1, "insert into backup (desc, date, time, repeatmode, repeatval, disk) values  (\'%s\',%ld,%ld,%d,%d,\'%s\');",
-		desc.c_str(), date.getJulian(), time.getTicks(), rt, rv, path.c_str());
+		sqlEscape(desc).c_str(), date.getJulian(), time.getTicks(), rt, rv, sqlEscape(path).c_str());
 	string cmd = buff;
 
 	errlog->debug(NONE, cmd);
@@ -51,7 +64,7 @@ bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& 
 bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 {
 	char buff[4096];
-	snprintf(buff, sizeof(buff)-1, "insert into restore (tarfile, path) values (\'%s\', \'%s\');", tarfile.c_str(), dest.c_str());
+	snprintf(buff, sizeof(buff)-1, "insert into restore (tarfile, path) values (\'%s\', \'%s\');", sqlEscape(tarfile).c_str(), sqlEscape(dest).c_str());
 	string cmd = buff;
 
 	errlog->debug(NONE, cmd);
@@ -69,7 +82,7 @@ bool fbDatabase::addRepo(string& desc, fbDate& date, fbTime& time, string& path,
 {
 	char buff[1024];
 	snprintf(buff, sizeof(buff)-1, "insert into repo (desc, date, time, path, tarfile) values (\'%s\', %ld, %ld, \'%s\', \'%s\');",
-		desc.c_str(), date.getJulian(), time.getTicks(), path.c_str(), tarfile.c_str());
+		sqlEscape(desc).c_str(), date.getJulian(), time.getTicks(), sqlEscape(path).c_str(), sqlEscape(tarfile).c_str());
 	string cmd = buff;
 
 	errlog->debug(NONE, cmd);
