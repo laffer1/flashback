@@ -150,8 +150,7 @@ socketdesc opentcp( bool server, char * address, int port )
     if ((cons[ncons].address = (char *) calloc( addresslen+1, sizeof(char) )) == NULL)
         return ETCPGENERIC;  /* could not allocate memory :( */
     
-    strncpy( cons[ncons].address, address, addresslen ); /* sizeof the buffer -1 */
-    cons[ncons].address[addresslen] = '\0';
+    memcpy( cons[ncons].address, address, addresslen );
 
     /* create an endpoint for communication */
     if ((cons[ncons].sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {

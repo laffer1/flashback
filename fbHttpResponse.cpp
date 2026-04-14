@@ -236,31 +236,31 @@ void fbHttpResponse::run()
                           // name
 			  arglen = strlen(argv[0]);
                           firstvar = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( firstvar, argv[0], arglen );
+                          memcpy( firstvar, argv[0], arglen );
                           // path
 			  arglen = strlen(argv[1]);
                           secondvar = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( secondvar, argv[1], arglen );
+                          memcpy( secondvar, argv[1], arglen );
                           // Month
 			  arglen = strlen(argv[2]);
                           var3 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var3, argv[2], arglen );
+                          memcpy( var3, argv[2], arglen );
                           // Day
 			  arglen = strlen(argv[3]);
                           var4 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var4, argv[3], arglen );
+                          memcpy( var4, argv[3], arglen );
                           // Year
 			  arglen = strlen(argv[4]);
                           var5 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var5, argv[4], arglen );
+                          memcpy( var5, argv[4], arglen );
                           // Hour
 			  arglen = strlen(argv[5]);
                           var6 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var6, argv[5], arglen );
+                          memcpy( var6, argv[5], arglen );
                           // Minute
 			  arglen = strlen(argv[6]);
                           var7 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var7, argv[6], arglen );
+                          memcpy( var7, argv[6], arglen );
 
                           // hack out the variable name and = so we can get to the values.
                           strtok( firstvar, "=" );
