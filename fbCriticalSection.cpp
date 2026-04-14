@@ -17,7 +17,7 @@
 */
 fbCriticalSection::fbCriticalSection():_locked(false)
 {
-#ifdef Win32
+#ifdef _WIN32
 	InitializeCriticalSection(&hCriticalSection);	/// < Create CS object
 #else
 	 pthread_mutex_init(&hMutex, NULL);
@@ -30,7 +30,7 @@ fbCriticalSection::fbCriticalSection():_locked(false)
 */
 fbCriticalSection::~fbCriticalSection()
 {
-#ifdef Win32
+#ifdef _WIN32
 	DeleteCriticalSection(&hCriticalSection);
 #else
 	pthread_mutex_destroy(&hMutex);
@@ -43,7 +43,7 @@ fbCriticalSection::~fbCriticalSection()
 */
 void fbCriticalSection::lock()
 {
-#ifdef Win32
+#ifdef _WIN32
 	EnterCriticalSection(&hCriticalSection);
 #else
 	 pthread_mutex_lock(&hMutex);
@@ -58,7 +58,7 @@ void fbCriticalSection::lock()
 void fbCriticalSection::unlock()
 {
 
-#ifdef Win32
+#ifdef _WIN32
 	LeaveCriticalSection(&hCriticalSection);
 #else
 	 pthread_mutex_unlock(&hMutex);
@@ -83,7 +83,7 @@ bool fbCriticalSection::isLocked()
 */
 bool fbCriticalSection::tryLock()
 {
-#ifdef Win32
+#ifdef _WIN32
 	if(!TryEnterCriticalSection(&hCriticalSection))
 		return false;
 #else

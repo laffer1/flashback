@@ -47,17 +47,16 @@ bugs:
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <strings.h> /* bzero */
 #include <errno.h>
 #include <stdbool.h>
 
-#ifdef Win32
+#ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #define socklen_t int
 #else
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -162,15 +161,15 @@ socketdesc opentcp( bool server, char * address, int port )
     }
 
     /* clear socket param struct */
-#ifdef Win32
-	ZeroMemory(&(cons[ncons].sa), sizeof cons[ncons].sa); 
+#ifdef _WIN32
+    ZeroMemory(&(cons[ncons].sa), sizeof cons[ncons].sa);
 #else
-    bzero(&(cons[ncons].sa), sizeof cons[ncons].sa); 
+    memset(&(cons[ncons].sa), 0, sizeof cons[ncons].sa);
 #endif
 
     /* Enable address reuse */
     on = 1;
-    setsockopt( cons[ncons].sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) );
+    setsockopt( cons[ncons].sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof(on) );
 
     /* setup some defaults for a TCP ip4 connection with a BIG ENDIAN safe
        port number */
@@ -253,9 +252,9 @@ socketdesc opentcp( bool server, char * address, int port )
 void closetcp( socketdesc sd )
 {
     /* disconnect socket */
-#ifdef Win32
+#ifdef _WIN32
     closesocket(cons[sd].sockfd);
-#else 
+#else
     (void) close(cons[sd].sockfd);
 #endif
     /* as a hint this is dead.  Maybe we can recycle them? */
@@ -300,7 +299,11 @@ char * readntcp( socketdesc sd, int size )
 
     if ( cons[sd].server == false )
     {
+#ifdef _WIN32
+        if ((bytes = recv(cons[sd].sockfd, buf, size, 0)) < 1)
+#else
         if ((bytes = read(cons[sd].sockfd, buf, size)) < 1)
+#endif
             return NULL;
     }
     else
@@ -446,10 +449,15 @@ int writetcp( socketdesc sd, char * str )
 */
 int writentcp( socketdesc sd, char * str, int len )
 {
-    if (cons[sd].server == false)
+    if (cons[sd].server == false) {
+#ifdef _WIN32
+        return send( cons[sd].sockfd, str, len, 0 );
+#else
         return write( cons[sd].sockfd, str, len );
-    else
+#endif
+    } else {
         return ETCPGENERIC;
+    }
 }
 
 

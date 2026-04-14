@@ -3,7 +3,7 @@
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
 
-#ifdef Win32
+#ifdef _WIN32
 
 #define SVCNAME TEXT("FlashBack")
 

@@ -43,7 +43,7 @@ void fbThread::start()
 
 	data->debug(NONE, "fbThread.start");
 
-#ifdef Win32
+#ifdef _WIN32
 	_hThread = CreateThread(NULL, 0, threadStart, this, 0, NULL);
 	if(_hThread == NULL)
 		data->err(THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
@@ -67,7 +67,7 @@ void fbThread::startDelete()
 
 	data->debug(NONE, "fbThread.startDelete");
 
-#ifdef Win32
+#ifdef _WIN32
 	_hThread = CreateThread(NULL, 0, threadStartDelete, this, 0, NULL);
 	if(_hThread == NULL)
 		data->err(THREADCREATEFAIL, "CreateThread Failed");  // needs getlasterror
@@ -99,7 +99,7 @@ void fbThread::forceStop()
 {
 	if (!_running)
 		return;
-#ifdef Win32
+#ifdef _WIN32
 	if(TerminateThread(_hThread, 0) == -1)
 		data->err(THREADTERMINATEFAILED, "TerminateThread Failed");
 #else
@@ -123,7 +123,7 @@ void fbThread::pause()
 	if (!_running || _paused)
 		return;
 
-#ifdef Win32
+#ifdef _WIN32
 	if(SuspendThread(_hThread) == -1)
 		data->err(THREADSUSPENDFAILED, "SuspendThread Failed");
 #else
@@ -140,7 +140,7 @@ void fbThread::resume()
 {
 	if (!_running || !_paused)
 		return;
-#ifdef Win32
+#ifdef _WIN32
 	if(ResumeThread(_hThread) == -1)
 		data->err(THREADRESUMEFAILED, "ResumeThread Failed");
 #else
@@ -180,7 +180,7 @@ bool fbThread::isStopping()
 }
 
 
-#ifdef Win32
+#ifdef _WIN32
 /**
 *	threadStart
 *	real thread function
@@ -264,7 +264,7 @@ void fbThread::_sleep(int sec)
 {
 	if(!_running || _paused)
 		return;
-#ifdef Win32
+#ifdef _WIN32
 	Sleep(sec * 1000);
 #else
 	sleep(sec);
@@ -280,7 +280,7 @@ void fbThread::_usleep(int msec)
 {
 	if(!_running || _paused)
 		return;
-#ifdef Win32
+#ifdef _WIN32
 	Sleep(msec);
 #else
 	usleep(msec);
@@ -293,7 +293,7 @@ void fbThread::_usleep(int msec)
 */
 void fbThread::_yield()
 {
-#ifdef Win32
+#ifdef _WIN32
 	Yield();
 #else
 	sched_yield();

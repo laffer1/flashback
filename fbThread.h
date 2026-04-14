@@ -41,7 +41,7 @@ private:
 	volatile bool _paused;		/// < has the thread been paused
 	fbData* data;	/// < Threads Error Logger
 
-#ifdef Win32
+#ifdef _WIN32
 	HANDLE _hThread;		/// < handle to running thread
 	static DWORD WINAPI threadStart(LPVOID thread);	/// < Real thread func
 	static DWORD WINAPI threadStartDelete(LPVOID thread);	/// < Real thread func, deletes thread when done

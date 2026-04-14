@@ -217,12 +217,9 @@ void fbHttpResponse::run()
                        client->write("<fieldset>\n<p>Name: <input type=\"text\" name=\"name\" value=\"\" />\n");
                        client->write("<br />Path: <input type=\"text\" name=\"path\" value=\"\" />\n");
                        client->write("<br />Month/Day/Year: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"month\" value=\"");
-                       char *tmp;
-                       int bytes = asprintf(&tmp, "%d", sdate->getMonth());
-		       if (bytes != -1) {
-                       	client->write(tmp);
-                       	free(tmp);
-		       }
+                       char tmp[32];
+                       snprintf(tmp, sizeof(tmp), "%d", sdate->getMonth());
+                       client->write(tmp);
                        client->write("\" />/<input type=\"text\" size=\"2\" maxlength=\"2\" name=\"day\" value=\"\" />/<input type=\"text\" maxlength=\"4\" size=\"4\" name=\"year\" value=\"\" />\n");
                        client->write("<br />Time: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"hour\" value=\"\" />:<input size=\"2\" maxlength=\"2\" type=\"text\" name=\"min\" value=\"\" />\n");
                        client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");

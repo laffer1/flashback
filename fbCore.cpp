@@ -65,7 +65,7 @@ void core()
 	while(FlashBackRunning)
 	{
 		//check for exit (every 10 seconds)
-#ifdef Win32
+#ifdef _WIN32
 		Sleep(1000 * 10);
 #else
 		sleep(10);
