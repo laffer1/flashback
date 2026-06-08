@@ -52,7 +52,7 @@ static string htmlEscape(const char *s)
     return out;
 }
 
-static const char * mime[][2] = { 
+static const char * mime[][2] = {
     { ".html", "text/html" },
     { ".htm", "text/htm" },
     { ".png", "image/png" },
@@ -131,18 +131,14 @@ void fbHttpResponse::shutdown()
 */
 void fbHttpResponse::run()
 {
-    char *path;                     // the virtual path 
-    char *querystring;          // the ? part of the uri if it exists
+    char *path;                     // the virtual path
+    char *querystring;          // the ? part of the uri if it exists (modified by strsep)
+    char *querystring_base = NULL; // original malloc'd pointer; strsep advances querystring
     char *loc;                       // the location of a query string if any
     size_t pathlen;               // length of path
     char **ap, *argv[1024];  // an argument array generated from the querystring
     char *firstvar;               // the first variable in the query string
     char *secondvar;          // the second var in the query string
-    char *var3;
-    char *var4;
-    char *var5;
-    char *var6;
-    char *var7;
     size_t arglen;
 
     // no path and we have a big problem.
@@ -156,7 +152,7 @@ void fbHttpResponse::run()
     data->msg(NONE, "%s", path); // log webserver request
 
     /* deal with / and /index it should access our default index.html */
-    if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 ) 
+    if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 )
     {
         free(path);
         path = strdup("/index.html");
@@ -174,6 +170,7 @@ void fbHttpResponse::run()
             internal();
             goto CLEANUP;
         }
+        querystring_base = querystring; // strsep will advance querystring; keep original for free()
         data->debug(NONE, "Copy the query");
         strncpy( querystring, loc, pathlen );
 	querystring[pathlen] = '\0';
@@ -182,7 +179,9 @@ void fbHttpResponse::run()
            // break it up into an argument vector.
 	   for (ap = argv; (*ap = strsep(&querystring, "&")) != NULL;)
                    if (**ap != '\0')
-                           if (++ap >= &argv[1024])
+                           /* guard: stop before writing argv[1023] so loop body can't
+                            * assign one past the array end at the top of the next iteration */
+                           if (++ap >= &argv[1023])
                                    break;
 
            data->debug(NONE, "query in argv array");
@@ -212,7 +211,7 @@ void fbHttpResponse::run()
                    {
                        fbDate *sdate = new fbDate();
                        fbTime *stime = new fbTime();
-                       
+
                        client->write("<form method=\"get\" >\n");
                        client->write("<fieldset>\n<p>Name: <input type=\"text\" name=\"name\" value=\"\" />\n");
                        client->write("<br />Path: <input type=\"text\" name=\"path\" value=\"\" />\n");
@@ -224,104 +223,112 @@ void fbHttpResponse::run()
                        client->write("<br />Time: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"hour\" value=\"\" />:<input size=\"2\" maxlength=\"2\" type=\"text\" name=\"min\" value=\"\" />\n");
                        client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
                        client->write("</form>\n");
-                       
+
                        delete sdate;
                        delete stime;
-                   } 
-                   else 
+                   }
+                   else
                    {
                       if ( argv[1] != NULL && argv[2] != NULL && argv[3] != NULL
                            && argv[4] != NULL && argv[5] != NULL && argv[6] != NULL)
                       {
+                          /* Keep original calloc'd pointers so we can free them correctly.
+                           * strtok returns interior pointers into these buffers — never free those. */
+                          char *fv_buf, *sv_buf, *v3_buf, *v4_buf, *v5_buf, *v6_buf, *v7_buf;
+                          char *fv_val, *sv_val, *v3_val, *v4_val, *v5_val, *v6_val, *v7_val;
+
                           // name
 			  arglen = strlen(argv[0]);
-                          firstvar = (char *) calloc(arglen +1, sizeof(char));
-                          memcpy( firstvar, argv[0], arglen );
+                          fv_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( fv_buf, argv[0], arglen );
                           // path
 			  arglen = strlen(argv[1]);
-                          secondvar = (char *) calloc(arglen +1, sizeof(char));
-                          memcpy( secondvar, argv[1], arglen );
+                          sv_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( sv_buf, argv[1], arglen );
                           // Month
 			  arglen = strlen(argv[2]);
-                          var3 = (char *) calloc(arglen +1, sizeof(char));
-                          memcpy( var3, argv[2], arglen );
+                          v3_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v3_buf, argv[2], arglen );
                           // Day
 			  arglen = strlen(argv[3]);
-                          var4 = (char *) calloc(arglen +1, sizeof(char));
-                          memcpy( var4, argv[3], arglen );
+                          v4_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v4_buf, argv[3], arglen );
                           // Year
 			  arglen = strlen(argv[4]);
-                          var5 = (char *) calloc(arglen +1, sizeof(char));
-                          memcpy( var5, argv[4], arglen );
+                          v5_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v5_buf, argv[4], arglen );
                           // Hour
 			  arglen = strlen(argv[5]);
-                          var6 = (char *) calloc(arglen +1, sizeof(char));
-                          memcpy( var6, argv[5], arglen );
+                          v6_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v6_buf, argv[5], arglen );
                           // Minute
 			  arglen = strlen(argv[6]);
-                          var7 = (char *) calloc(arglen +1, sizeof(char));
-                          memcpy( var7, argv[6], arglen );
+                          v7_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v7_buf, argv[6], arglen );
 
                           // hack out the variable name and = so we can get to the values.
-                          strtok( firstvar, "=" );
-                          firstvar = strtok( NULL, "=" );
-                          strtok( secondvar, "=" );
-                          secondvar = strtok( NULL, "=" );
-                          strtok( var3, "=" );
-                          var3 = strtok( NULL, "=" );
-                          strtok( var4, "=" );
-                          var4 = strtok( NULL, "=" );
-                          strtok( var5, "=" );
-                          var5 = strtok( NULL, "=" );
-                          strtok( var6, "=" );
-                          var6 = strtok( NULL, "=" );
-                          strtok( var7, "=" );
-                          var7 = strtok( NULL, "=" );
-                          
-                          if (firstvar == NULL || secondvar == NULL || var3 == NULL ||
-                              var4 == NULL || var5 == NULL || var6 == NULL || var7 == NULL)
+                          strtok( fv_buf, "=" );
+                          fv_val = strtok( NULL, "=" );
+                          strtok( sv_buf, "=" );
+                          sv_val = strtok( NULL, "=" );
+                          strtok( v3_buf, "=" );
+                          v3_val = strtok( NULL, "=" );
+                          strtok( v4_buf, "=" );
+                          v4_val = strtok( NULL, "=" );
+                          strtok( v5_buf, "=" );
+                          v5_val = strtok( NULL, "=" );
+                          strtok( v6_buf, "=" );
+                          v6_val = strtok( NULL, "=" );
+                          strtok( v7_buf, "=" );
+                          v7_val = strtok( NULL, "=" );
+
+                          if (fv_val == NULL || sv_val == NULL || v3_val == NULL ||
+                              v4_val == NULL || v5_val == NULL || v6_val == NULL || v7_val == NULL)
                           {
                               client->write("Bad parameters");
                           }
                           else
                           {
-                              sanitizestr( firstvar );
-                              sanitizestr( secondvar );
-                              sanitizestr( var3 );
-                              sanitizestr( var4 );
-                              sanitizestr( var5 );
-                              sanitizestr( var6 );
-                              sanitizestr( var7 );
+                              sanitizestr( fv_val );
+                              sanitizestr( sv_val );
+                              sanitizestr( v3_val );
+                              sanitizestr( v4_val );
+                              sanitizestr( v5_val );
+                              sanitizestr( v6_val );
+                              sanitizestr( v7_val );
 
-                              client->write(firstvar);
+                              client->write(htmlEscape(fv_val).c_str());
                               client->write("<br />\n");
-                              client->write(secondvar);
+                              client->write(htmlEscape(sv_val).c_str());
                               client->write("<br />\n");
-                              data->msg( NONE, "Scheduling job %s on %s", firstvar, secondvar );
+                              data->msg( NONE, "Scheduling job %s on %s", fv_val, sv_val );
 
                               fbDate *sdate = new fbDate ( // month, day, year
-                                                        (int)strtol(var3, (char **)NULL, 10),
-                                                        (int)strtol(var4, (char **)NULL, 10),
-                                                        (int)strtol(var5, (char **)NULL, 10) );
+                                                        (int)strtol(v3_val, (char **)NULL, 10),
+                                                        (int)strtol(v4_val, (char **)NULL, 10),
+                                                        (int)strtol(v5_val, (char **)NULL, 10) );
 
                               fbTime *stime = new fbTime( // hour : min : second
-                                                        (int)strtol(var6, (char **)NULL, 10),
-                                                        (int)strtol(var7, (char **)NULL, 10),
+                                                        (int)strtol(v6_val, (char **)NULL, 10),
+                                                        (int)strtol(v7_val, (char **)NULL, 10),
                                                         0);
 
                               // addBackupJob takes ownership of sdate and stime and deletes them
-                              data->addBackupJob(new string(firstvar), sdate, stime, new string(secondvar));
-
-                              free(var3);
-                              free(var4);
-                              free(var5);
-                              free(var6);
-                              free(var7);
+                              data->addBackupJob(new string(fv_val), sdate, stime, new string(sv_val));
                           }
+
+                          // free the original calloc'd buffers (not the interior strtok pointers)
+                          free(fv_buf);
+                          free(sv_buf);
+                          free(v3_buf);
+                          free(v4_buf);
+                          free(v5_buf);
+                          free(v6_buf);
+                          free(v7_buf);
                       }
                       else
                       {
-                          client->write("Bad parameters"); 
+                          client->write("Bad parameters");
                      }
                  }
               }
@@ -340,7 +347,7 @@ void fbHttpResponse::run()
                        client->write("<form method=\"get\" >\n<fieldset>\n");
                        client->write("Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
                        client->write("</fieldset>\n");
-			
+
                        bool ret;
                        string desc, path, tarfile, d, t;
                        fbDate date;
@@ -367,8 +374,8 @@ void fbHttpResponse::run()
                                client->write("\t<tr>\n");
 
                                client->write("\t\t<td>\n\t\t\t %d \n\t\t</td>\n", id);
-                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", desc.c_str());
-                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", path.c_str());
+                               client->write("\t\t<td>\n\t\t\t " + htmlEscape(desc.c_str()) + " \n\t\t</td>\n");
+                               client->write("\t\t<td>\n\t\t\t " + htmlEscape(path.c_str()) + " \n\t\t</td>\n");
 
                                d = "";
                                date.mdy(d);
@@ -378,26 +385,28 @@ void fbHttpResponse::run()
                                client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", d.c_str());
                                client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", t.c_str());
 
-                               client->write("\t\t<td>\n\t\t\t <input type=\"submit\" name=\"file\" value=\"%s\" /> \n\t\t</td>\n", tarfile.c_str());
+                               client->write("\t\t<td>\n\t\t\t <input type=\"submit\" name=\"file\" value=\"" + htmlEscape(tarfile.c_str()) + "\" /> \n\t\t</td>\n");
                                client->write("\t</tr>\n");
                            }
 
                        } while(ret);
                        client->write("</table>\n</form>\n");
                    }
-                   else 
+                   else
                    {
                        if ( argv[1] != NULL)
                        {
-                           firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
-                           strcpy( firstvar, argv[0] );
-                           secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
-                           strcpy( secondvar, argv[1] );
+                           /* Keep original calloc'd pointers for free(); strtok returns
+                            * interior pointers — never free those. */
+                           char *fv_buf = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
+                           memcpy( fv_buf, argv[0], strlen(argv[0]) );
+                           char *sv_buf = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
+                           memcpy( sv_buf, argv[1], strlen(argv[1]) );
 
                            // hack out the variable name and = so we can get to the values.
-                           strtok( firstvar, "=" );
+                           strtok( fv_buf, "=" );
                            firstvar = strtok( NULL, "=" );
-                           strtok( secondvar, "=" );
+                           strtok( sv_buf, "=" );
                            secondvar = strtok( NULL, "=" );
 
                            if (firstvar == NULL || secondvar == NULL)
@@ -409,19 +418,22 @@ void fbHttpResponse::run()
                                sanitizestr( firstvar );
                                sanitizestr( secondvar );
 
-                               client->write(secondvar);
+                               client->write(htmlEscape(secondvar).c_str());
                                client->write("<br />\n");
-                               client->write(firstvar);
+                               client->write(htmlEscape(firstvar).c_str());
                                client->write("<br />\n");
 
                                data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
                                // firstvar is our file name and secondvar is the path to restore to
                                data->addRestoreJob( new string(secondvar), new string(firstvar) );
                            }
+
+                           free(fv_buf);
+                           free(sv_buf);
                        }
                        else
                        {
-                           client->write("Bad parameters"); 
+                           client->write("Bad parameters");
                        }
                  }
               }
@@ -436,11 +448,11 @@ void fbHttpResponse::run()
                client->write("</div>\n");
                dynamicfoot();
            }
-           free(querystring);
+           free(querystring_base);
         }
         else // can't be valid
         {
-           free(querystring);
+           free(querystring_base);
            internal();
         }
     }
@@ -458,7 +470,7 @@ CLEANUP:
     data->debug(NONE, "fbHttpResponse.run() delete client");
     delete client;
 
-    shutdown();  // clean up 
+    shutdown();  // clean up
 }
 
 
@@ -489,8 +501,10 @@ void fbHttpResponse::sanitizestr( char * str )
     result = spc_decode_url(str, &resultlen);
     if (result == NULL)
         return;
-    strncpy( str, result, len );
-    str[len] = '\0';
+    /* resultlen <= len (percent-decoding shrinks or equals); copy only what was decoded
+     * and NUL-terminate within the original allocation (which is len+1 bytes). */
+    memcpy( str, result, resultlen );
+    str[resultlen] = '\0';
     free(result);
 }
 
@@ -528,7 +542,8 @@ void fbHttpResponse::dynamichead( const char * title )
     header( "Content-Language", "en-US" );
     client->write("\r\n"); // end header section
 
-    client->write("<html>\n<head>\n\t<title>");
+    client->write("<!DOCTYPE html>\n");
+    client->write("<html lang=\"en\">\n<head>\n\t<meta charset=\"utf-8\" />\n\t<title>");
     if (title != NULL)
         client->write(title);
     client->write("</title>\n");
@@ -571,7 +586,6 @@ void fbHttpResponse::sendfile( const char * path )
 {
     FILE *fp;           // the file to send to the client
     string realp = data->getWebServerRootPath();
-    int c;                  // an individual character we're going to write to stream
     char *resolved;  // The path after it has been tested with realpath
     struct stat st;  // the information about a file from lstat call
 
@@ -606,6 +620,17 @@ void fbHttpResponse::sendfile( const char * path )
         notfound();
         return;
     }
+    /* Require that the next character after the root prefix is '/' (subdirectory) or
+     * '\0' (exact match) so that "/webrootEVIL" cannot pass as a sibling of "/webroot". */
+    {
+        char next = resolved[data->getWebServerRootPath().length()];
+        if (next != '/' && next != '\0')
+        {
+            free(resolved);
+            notfound();
+            return;
+        }
+    }
 
     /* Find out if it's a symlink */
     if ( lstat( resolved, &st ) == -1 )
@@ -618,7 +643,7 @@ void fbHttpResponse::sendfile( const char * path )
     else
     {
          if (S_ISLNK(st.st_mode) )
-         { 
+         {
              // this means it's a symlink which we don't support.
              // TODO: permissions error instead?
              free(resolved);
@@ -627,7 +652,7 @@ void fbHttpResponse::sendfile( const char * path )
          }
     }
 
-    if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
+    if ( (fp = fopen( resolved, "rb" ) ) == NULL ) {
         //data->msg(NONE, "fbHttpResponse: Unable to open file");
         //data->msg(NONE, resolved);
         free(resolved);
@@ -643,10 +668,11 @@ void fbHttpResponse::sendfile( const char * path )
     header( "Content-Language", "en-US" );
     client->write("\r\n"); // end header section
 
-    while ( (c = fgetc(fp)) != EOF && !ferror(fp))
     {
-        if (c != EOF)
-            client->write(c);
+        char buf[65536];   // 64 KB read buffer
+        size_t n;
+        while ( (n = fread(buf, 1, sizeof(buf), fp)) > 0 )
+            client->write(string(buf, n));
     }
 
     fclose(fp);
@@ -786,7 +812,7 @@ const char * fbHttpResponse::matchmimetype( const char *filename )
     for ( int i = 0; i < MIMECOUNT; i++ )
     {
         extlen = strlen( mime[i][0] );
-        if (strcasecmp( mime[i][0], 
+        if (strcasecmp( mime[i][0],
                  filename + (len - extlen)) == 0)
             return mime[i][1];
     }

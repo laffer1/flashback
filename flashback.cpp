@@ -26,7 +26,7 @@ void __cdecl _tmain(int argc, TCHAR *argv[])
     // If command-line parameter is "install", install the service. 
     // Otherwise, the service is probably being started by the SCM.
 
-    if( lstrcmpi( argv[1], TEXT("install")) == 0 )
+    if( argc > 1 && lstrcmpi( argv[1], TEXT("install")) == 0 )
     {
         SvcInstall();
         return;

@@ -100,12 +100,16 @@ void fbThread::forceStop()
 	if (!_running)
 		return;
 #ifdef _WIN32
-	if(TerminateThread(_hThread, 0) == -1)
-		data->err(THREADTERMINATEFAILED, "TerminateThread Failed");
+	if (_hThread != NULL) {
+		if(TerminateThread(_hThread, 0) == -1)
+			data->err(THREADTERMINATEFAILED, "TerminateThread Failed");
+	}
 #else
-	if(pthread_cancel(_hThread))
-	{
-		data->err(THREADTERMINATEFAILED, "pthread_cancel Failed");
+	if (_hThread != 0) {
+		if(pthread_cancel(_hThread))
+		{
+			data->err(THREADTERMINATEFAILED, "pthread_cancel Failed");
+		}
 	}
 #endif
 	_running = false;
@@ -228,14 +232,17 @@ void* fbThread::threadStart(void* thread)
 	t->_running = false;
 	t->_stopping = false;
 	t->_paused = false;
-	pthread_detach(t->_hThread);
+	/* Zero _hThread before detach so forceStop cannot cancel a handle
+	 * that is already being detached. */
+	pthread_t self = t->_hThread;
 	t->_hThread = 0;
+	pthread_detach(self);
 	return NULL;
 }
 
 /**
-*	threadStart
-*	real thread function
+*	threadStartDelete
+*	real thread function (self-deleting variant)
 *	@param thread thread to run
 */
 void* fbThread::threadStartDelete(void* thread)
@@ -247,10 +254,14 @@ void* fbThread::threadStartDelete(void* thread)
 	t->_running = false;
 	t->_stopping = false;
 	t->_paused = false;
-	pthread_detach(t->_hThread);
+	/* Zero _hThread before delete so ~fbThread/forceStop cannot cancel
+	 * an already-exiting thread handle, then detach after the object is
+	 * gone so resource release happens on thread exit. */
+	pthread_t self = t->_hThread;
 	t->_hThread = 0;
 	t->data->debug(NONE, "fbThread.run delete myself");
 	delete t;
+	pthread_detach(self);
 	return NULL;
 }
 #endif

@@ -33,8 +33,11 @@ public:
 	bool isConnected();  /// < are we connected
 
 	bool exe(string& cmd);  /// < new command method
+	bool exeStmt(sqlite3_stmt* stmt);  /// < step and finalize a pre-bound prepared statement
 	int query(string& cmd);  /// < runs a query, locks qCS()
 	void queryDone(); /// < unlock query
+
+	sqlite3* handle() { return db; }  /// < raw database handle for prepared statements
 
 
 	const int rows() { return _rows; };

@@ -56,8 +56,8 @@ public:
 	fbTime& operator--(const int s){--ticks; update(); return *this;};
 
 	void addSec(const int s = 1){*this += s;};
-	void addMin(const int m = 1){*this += (m*60);};
-	void addHour(const int h = 1){*this += (h*3600);};
+	long addMin(const int m = 1);   ///< add minutes; returns number of days carried over midnight
+	long addHour(const int h = 1);  ///< add hours;   returns number of days carried over midnight
 
 	//output
 	void hms(string& t);

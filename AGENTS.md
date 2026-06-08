@@ -1,6 +1,110 @@
 
 You are a senior software engineering assistant: precise, evidence-driven, direct, and safe.
 
+## Application Overview
+
+FlashBack is a file backup daemon for "flash drives" and other media (USB sticks, removable
+disks, and ordinary filesystem partitions). It is written in C++ and runs as a background
+service that exposes a small built-in HTTP server for its user interface. A user points a
+browser at the daemon, schedules backup jobs for file paths, browses the backup repository,
+and requests restores; a scheduler thread performs the work in the background.
+
+- **Language / build**: C++ built with GNU Make (`gmake` / GNU `make` — *not* BSD make).
+- **Supported platforms**: Linux (Ubuntu, Fedora), macOS, FreeBSD, MidnightBSD. A Windows
+  port was started but **never finished** — `_WIN32`/`WIN32` branches exist throughout
+  (service skeleton in `flashback.cpp`, Win32 threading in `fbThread.cpp`, socket stubs),
+  but it does not build or run as a complete service.
+- **Dependencies**: `sqlite3`, `libarchive`, `libbz2`, `zlib`. (On the BSDs libarchive ships
+  with the base system / ports; on Ubuntu install the `-dev` packages.)
+- **License**: 2-clause BSD. `urldecode.cpp` contains public-domain code from an O'Reilly book.
+
+## Architecture
+
+Startup and lifecycle:
+
+- `flashback.cpp` — process entry point. On Unix it `fork()`s into a daemon (detaches the
+  terminal, `setsid`, `chdir("/")`, `umask(027)`) and calls `core()`. The `_WIN32` branch is
+  an incomplete Windows service skeleton (`SvcMain`/`SvcInstall`).
+- `fbCore.cpp::core()` — constructs the central `fbData` object, starts the `fbScheduler`
+  thread and the `fbHttpServer` thread, then loops until `SIGTERM` flips `FlashBackRunning`,
+  at which point it shuts both down.
+
+Central state:
+
+- `fbData` (`fbData.{h,cpp}`) — façade/aggregate that owns the `fbErrorLogger`, the
+  `fbDatabase`, and the `fbConfig`, and exposes logging (`err`/`warn`/`msg`/`debug`),
+  config accessors, and the job APIs (`addBackupJob`, `addRestoreJob`, `queryRepo`, …).
+  A pointer to `fbData` is threaded through nearly every object.
+
+Threading:
+
+- `fbThread` (`fbThread.{h,cpp}`) — base class wrapping pthreads (with `_WIN32` branches).
+  `start()` runs a normal thread; `startDelete()` runs a detached, self-deleting thread
+  (used by per-request and per-job objects that `delete this` when `run()` returns).
+- `fbCriticalSection` / `fbLock` — mutex / RAII-style lock helpers.
+
+Web UI / HTTP server:
+
+- `fbHttpServer` (`fbHttpServer.{h,cpp}`) — listener thread. Loops accepting clients and
+  spawns a self-deleting `fbHttpResponse` thread per request.
+- `fbSocket` (`fbSocket.{h,cpp}`) + `sockets/tcp.c` — TCP socket setup/accept (BSD sockets,
+  with Winsock under `_WIN32`).
+- `fbClient` (`fbClient.{h,cpp}`) — wraps one client connection; parses the request line
+  (GET/POST/HEAD), extracts the path, and writes responses.
+- `fbHttpResponse` (`fbHttpResponse.{h,cpp}`) — the request handler. Serves static assets
+  from the configured web root (`sendfile`, with `realpath` + web-root prefix check and a
+  symlink refusal) and handles dynamic `?`-query endpoints: `/current` (list jobs),
+  `/schedule` (create backup job form + submit), `/restore` (list repo + submit restore),
+  `/settings`. Query strings are split on `&`, values pulled out with `strtok`/`strsep`,
+  URL-decoded via `sanitizestr`→`spc_decode_url`, and HTML-escaped (`htmlEscape`) before
+  being written back into responses.
+- `urldecode.{cpp,h}` — `spc_decode_url`, percent-decoding helper.
+- `www/` — static UI assets: `index.html`, `help.html`, CSS (`main.css`, `buttons.css`,
+  `forms.css`), and button/icon PNGs. The dynamic pages in `fbHttpResponse` reference these
+  styles and the `*32.png` toolbar icons.
+
+Backup / restore engine (libarchive):
+
+- `fbBackup` (`fbBackup.{h,cpp}`) — self-deleting thread. Creates a ustar + bzip2 archive,
+  recursively traverses the source path (`traverseDir`), and adds regular files and symlinks
+  (`addFile`), stripping the source prefix from stored names (`fixPath`).
+- `fbRestore` (`fbRestore.{h,cpp}`) — self-deleting thread. Opens a tar.bz2 archive and
+  extracts into the destination using `ARCHIVE_EXTRACT_SECURE_SYMLINKS |
+  ARCHIVE_EXTRACT_SECURE_NODOTDOT`.
+
+Scheduling and persistence:
+
+- `fbScheduler` (`fbScheduler.{h,cpp}`) — polling thread. Every 10s queries due backup jobs,
+  spawns `fbBackup`, records the result in the `repo` table, deletes the one-shot job, and
+  re-inserts it advanced by its repeat interval
+  (`MINS`/`HOUR`/`DAY`/`WEEK`/`MONTH`/`YEAR`). Then processes pending restore jobs. Backup
+  archive paths are currently hard-coded to `/var/flashback/` (`bk_path`).
+- `fbDatabase` (`fbDatabase.{h,cpp}`) — SQLite access layer over the `backup`, `restore`, and
+  `repo` tables. Writes use bound prepared statements; `deleteRow` validates the table name
+  against an allowlist.
+- `fbSQL` (`fbSQL.{h,cpp}`) — thin sqlite3 wrapper (`connect`/`query`/`exe`/`exeStmt`/
+  `handle`/results table).
+- `fbConfig` (`fbConfig.{h,cpp}`) — plaintext `key=value` config. Default file `/etc/flashback`
+  (`flashback.txt` on Windows). Keys: `WebServerAddr`, `WebServerPort`, `WebServerRootPath`,
+  `DBPath`. Defaults: `127.0.0.1:8080`, web root `/usr/local/share/flashback/www/`, db
+  `/var/flashback/flashback.db`.
+- `flashback.db` — seed SQLite database installed to `/var/flashback/`.
+- `fbDate` / `fbTime` (`*.{h,cpp}`) — Julian-day / tick date-time helpers used for scheduling.
+- `fbErrorLogger` (`fbErrorLogger.{h,cpp}`), `fbErrorCodes.h`, `fbErrorLevel.h` — logging
+  with severity levels and error codes. `fbRepeatType.h` — the `Repeat_type` enum.
+
+Build, install, and run:
+
+- `make` (alias `make release`) builds `bin/flashback`; `make debug` builds `bin/flashback_d`
+  with `-DDebug -g`; `make win32` is the (incomplete) Windows target. Link libs:
+  `-lsqlite3 -larchive -lbz2 -lz` (`-lws2_32` on Windows).
+- `make install` lays down the binary in `${PREFIX}/sbin`, `www/` + `README.md` in
+  `${PREFIX}/share/flashback`, and `flashback.db` in `/var/flashback`.
+- `flashback.sh` is an rc-style start script. `Jenkinsfile` defines CI.
+- **There is no automated test suite** in the repository today.
+
+Documentation lives in `doc/` (`Flashback.pod`, DB notes, library notes, todo).
+
 ## Priorities
 
 If rules conflict, lower-numbered priority wins:

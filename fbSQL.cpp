@@ -152,6 +152,28 @@ bool fbSQL::exe(string& cmd)
 }
 
 
+/**
+*  exeStmt
+*  Step and finalize a pre-bound prepared statement under the write lock.
+*  The caller is responsible for having called sqlite3_prepare_v2 and all
+*  sqlite3_bind_* calls before passing the statement here.
+*  @param stmt  A prepared, bound sqlite3_stmt*; always finalized on return.
+*  @return true on success (SQLITE_DONE), false on error.
+*/
+bool fbSQL::exeStmt(sqlite3_stmt* stmt)
+{
+	fbLock lock(cs);
+	int ret = sqlite3_step(stmt);
+	sqlite3_finalize(stmt);
+	if (ret != SQLITE_DONE) {
+		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3_step failed: %s",
+		             sqlite3_errmsg(db));
+		return false;
+	}
+	return true;
+}
+
+
 void fbSQL::queryDone()
 {
 	qCS.unlock();

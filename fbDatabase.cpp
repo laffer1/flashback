@@ -2,19 +2,6 @@
 
 #include "fbDatabase.h"
 
-static string sqlEscape(const string& s)
-{
-    string out;
-    out.reserve(s.size());
-    for (size_t i = 0; i < s.size(); i++) {
-        if (s[i] == '\'')
-            out += "''";
-        else
-            out += s[i];
-    }
-    return out;
-}
-
 /**
 *  fbDatabase
 *  main database access object
@@ -44,65 +31,100 @@ fbDatabase::~fbDatabase()
 
 bool fbDatabase::addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt, int rv)
 {
-	char buff[1024];
-	snprintf(buff, sizeof(buff)-1, "insert into backup (desc, date, time, repeatmode, repeatval, disk) values  (\'%s\',%ld,%ld,%d,%d,\'%s\');",
-		sqlEscape(desc).c_str(), date.getJulian(), time.getTicks(), rt, rv, sqlEscape(path).c_str());
-	string cmd = buff;
+	static const char sql[] =
+		"INSERT INTO backup (desc, date, time, repeatmode, repeatval, disk)"
+		" VALUES (?, ?, ?, ?, ?, ?);";
 
-	errlog->debug(NONE, cmd);
-	if(!db.exe(cmd))
-	{
-		errlog->warn(UNKNOWN, "Failed to add Backup Job..");
+	//backup (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);
+
+	sqlite3_stmt* stmt = NULL;
+	if (sqlite3_prepare_v2(db.handle(), sql, -1, &stmt, NULL) != SQLITE_OK) {
+		errlog->warn(UNKNOWN, "Failed to prepare addBackupJob: %s",
+		             sqlite3_errmsg(db.handle()));
 		return false;
 	}
 
-//backup (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, repeatmode INTEGER, repeatval INTEGER, disk TEXT);
+	sqlite3_bind_text(stmt, 1, desc.c_str(), -1, SQLITE_TRANSIENT);
+	sqlite3_bind_int64(stmt, 2, date.getJulian());
+	sqlite3_bind_int64(stmt, 3, time.getTicks());
+	sqlite3_bind_int(stmt,  4, static_cast<int>(rt));
+	sqlite3_bind_int(stmt,  5, rv);
+	sqlite3_bind_text(stmt, 6, path.c_str(), -1, SQLITE_TRANSIENT);
 
+	errlog->debug(NONE, "addBackupJob prepared statement executing");
+	if (!db.exeStmt(stmt)) {
+		errlog->warn(UNKNOWN, "Failed to add Backup Job..");
+		return false;
+	}
 	return true;
 }
 
 bool fbDatabase::addRestoreJob(string& tarfile, string& dest)
 {
-	char buff[4096];
-	snprintf(buff, sizeof(buff)-1, "insert into restore (tarfile, path) values (\'%s\', \'%s\');", sqlEscape(tarfile).c_str(), sqlEscape(dest).c_str());
-	string cmd = buff;
+	static const char sql[] =
+		"INSERT INTO restore (tarfile, path) VALUES (?, ?);";
 
-	errlog->debug(NONE, cmd);
-	if(!db.exe(cmd))
-	{
-		errlog->warn(UNKNOWN, "Failed to add Restore Job..");
+	//restore (ID INTEGER PRIMARY KEY, tarfile TEXT, path TEXT);
+
+	sqlite3_stmt* stmt = NULL;
+	if (sqlite3_prepare_v2(db.handle(), sql, -1, &stmt, NULL) != SQLITE_OK) {
+		errlog->warn(UNKNOWN, "Failed to prepare addRestoreJob: %s",
+		             sqlite3_errmsg(db.handle()));
 		return false;
 	}
 
-//restore (ID INTEGER PRIMARY KEY, tarfile TEXT, path TEXT);
+	sqlite3_bind_text(stmt, 1, tarfile.c_str(), -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 2, dest.c_str(),    -1, SQLITE_TRANSIENT);
+
+	errlog->debug(NONE, "addRestoreJob prepared statement executing");
+	if (!db.exeStmt(stmt)) {
+		errlog->warn(UNKNOWN, "Failed to add Restore Job..");
+		return false;
+	}
 	return true;
 }
 
 bool fbDatabase::addRepo(string& desc, fbDate& date, fbTime& time, string& path, string& tarfile)
 {
-	char buff[1024];
-	snprintf(buff, sizeof(buff)-1, "insert into repo (desc, date, time, path, tarfile) values (\'%s\', %ld, %ld, \'%s\', \'%s\');",
-		sqlEscape(desc).c_str(), date.getJulian(), time.getTicks(), sqlEscape(path).c_str(), sqlEscape(tarfile).c_str());
-	string cmd = buff;
+	static const char sql[] =
+		"INSERT INTO repo (desc, date, time, path, tarfile) VALUES (?, ?, ?, ?, ?);";
 
-	errlog->debug(NONE, cmd);
-	if(!db.exe(cmd))
-	{
+	//repo (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, path TEXT, tarfile TEXT);
+
+	sqlite3_stmt* stmt = NULL;
+	if (sqlite3_prepare_v2(db.handle(), sql, -1, &stmt, NULL) != SQLITE_OK) {
+		errlog->warn(UNKNOWN, "Failed to prepare addRepo: %s",
+		             sqlite3_errmsg(db.handle()));
+		return false;
+	}
+
+	sqlite3_bind_text(stmt, 1, desc.c_str(),    -1, SQLITE_TRANSIENT);
+	sqlite3_bind_int64(stmt, 2, date.getJulian());
+	sqlite3_bind_int64(stmt, 3, time.getTicks());
+	sqlite3_bind_text(stmt, 4, path.c_str(),    -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 5, tarfile.c_str(), -1, SQLITE_TRANSIENT);
+
+	errlog->debug(NONE, "addRepo prepared statement executing");
+	if (!db.exeStmt(stmt)) {
 		errlog->warn(UNKNOWN, "Failed to add Restore Job..");
 		return false;
 	}
-//repo (ID INTEGER PRIMARY KEY, desc TEXT, date INTEGER, time INTEGER, path TEXT, tarfile TEXT);
 	return true;
 }
 
 bool fbDatabase::queryBackups()
 {
-	char buff[1024];
+	char buff[256];
 	fbDate date;
 	fbTime time;
 
-	snprintf(buff, sizeof(buff)-1, "select * from backup where date <= %ld AND time <= %ld;",
-	   date.getJulian(), time.getTicks());
+	// BUG-11: the old predicate (date <= today AND time <= now) permanently
+	// skipped jobs from earlier dates whose time-of-day is later than now.
+	// Correct predicate: due if date is strictly before today, OR it is
+	// today and the scheduled time is at or before the current time.
+	snprintf(buff, sizeof(buff), "SELECT * FROM backup WHERE date < %ld"
+	         " OR (date = %ld AND time <= %ld);",
+	         date.getJulian(), date.getJulian(), time.getTicks());
 
 	string cmd = buff;
 	errlog->debug(NONE, cmd);
@@ -257,13 +279,35 @@ bool fbDatabase::getRepoRow(string& desc, fbDate& date, fbTime& time, string& pa
 
 bool fbDatabase::deleteRow(const char* table, int id)
 {
-	char buff[1024];
-	snprintf(buff, sizeof(buff)-1, "DELETE FROM %s WHERE ID = %d;", table, id);
-	string cmd = buff;
-	return db.exe(cmd);
+	// Validate table name against allowlist — table names cannot be bound
+	// parameters in SQLite, so we hard-code the permitted set here.
+	static const char* const allowed[] = { "backup", "restore", "repo", NULL };
+	bool valid = false;
+	for (int i = 0; allowed[i] != NULL; ++i) {
+		if (strcmp(table, allowed[i]) == 0) {
+			valid = true;
+			break;
+		}
+	}
+	if (!valid) {
+		errlog->warn(UNKNOWN, "deleteRow: rejected unknown table '%s'", table);
+		return false;
+	}
+
+	// Build SQL with the validated literal table name; bind id as a parameter.
+	char sql[64];
+	snprintf(sql, sizeof(sql), "DELETE FROM %s WHERE ID = ?;", table);
+
+	sqlite3_stmt* stmt = NULL;
+	if (sqlite3_prepare_v2(db.handle(), sql, -1, &stmt, NULL) != SQLITE_OK) {
+		errlog->warn(UNKNOWN, "Failed to prepare deleteRow: %s",
+		             sqlite3_errmsg(db.handle()));
+		return false;
+	}
+
+	sqlite3_bind_int(stmt, 1, id);
+	return db.exeStmt(stmt);
 }
-
-
 
 
 

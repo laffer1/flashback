@@ -82,15 +82,21 @@ void fbScheduler::run()
                     switch(repeat)
                     {
                         case MINS:
-                            time.addMin(repeatval);
-                            //need to check for day overflow!
+                        {
+                            long carry = time.addMin(repeatval);
+                            if (carry > 0)
+                                date.addDay((int)carry);
                             data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
                             break;
+                        }
                         case HOUR:
-                            time.addHour(repeatval);
-                            //need to check for day overflow
+                        {
+                            long carry = time.addHour(repeatval);
+                            if (carry > 0)
+                                date.addDay((int)carry);
                             data->db->addBackupJob(desc, date, time, path, repeat, repeatval);
                             break;
+                        }
                         case DAY:
                             date.addDay(repeatval);
                             data->db->addBackupJob(desc, date, time, path, repeat, repeatval);

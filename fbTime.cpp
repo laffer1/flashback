@@ -106,6 +106,40 @@ void fbTime::update()
 	min = (ticks - (hour * 3600) - sec) / 60;
 }
 
+/*
+ *  addMin
+ *  Adds the given number of minutes to the time.
+ *  If the result crosses midnight, ticks wraps within the day and the
+ *  number of whole days that overflowed is returned so the caller can
+ *  advance the date accordingly.
+ *  @param m  Minutes to add (default 1)
+ *  @return   Number of full days carried past midnight (0 if no overflow)
+ */
+long fbTime::addMin(const int m)
+{
+	ticks += (long)m * 60;
+	long days = ticks / 86400;
+	update();   // wraps ticks into [0, 86400)
+	return days;
+}
+
+/*
+ *  addHour
+ *  Adds the given number of hours to the time.
+ *  If the result crosses midnight, ticks wraps within the day and the
+ *  number of whole days that overflowed is returned so the caller can
+ *  advance the date accordingly.
+ *  @param h  Hours to add (default 1)
+ *  @return   Number of full days carried past midnight (0 if no overflow)
+ */
+long fbTime::addHour(const int h)
+{
+	ticks += (long)h * 3600;
+	long days = ticks / 86400;
+	update();   // wraps ticks into [0, 86400)
+	return days;
+}
+
 void fbTime::hms(string& t)
 {
 	t += (hour < 10 ? "0" : "");

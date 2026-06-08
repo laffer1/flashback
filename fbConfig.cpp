@@ -172,7 +172,7 @@ void fbConfig::setWebServerPort(const string& strPort)
 void fbConfig::setWebServerPort(int intPort)
 {
     dirty = true;
-    if (intPort>1024 && intPort<65536)
+    if (intPort>=1024 && intPort<65536)
         port = intPort;
     else
         errlog->warn(NONE, "Attempt to set port outside of valid range: %d", intPort);

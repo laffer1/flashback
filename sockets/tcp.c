@@ -260,7 +260,7 @@ void closetcp( socketdesc sd )
     cons[sd].sockfd = -1; 
 
     /* free the address memory storage */
-    (void) free(cons[ncons].address);
+    (void) free(cons[sd].address);
 }
 
 
