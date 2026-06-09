@@ -33,6 +33,7 @@
 #include "fbHttpServer.h"
 #include "fbHttpResponse.h"
 #include "fbSocket.h"
+#include "fbAuth.h"
 
 #define MIMECOUNT 12
 
@@ -149,7 +150,25 @@ void fbHttpResponse::run()
     }
 
     data->debug(NONE, "fbHttpResponse.run");
-    data->msg(NONE, "%s", path); // log webserver request
+    /* Log the request path WITHOUT its query string, so that parameters such
+     * as /settings?password=... never reach the log file. */
+    {
+        const char *q = strchr(path, '?');
+        if (q != NULL)
+        {
+            string logpath(path, (size_t)(q - path));
+            data->msg(NONE, "%s", logpath.c_str());
+        }
+        else
+            data->msg(NONE, "%s", path);
+    }
+
+    /* Enforce the configured authentication policy before doing any work. */
+    if (!authorized())
+    {
+        unauthorized();
+        goto CLEANUP;
+    }
 
     /* deal with / and /index it should access our default index.html */
     if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 )
@@ -442,11 +461,7 @@ void fbHttpResponse::run()
            }
            else if ( strcmp( path, "/settings" ) == 0 )
            {
-               dynamichead("FlashBack :: Settings");
-                client->write("<div id=\"container\">\n");
-               client->write("<h2>Settings</h2>\n");
-               client->write("</div>\n");
-               dynamicfoot();
+               settingspage(argv);
            }
            free(querystring_base);
         }
@@ -471,6 +486,180 @@ CLEANUP:
     delete client;
 
     shutdown();  // clean up
+}
+
+
+/**
+*	authorized
+*	Check the request against the configured authentication policy.
+*	@return true if the request may proceed (auth disabled, or valid Basic creds)
+*/
+bool fbHttpResponse::authorized()
+{
+    string mode, user, salt, hash;
+    int iters;
+
+    data->db->getAuthConfig(mode, user, salt, hash, iters);
+
+    if (mode != "basic")
+        return true;   // authentication disabled (the default)
+
+    const string& creds = client->getAuthorization();
+    if (creds.empty())
+        return false;
+
+    string u, p;
+    if (!fbAuthDecodeBasic(creds, u, p))
+        return false;
+    if (u != user)
+        return false;
+    if (hash.empty() || iters <= 0)
+        return false;
+
+    return fbAuthVerifyPassword(p, salt, hash, iters);
+}
+
+
+/**
+*	unauthorized
+*	Send a 401 challenge so the browser prompts for HTTP Basic credentials.
+*/
+void fbHttpResponse::unauthorized()
+{
+    data->debug(NONE, "fbHttpResponse.unauthorized");
+    status( "401", "Unauthorized" );
+    header( "Server", SERVERID );
+    headdate();
+    header( "WWW-Authenticate", "Basic realm=\"FlashBack\"" );
+    header( "Connection", "close" );
+    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    client->write("\r\n");
+    client->write("<html>\n<head>\n\t<title>401 Unauthorized</title>\n</head>\n");
+    client->write("<body>\n<h1>401 Unauthorized</h1>\n<p>Authentication is required to use FlashBack.</p>\n</body>\n</html>\n");
+}
+
+
+/**
+*	settingspage
+*	Render the /settings page and process authentication-settings submissions.
+*	The form uses GET; the request logger strips query strings so the password
+*	is not written to the log. Passwords are stored hashed, never in plaintext.
+*/
+void fbHttpResponse::settingspage( char **argv )
+{
+    string mode, username, password;
+    bool submitted = false;
+
+    /* Parse the query parameters (each argv entry is "name=value"; the first
+     * may carry a leading '?'). Values are URL-decoded via sanitizestr. */
+    for (int i = 0; argv[i] != NULL; i++)
+    {
+        const char *p = argv[i];
+        if (*p == '?') p++;
+        const char *eq = strchr(p, '=');
+        if (eq == NULL) continue;
+
+        string name(p, (size_t)(eq - p));
+        char *vbuf = strdup(eq + 1);
+        if (vbuf == NULL) continue;
+        sanitizestr(vbuf);
+        string value(vbuf);
+        free(vbuf);
+
+        if (name == "mode") { mode = value; submitted = true; }
+        else if (name == "username") username = value;
+        else if (name == "password") password = value;
+    }
+
+    /* Current settings: used to pre-fill the form and to allow re-saving Basic
+     * auth with a blank password (keeping the existing credential). */
+    string curMode, curUser, curSalt, curHash;
+    int curIter = 0;
+    data->db->getAuthConfig(curMode, curUser, curSalt, curHash, curIter);
+
+    string status_msg;
+
+    if (submitted)
+    {
+        if (mode == "none")
+        {
+            status_msg = data->db->setAuthConfig("none", "", "", "", 0)
+                       ? "Authentication disabled." : "Failed to save settings.";
+            curMode = "none"; curUser = ""; curSalt = ""; curHash = ""; curIter = 0;
+        }
+        else if (mode == "basic")
+        {
+            if (!password.empty())
+            {
+                if (username.empty())
+                    status_msg = "A username is required to enable Basic authentication.";
+                else
+                {
+                    string salt, hash;
+                    if (fbAuthHashPassword(password, FBAUTH_DEFAULT_ITERATIONS, salt, hash) &&
+                        data->db->setAuthConfig("basic", username, salt, hash, FBAUTH_DEFAULT_ITERATIONS))
+                    {
+                        status_msg = "Basic authentication enabled.";
+                        curMode = "basic"; curUser = username;
+                        curSalt = salt; curHash = hash; curIter = FBAUTH_DEFAULT_ITERATIONS;
+                    }
+                    else
+                        status_msg = "Failed to hash or save the password.";
+                }
+            }
+            else if (curMode == "basic" && !curHash.empty())
+            {
+                string keepUser = username.empty() ? curUser : username;
+                if (data->db->setAuthConfig("basic", keepUser, curSalt, curHash, curIter))
+                {
+                    status_msg = "Basic authentication settings updated.";
+                    curUser = keepUser;
+                }
+                else
+                    status_msg = "Failed to save settings.";
+            }
+            else
+                status_msg = "A password is required to enable Basic authentication.";
+        }
+        else
+            status_msg = "Unknown authentication mode.";
+    }
+
+    dynamichead("FlashBack :: Settings");
+    client->write("<div id=\"container\">\n");
+    client->write("<h2>Settings</h2>\n");
+
+    if (!status_msg.empty())
+    {
+        client->write("<p><strong>");
+        client->write(htmlEscape(status_msg.c_str()));
+        client->write("</strong></p>\n");
+    }
+
+    client->write("<h3>Authentication</h3>\n");
+    client->write("<form method=\"get\" action=\"/settings\">\n<fieldset>\n");
+    client->write("<p>Mode:\n<select name=\"mode\">\n");
+    client->write("<option value=\"none\"");
+    if (curMode != "basic") client->write(" selected=\"selected\"");
+    client->write(">None (no login; intended for localhost)</option>\n");
+    client->write("<option value=\"basic\"");
+    if (curMode == "basic") client->write(" selected=\"selected\"");
+    client->write(">HTTP Basic (username and password)</option>\n");
+    client->write("</select></p>\n");
+
+    client->write("<p>Username: <input type=\"text\" name=\"username\" value=\"");
+    client->write(htmlEscape(curUser.c_str()));
+    client->write("\" /></p>\n");
+
+    client->write("<p>Password: <input type=\"password\" name=\"password\" value=\"\" />\n");
+    client->write("<br /><small>Leave the password blank to keep the current one when Basic authentication is already enabled.</small></p>\n");
+
+    client->write("<p><input type=\"submit\" name=\"submit\" value=\"Save\" /></p>\n");
+    client->write("</fieldset>\n</form>\n");
+    client->write("<p><small>Credentials are submitted in the URL over plain HTTP, so run FlashBack only on a trusted or localhost network. Passwords are stored hashed with PBKDF2-HMAC-SHA256.</small></p>\n");
+
+    client->write("</div>\n");
+    dynamicfoot();
 }
 
 

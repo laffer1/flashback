@@ -66,6 +66,9 @@ protected:
     void sendfile( const char *filename );     /// send a file via webserver using path
     const char * matchmimetype( const char *filename ); /// Determine mime type
     void sanitizestr( char *str );                   /// clean up encoding of GET requestion
+    bool authorized();                                  /// true if the request satisfies the configured auth policy
+    void unauthorized();                              /// 401 Basic authentication challenge
+    void settingspage( char **argv );             /// render and process the /settings page
 };
 
 #endif

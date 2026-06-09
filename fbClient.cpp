@@ -23,6 +23,7 @@
  * SUCH DAMAGE.
  */
 
+#include <strings.h>
 #include "fbClient.h"
 
 /**
@@ -133,6 +134,33 @@ void fbClient::parseHeaders()
     }   
 
     // TODO: figure out HTTP version.  Not important for now.
+
+    /* Drain the remaining request headers (previously left unread, which could
+     * deadlock writes while the client was still sending). We only retain the
+     * Authorization header, used for HTTP Basic authentication. */
+    {
+        char hdr[MAX_REQUEST];
+        int guard = 0;
+        while (guard++ < 100 && fgets(hdr, MAX_REQUEST, clientfp) != NULL)
+        {
+            // a blank line (just CR/LF) terminates the header section
+            if (hdr[0] == '\r' || hdr[0] == '\n')
+                break;
+
+            if (strncasecmp(hdr, "authorization:", 14) == 0)
+            {
+                char *val = hdr + 14;
+                while (*val == ' ' || *val == '\t')
+                    val++;
+                size_t vl = strlen(val);
+                while (vl > 0 && (val[vl-1] == '\r' || val[vl-1] == '\n' ||
+                                  val[vl-1] == ' '  || val[vl-1] == '\t'))
+                    val[--vl] = '\0';
+                authorization = val;
+            }
+        }
+    }
+
     free(reqstr);
 }
 
@@ -186,6 +214,16 @@ char * fbClient::getPath()
     if (path == NULL)
         return NULL;
     return strdup(path->c_str());
+}
+
+
+/**
+*	getAuthorization
+*	the value of the Authorization request header, or "" if none was sent
+*/
+const string& fbClient::getAuthorization()
+{
+    return authorization;
 }
 
 

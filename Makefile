@@ -8,11 +8,11 @@ CC=cc
 CXX=c++
 CFLAGS= -pthread -Wall -pedantic -D_FILE_OFFSET_BITS=64 -D__BSD_VISIBLE=1
 BINNAME=bin/flashback
-LIBS=-lsqlite3 -larchive -lbz2 -lz
+LIBS=-lsqlite3 -larchive -lbz2 -lz -lcrypto
 OBJECTS=flashback.o fbCore.o fbThread.o fbCriticalSection.o fbLock.o fbErrorLogger.o \
 	fbClient.o fbDiskDetector.o fbScheduler.o tcp.o fbSQL.o fbDate.o fbHttpServer.o \
 	fbSocket.o fbTime.o fbDatabase.o fbData.o fbHttpResponse.o fbConfig.o \
-	fbBackup.o fbRestore.o urldecode.o
+	fbBackup.o fbRestore.o urldecode.o fbAuth.o
 
 PREFIX= /usr/local
 DESTDIR=

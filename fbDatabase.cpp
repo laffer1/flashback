@@ -13,12 +13,14 @@
 fbDatabase::fbDatabase(fbErrorLogger* log, string path):errlog(log), cs(), db(errlog), row(0)
 {
 	db.connect(path);
+	ensureAuthSchema();
 	errlog->debug(NONE, "fbDatabase.this");
 }
 
 fbDatabase::fbDatabase(fbErrorLogger* log, const char* path):errlog(log), cs(), db(errlog), row(0)
 {
 	db.connect(path);
+	ensureAuthSchema();
 	errlog->debug(NONE, "fbDatabase.this");
 }
 
@@ -276,6 +278,81 @@ bool fbDatabase::getRepoRow(string& desc, fbDate& date, fbTime& time, string& pa
 	return true;
 }
 
+
+void fbDatabase::ensureAuthSchema()
+{
+	// Single-row table (id is pinned to 1) holding the authentication policy
+	// and, when basic auth is enabled, the username and the PBKDF2 salt/hash.
+	// Created if absent so existing databases upgrade transparently.
+	string cmd =
+		"CREATE TABLE IF NOT EXISTS auth ("
+		"id INTEGER PRIMARY KEY CHECK (id = 1), "
+		"auth_mode TEXT NOT NULL DEFAULT 'none', "
+		"username TEXT, "
+		"salt TEXT, "
+		"pw_hash TEXT, "
+		"iterations INTEGER);";
+	if (!db.exe(cmd))
+		errlog->warn(UNKNOWN, "Failed to ensure auth table exists");
+}
+
+bool fbDatabase::getAuthConfig(string& mode, string& username, string& saltHex, string& hashHex, int& iterations)
+{
+	// Defaults: authentication disabled.
+	mode = "none";
+	username = "";
+	saltHex = "";
+	hashHex = "";
+	iterations = 0;
+
+	string cmd = "SELECT auth_mode, username, salt, pw_hash, iterations FROM auth WHERE id = 1;";
+	errlog->debug(NONE, cmd);
+	db.query(cmd);
+
+	if (db.rows() < 1 || db.cols() < 5)
+	{
+		db.queryDone();
+		return false;   // no row yet — caller uses the "none" defaults
+	}
+
+	int idx = 0;   // first (only) row
+	mode       = db.table[idx++];
+	username   = db.table[idx++];
+	saltHex    = db.table[idx++];
+	hashHex    = db.table[idx++];
+	iterations = atoi(db.table[idx++].c_str());
+	db.queryDone();
+
+	if (mode.empty())
+		mode = "none";
+	return true;
+}
+
+bool fbDatabase::setAuthConfig(const string& mode, const string& username, const string& saltHex, const string& hashHex, int iterations)
+{
+	static const char sql[] =
+		"INSERT OR REPLACE INTO auth (id, auth_mode, username, salt, pw_hash, iterations)"
+		" VALUES (1, ?, ?, ?, ?, ?);";
+
+	sqlite3_stmt* stmt = NULL;
+	if (sqlite3_prepare_v2(db.handle(), sql, -1, &stmt, NULL) != SQLITE_OK) {
+		errlog->warn(UNKNOWN, "Failed to prepare setAuthConfig: %s",
+		             sqlite3_errmsg(db.handle()));
+		return false;
+	}
+
+	sqlite3_bind_text(stmt, 1, mode.c_str(),     -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 2, username.c_str(), -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 3, saltHex.c_str(),  -1, SQLITE_TRANSIENT);
+	sqlite3_bind_text(stmt, 4, hashHex.c_str(),  -1, SQLITE_TRANSIENT);
+	sqlite3_bind_int(stmt,  5, iterations);
+
+	if (!db.exeStmt(stmt)) {
+		errlog->warn(UNKNOWN, "Failed to save authentication settings");
+		return false;
+	}
+	return true;
+}
 
 bool fbDatabase::deleteRow(const char* table, int id)
 {

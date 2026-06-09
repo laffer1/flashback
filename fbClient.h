@@ -77,6 +77,7 @@ public:
 
     char * getPath();                             /// get the client path (like what's after the server address)
     char * getHost();                             /// hostname it sent
+    const string& getAuthorization();      /// value of the Authorization header ("" if none)
     void write( string val );                    /// write a string to the client
     void write( int c );                            /// write a character to the client
     void write( const char* str, ... );		    /// write string to client, using vfprintf..
@@ -91,6 +92,7 @@ protected:
     enum HTTP_PROTOCOL httpproto;  /// ssl or "regular"
     string *host;                                  /// the server host of the request (if we did named hosting)
     string *path;                                  /// the URL (NOT URI)
+    string authorization;                       /// the Authorization header value, if the client sent one
 };
 
 #endif

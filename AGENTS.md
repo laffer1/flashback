@@ -14,8 +14,9 @@ and requests restores; a scheduler thread performs the work in the background.
   port was started but **never finished** — `_WIN32`/`WIN32` branches exist throughout
   (service skeleton in `flashback.cpp`, Win32 threading in `fbThread.cpp`, socket stubs),
   but it does not build or run as a complete service.
-- **Dependencies**: `sqlite3`, `libarchive`, `libbz2`, `zlib`. (On the BSDs libarchive ships
-  with the base system / ports; on Ubuntu install the `-dev` packages.)
+- **Dependencies**: `sqlite3`, `libarchive`, `libbz2`, `zlib`, and OpenSSL `libcrypto`
+  (password hashing). (On the BSDs libarchive ships with the base system / ports; on Ubuntu
+  install the `-dev` packages.)
 - **License**: 2-clause BSD. `urldecode.cpp` contains public-domain code from an O'Reilly book.
 
 ## Architecture
@@ -59,6 +60,12 @@ Web UI / HTTP server:
   URL-decoded via `sanitizestr`→`spc_decode_url`, and HTML-escaped (`htmlEscape`) before
   being written back into responses.
 - `urldecode.{cpp,h}` — `spc_decode_url`, percent-decoding helper.
+- `fbAuth.{cpp,h}` — authentication helpers (OpenSSL): PBKDF2-HMAC-SHA256 password
+  hashing/verification (random salt, constant-time compare) and HTTP Basic credential
+  decoding. Authentication is configurable from `/settings`: `none` (default, no login;
+  intended for localhost) or `basic` (username + password). Credentials are stored hashed
+  in the SQLite `auth` table; `fbClient` parses the `Authorization` header and
+  `fbHttpResponse::authorized()` enforces the policy, returning a 401 challenge when needed.
 - `www/` — static UI assets: `index.html`, `help.html`, CSS (`main.css`, `buttons.css`,
   `forms.css`), and button/icon PNGs. The dynamic pages in `fbHttpResponse` reference these
   styles and the `*32.png` toolbar icons.
