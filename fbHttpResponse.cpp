@@ -178,8 +178,14 @@ void fbHttpResponse::run()
     }
 
     data->debug(NONE, "Test for querystring");
+    // Settings changes must use POST (not GET) so credentials never land in the
+    // URL/logs and to enable CSRF defenses; handled separately from the GET forms.
+    if ( client->getType() == POST && strcmp( path, "/settings" ) == 0 )
+    {
+        handleSettingsPost();
+    }
     // Is this a built in command.. ? for forms
-    if ( ( loc = strstr( path, "?" ) ) != NULL )
+    else if ( ( loc = strstr( path, "?" ) ) != NULL )
     {
         pathlen = strlen(path);
         querystring = (char *) malloc(pathlen + 1); // it's actually smaller than that.
@@ -545,85 +551,186 @@ void fbHttpResponse::unauthorized()
 *	The form uses GET; the request logger strips query strings so the password
 *	is not written to the log. Passwords are stored hashed, never in plaintext.
 */
-void fbHttpResponse::settingspage( char **argv )
+/* Extract the host[:port] portion of a URL (strip scheme and any path). */
+static string urlHost(const string& url)
 {
-    string mode, username, password;
-    bool submitted = false;
+    size_t p = 0;
+    size_t s = url.find("://");
+    if (s != string::npos) p = s + 3;
+    size_t slash = url.find('/', p);
+    return (slash == string::npos) ? url.substr(p) : url.substr(p, slash - p);
+}
 
-    /* Parse the query parameters (each argv entry is "name=value"; the first
-     * may carry a leading '?'). Values are URL-decoded via sanitizestr. */
-    for (int i = 0; argv[i] != NULL; i++)
+/* Is the given Host header value a loopback host? */
+static bool isLoopbackHost(const string& host)
+{
+    string h = host;
+    if (!h.empty() && h[0] == '[') {            // [::1]:port
+        size_t end = h.find(']');
+        if (end != string::npos) h = h.substr(1, end - 1);
+    } else {
+        size_t c = h.find(':');                  // host:port
+        if (c != string::npos) h = h.substr(0, c);
+    }
+    return h == "127.0.0.1" || h == "::1" || h == "localhost" ||
+           (h.size() >= 4 && h.compare(0, 4, "127.") == 0);
+}
+
+
+/**
+*	sameOrigin
+*	CSRF defense: when the browser supplies an Origin or Referer header it must
+*	match the Host the request was sent to. A request with neither header (e.g.
+*	a non-browser client, which is not a CSRF vector) is allowed.
+*/
+bool fbHttpResponse::sameOrigin()
+{
+    const string& host = client->getHostHeader();
+    const string& origin = client->getOrigin();
+    const string& referer = client->getReferer();
+
+    if (!origin.empty())
+        return !host.empty() && urlHost(origin) == host;
+    if (!referer.empty())
+        return !host.empty() && urlHost(referer) == host;
+    return true;   // no Origin/Referer: not a browser CSRF vector
+}
+
+
+/**
+*	parseForm
+*	Parse an application/x-www-form-urlencoded body into the fields we use.
+*/
+void fbHttpResponse::parseForm( const string& bodydata, string& mode, string& username,
+                                string& password, string& current )
+{
+    size_t start = 0;
+    while (start < bodydata.size())
     {
-        const char *p = argv[i];
-        if (*p == '?') p++;
-        const char *eq = strchr(p, '=');
-        if (eq == NULL) continue;
+        size_t amp = bodydata.find('&', start);
+        string pair = (amp == string::npos) ? bodydata.substr(start)
+                                            : bodydata.substr(start, amp - start);
+        start = (amp == string::npos) ? bodydata.size() : amp + 1;
 
-        string name(p, (size_t)(eq - p));
-        char *vbuf = strdup(eq + 1);
-        if (vbuf == NULL) continue;
-        sanitizestr(vbuf);
+        size_t eq = pair.find('=');
+        if (eq == string::npos)
+            continue;
+
+        string name = pair.substr(0, eq);
+        char *vbuf = strdup(pair.substr(eq + 1).c_str());
+        if (vbuf == NULL)
+            continue;
+        sanitizestr(vbuf);          // '+' -> space and %xx decoding
         string value(vbuf);
         free(vbuf);
 
-        if (name == "mode") { mode = value; submitted = true; }
+        if (name == "mode") mode = value;
         else if (name == "username") username = value;
         else if (name == "password") password = value;
+        else if (name == "current") current = value;
+    }
+}
+
+
+/**
+*	settingspage
+*	GET handler: render the read-only settings form. State changes happen only
+*	through POST (handleSettingsPost) so credentials never appear in the URL.
+*/
+void fbHttpResponse::settingspage( char **argv )
+{
+    (void)argv;   // GET no longer carries credentials
+    renderSettingsForm("");
+}
+
+
+/**
+*	handleSettingsPost
+*	POST handler: apply authentication-settings changes with CSRF protection.
+*/
+void fbHttpResponse::handleSettingsPost()
+{
+    // CSRF: the Origin/Referer (when present) must match the Host header.
+    if (!sameOrigin())
+    {
+        forbidden("Request origin could not be verified.");
+        return;
     }
 
-    /* Current settings: used to pre-fill the form and to allow re-saving Basic
-     * auth with a blank password (keeping the existing credential). */
+    string mode, username, password, current;
+    parseForm(client->getBody(), mode, username, password, current);
+
     string curMode, curUser, curSalt, curHash;
     int curIter = 0;
     data->db->getAuthConfig(curMode, curUser, curSalt, curHash, curIter);
 
+    // Authorization to change settings:
+    //  - If Basic auth is already enabled, require the current password.
+    //  - If auth is disabled (bootstrap), only allow changes from a loopback
+    //    host, so an exposed instance cannot be hijacked before a password is set.
+    if (curMode == "basic" && !curHash.empty())
+    {
+        if (current.empty() || !fbAuthVerifyPassword(current, curSalt, curHash, curIter))
+        {
+            renderSettingsForm("The current password is required and must be correct to change settings.");
+            return;
+        }
+    }
+    else if (!isLoopbackHost(client->getHostHeader()))
+    {
+        renderSettingsForm("For safety, authentication can only be configured from the local machine. Access FlashBack via http://127.0.0.1 to set a username and password.");
+        return;
+    }
+
     string status_msg;
 
-    if (submitted)
+    if (mode == "none")
     {
-        if (mode == "none")
+        status_msg = data->db->setAuthConfig("none", "", "", "", 0)
+                   ? "Authentication disabled." : "Failed to save settings.";
+    }
+    else if (mode == "basic")
+    {
+        if (!password.empty())
         {
-            status_msg = data->db->setAuthConfig("none", "", "", "", 0)
-                       ? "Authentication disabled." : "Failed to save settings.";
-            curMode = "none"; curUser = ""; curSalt = ""; curHash = ""; curIter = 0;
-        }
-        else if (mode == "basic")
-        {
-            if (!password.empty())
-            {
-                if (username.empty())
-                    status_msg = "A username is required to enable Basic authentication.";
-                else
-                {
-                    string salt, hash;
-                    if (fbAuthHashPassword(password, FBAUTH_DEFAULT_ITERATIONS, salt, hash) &&
-                        data->db->setAuthConfig("basic", username, salt, hash, FBAUTH_DEFAULT_ITERATIONS))
-                    {
-                        status_msg = "Basic authentication enabled.";
-                        curMode = "basic"; curUser = username;
-                        curSalt = salt; curHash = hash; curIter = FBAUTH_DEFAULT_ITERATIONS;
-                    }
-                    else
-                        status_msg = "Failed to hash or save the password.";
-                }
-            }
-            else if (curMode == "basic" && !curHash.empty())
-            {
-                string keepUser = username.empty() ? curUser : username;
-                if (data->db->setAuthConfig("basic", keepUser, curSalt, curHash, curIter))
-                {
-                    status_msg = "Basic authentication settings updated.";
-                    curUser = keepUser;
-                }
-                else
-                    status_msg = "Failed to save settings.";
-            }
+            if (username.empty())
+                status_msg = "A username is required to enable Basic authentication.";
             else
-                status_msg = "A password is required to enable Basic authentication.";
+            {
+                string salt, hash;
+                if (fbAuthHashPassword(password, FBAUTH_DEFAULT_ITERATIONS, salt, hash) &&
+                    data->db->setAuthConfig("basic", username, salt, hash, FBAUTH_DEFAULT_ITERATIONS))
+                    status_msg = "Basic authentication enabled.";
+                else
+                    status_msg = "Failed to hash or save the password.";
+            }
+        }
+        else if (curMode == "basic" && !curHash.empty())
+        {
+            string keepUser = username.empty() ? curUser : username;
+            status_msg = data->db->setAuthConfig("basic", keepUser, curSalt, curHash, curIter)
+                       ? "Basic authentication settings updated." : "Failed to save settings.";
         }
         else
-            status_msg = "Unknown authentication mode.";
+            status_msg = "A password is required to enable Basic authentication.";
     }
+    else
+        status_msg = "Unknown authentication mode.";
+
+    renderSettingsForm(status_msg);
+}
+
+
+/**
+*	renderSettingsForm
+*	Emit the settings page with the (POST) authentication form, pre-filled from
+*	the current configuration. status_msg, if non-empty, is shown (escaped).
+*/
+void fbHttpResponse::renderSettingsForm( const string& status_msg )
+{
+    string curMode, curUser, curSalt, curHash;
+    int curIter = 0;
+    data->db->getAuthConfig(curMode, curUser, curSalt, curHash, curIter);
 
     dynamichead("FlashBack :: Settings");
     client->write("<div id=\"container\">\n");
@@ -637,7 +744,7 @@ void fbHttpResponse::settingspage( char **argv )
     }
 
     client->write("<h3>Authentication</h3>\n");
-    client->write("<form method=\"get\" action=\"/settings\">\n<fieldset>\n");
+    client->write("<form method=\"post\" action=\"/settings\">\n<fieldset>\n");
     client->write("<p>Mode:\n<select name=\"mode\">\n");
     client->write("<option value=\"none\"");
     if (curMode != "basic") client->write(" selected=\"selected\"");
@@ -651,15 +758,37 @@ void fbHttpResponse::settingspage( char **argv )
     client->write(htmlEscape(curUser.c_str()));
     client->write("\" /></p>\n");
 
-    client->write("<p>Password: <input type=\"password\" name=\"password\" value=\"\" />\n");
-    client->write("<br /><small>Leave the password blank to keep the current one when Basic authentication is already enabled.</small></p>\n");
+    client->write("<p>New password: <input type=\"password\" name=\"password\" value=\"\" />\n");
+    client->write("<br /><small>Leave blank to keep the current password when Basic authentication is already enabled.</small></p>\n");
+
+    if (curMode == "basic")
+        client->write("<p>Current password (required to change settings): <input type=\"password\" name=\"current\" value=\"\" /></p>\n");
 
     client->write("<p><input type=\"submit\" name=\"submit\" value=\"Save\" /></p>\n");
     client->write("</fieldset>\n</form>\n");
-    client->write("<p><small>Credentials are submitted in the URL over plain HTTP, so run FlashBack only on a trusted or localhost network. Passwords are stored hashed with PBKDF2-HMAC-SHA256.</small></p>\n");
+    client->write("<p><small>Credentials are sent over plain HTTP, so run FlashBack only on a trusted or localhost network. Passwords are stored hashed with PBKDF2-HMAC-SHA256.</small></p>\n");
 
     client->write("</div>\n");
     dynamicfoot();
+}
+
+
+/**
+*	forbidden
+*	403 response, used when the CSRF / same-origin check fails.
+*/
+void fbHttpResponse::forbidden( const char *reason )
+{
+    data->debug(NONE, "fbHttpResponse.forbidden");
+    status( "403", "Forbidden" );
+    header( "Server", SERVERID );
+    headdate();
+    header( "Connection", "close" );
+    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    client->write("\r\n");
+    client->write("<html>\n<head>\n\t<title>403 Forbidden</title>\n</head>\n<body>\n<h1>403 Forbidden</h1>\n<p>");
+    client->write(htmlEscape(reason == NULL ? "Forbidden" : reason));
+    client->write("</p>\n</body>\n</html>\n");
 }
 
 
@@ -729,6 +858,8 @@ void fbHttpResponse::dynamichead( const char * title )
     header( "Connection", "close");
     header( "Content-Type", "text/html" );
     header( "Content-Language", "en-US" );
+    header( "Cache-Control", "no-store" );      // dynamic pages may contain sensitive data
+    header( "Referrer-Policy", "no-referrer" ); // don't leak URLs via the Referer header
     client->write("\r\n"); // end header section
 
     client->write("<!DOCTYPE html>\n");

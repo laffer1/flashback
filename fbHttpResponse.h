@@ -68,7 +68,13 @@ protected:
     void sanitizestr( char *str );                   /// clean up encoding of GET requestion
     bool authorized();                                  /// true if the request satisfies the configured auth policy
     void unauthorized();                              /// 401 Basic authentication challenge
-    void settingspage( char **argv );             /// render and process the /settings page
+    void forbidden( const char *reason );      /// 403 Forbidden response
+    void settingspage( char **argv );             /// GET: render the read-only /settings form
+    void renderSettingsForm( const string& status_msg ); /// emit the /settings page and form
+    void handleSettingsPost();                     /// POST: validate (CSRF) and apply auth settings
+    bool sameOrigin();                                 /// CSRF: Origin/Referer host matches the Host header
+    void parseForm( const string& body, string& mode, string& username,
+                    string& password, string& current ); /// parse urlencoded POST body
 };
 
 #endif

@@ -66,6 +66,9 @@ Web UI / HTTP server:
   intended for localhost) or `basic` (username + password). Credentials are stored hashed
   in the SQLite `auth` table; `fbClient` parses the `Authorization` header and
   `fbHttpResponse::authorized()` enforces the policy, returning a 401 challenge when needed.
+  Settings changes use POST with Origin/Referer (CSRF) checks; changing an existing
+  credential requires the current password, and first-time setup (mode `none`) is
+  restricted to loopback. Query strings are stripped from request logs.
 - `www/` — static UI assets: `index.html`, `help.html`, CSS (`main.css`, `buttons.css`,
   `forms.css`), and button/icon PNGs. The dynamic pages in `fbHttpResponse` reference these
   styles and the `*32.png` toolbar icons.

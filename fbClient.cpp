@@ -89,6 +89,8 @@ void fbClient::parseHeaders()
     char *tmp2 = NULL;  // a copy of the request to work on
 
     reqstr = (char *)calloc( MAX_REQUEST,  sizeof(char));
+    httptype = NOTSUPPORTED;
+    contentLength = 0;
 
     tmp2 = reqstr;
 
@@ -136,29 +138,50 @@ void fbClient::parseHeaders()
     // TODO: figure out HTTP version.  Not important for now.
 
     /* Drain the remaining request headers (previously left unread, which could
-     * deadlock writes while the client was still sending). We only retain the
-     * Authorization header, used for HTTP Basic authentication. */
+     * deadlock writes while the client was still sending). We retain the headers
+     * needed for authentication (Authorization) and CSRF defense (Host, Origin,
+     * Referer) plus Content-Length so a POST body can be read. */
     {
         char hdr[MAX_REQUEST];
         int guard = 0;
-        while (guard++ < 100 && fgets(hdr, MAX_REQUEST, clientfp) != NULL)
+        while (guard++ < 200 && fgets(hdr, MAX_REQUEST, clientfp) != NULL)
         {
             // a blank line (just CR/LF) terminates the header section
             if (hdr[0] == '\r' || hdr[0] == '\n')
                 break;
 
-            if (strncasecmp(hdr, "authorization:", 14) == 0)
-            {
-                char *val = hdr + 14;
-                while (*val == ' ' || *val == '\t')
-                    val++;
-                size_t vl = strlen(val);
-                while (vl > 0 && (val[vl-1] == '\r' || val[vl-1] == '\n' ||
-                                  val[vl-1] == ' '  || val[vl-1] == '\t'))
-                    val[--vl] = '\0';
+            char *colon = strchr(hdr, ':');
+            if (colon == NULL)
+                continue;
+            size_t namelen = (size_t)(colon - hdr);
+
+            char *val = colon + 1;
+            while (*val == ' ' || *val == '\t')
+                val++;
+            size_t vl = strlen(val);
+            while (vl > 0 && (val[vl-1] == '\r' || val[vl-1] == '\n' ||
+                              val[vl-1] == ' '  || val[vl-1] == '\t'))
+                val[--vl] = '\0';
+
+            if (namelen == 13 && strncasecmp(hdr, "authorization", 13) == 0)
                 authorization = val;
-            }
+            else if (namelen == 4 && strncasecmp(hdr, "host", 4) == 0)
+                hostHeader = val;
+            else if (namelen == 6 && strncasecmp(hdr, "origin", 6) == 0)
+                origin = val;
+            else if (namelen == 7 && strncasecmp(hdr, "referer", 7) == 0)
+                referer = val;
+            else if (namelen == 14 && strncasecmp(hdr, "content-length", 14) == 0)
+                contentLength = atol(val);
         }
+    }
+
+    /* Read the request body for POST submissions (bounded to avoid abuse). */
+    if (httptype == POST && contentLength > 0 && contentLength <= 65536)
+    {
+        vector<char> buf((size_t)contentLength);
+        size_t got = fread(buf.data(), 1, (size_t)contentLength, clientfp);
+        body.assign(buf.data(), got);
     }
 
     free(reqstr);
@@ -225,6 +248,16 @@ const string& fbClient::getAuthorization()
 {
     return authorization;
 }
+
+
+/**
+*	header / body / method accessors
+*/
+const string& fbClient::getHostHeader() { return hostHeader; }
+const string& fbClient::getOrigin()     { return origin; }
+const string& fbClient::getReferer()    { return referer; }
+const string& fbClient::getBody()       { return body; }
+enum HTTP_TYPE fbClient::getType()      { return httptype; }
 
 
 /**

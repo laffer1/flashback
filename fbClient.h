@@ -78,6 +78,11 @@ public:
     char * getPath();                             /// get the client path (like what's after the server address)
     char * getHost();                             /// hostname it sent
     const string& getAuthorization();      /// value of the Authorization header ("" if none)
+    const string& getHostHeader();        /// value of the Host header ("" if none)
+    const string& getOrigin();                /// value of the Origin header ("" if none)
+    const string& getReferer();               /// value of the Referer header ("" if none)
+    const string& getBody();                  /// request body (POST submissions), "" if none
+    enum HTTP_TYPE getType();           /// request method (GET/POST/HEAD/NOTSUPPORTED)
     void write( string val );                    /// write a string to the client
     void write( int c );                            /// write a character to the client
     void write( const char* str, ... );		    /// write string to client, using vfprintf..
@@ -93,6 +98,11 @@ protected:
     string *host;                                  /// the server host of the request (if we did named hosting)
     string *path;                                  /// the URL (NOT URI)
     string authorization;                       /// the Authorization header value, if the client sent one
+    string hostHeader;                         /// the Host header value, for same-origin checks
+    string origin;                                 /// the Origin header value, for CSRF defense
+    string referer;                               /// the Referer header value, for CSRF defense
+    string body;                                  /// the request body (POST form submissions)
+    long contentLength;                       /// Content-Length of the body; 0 if absent
 };
 
 #endif
