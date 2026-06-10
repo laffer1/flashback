@@ -83,6 +83,7 @@ public:
     const string& getReferer();               /// value of the Referer header ("" if none)
     const string& getBody();                  /// request body (POST submissions), "" if none
     enum HTTP_TYPE getType();           /// request method (GET/POST/HEAD/NOTSUPPORTED)
+    bool isLocalPeer();                          /// true if the transport peer is a loopback address
     void write( string val );                    /// write a string to the client
     void write( int c );                            /// write a character to the client
     void write( const char* str, ... );		    /// write string to client, using vfprintf..

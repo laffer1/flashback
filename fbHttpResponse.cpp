@@ -561,22 +561,6 @@ static string urlHost(const string& url)
     return (slash == string::npos) ? url.substr(p) : url.substr(p, slash - p);
 }
 
-/* Is the given Host header value a loopback host? */
-static bool isLoopbackHost(const string& host)
-{
-    string h = host;
-    if (!h.empty() && h[0] == '[') {            // [::1]:port
-        size_t end = h.find(']');
-        if (end != string::npos) h = h.substr(1, end - 1);
-    } else {
-        size_t c = h.find(':');                  // host:port
-        if (c != string::npos) h = h.substr(0, c);
-    }
-    return h == "127.0.0.1" || h == "::1" || h == "localhost" ||
-           (h.size() >= 4 && h.compare(0, 4, "127.") == 0);
-}
-
-
 /**
 *	sameOrigin
 *	CSRF defense: when the browser supplies an Origin or Referer header it must
@@ -676,9 +660,9 @@ void fbHttpResponse::handleSettingsPost()
             return;
         }
     }
-    else if (!isLoopbackHost(client->getHostHeader()))
+    else if (!client->isLocalPeer())
     {
-        renderSettingsForm("For safety, authentication can only be configured from the local machine. Access FlashBack via http://127.0.0.1 to set a username and password.");
+        renderSettingsForm("For safety, authentication can only be configured from the local machine. Connect from 127.0.0.1 (loopback) to set a username and password.");
         return;
     }
 
