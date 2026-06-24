@@ -24,7 +24,7 @@ fbDate::fbDate(fbDate& date): julian(0), year(0), mon(0), day(0)
 }
 fbDate::fbDate(tm& time): julian(0), year(0), mon(0), day(0)
 {
-	setJulian(time.tm_mday, time.tm_mon, time.tm_year);
+	setJulian(time.tm_mon, time.tm_mday, time.tm_year);
 }
 
 fbDate::fbDate(const int _month, const int _day, const int _year): julian(0), year(0), mon(0), day(0)

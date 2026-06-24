@@ -185,6 +185,7 @@ int fbSQL::query(string& cmd)
 	{	//error, report warning
 		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3 error code: %s", errmsg);
 		sqlite3_free(errmsg);
+		qCS.unlock();
 		return ret;
 	}
 

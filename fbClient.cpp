@@ -37,7 +37,7 @@
 *	Default client  constructor
 *	@note Initilize all member vars
 */
-fbClient::fbClient(fbData* _data, int sock ):data(_data)
+fbClient::fbClient(fbData* _data, int sock ):data(_data), clientfp(NULL), host(NULL), path(NULL)
 {
     data->debug(NONE, "fbClient.this");
     if ( sock == ETCPACCEPTFAIL )
@@ -87,6 +87,11 @@ void fbClient::parseHeaders()
     char *tmp = NULL;    // a working variable to "hack" out the space seperated string
     char *tmp2 = NULL;  // a copy of the request to work on
 
+    if (clientfp == NULL) {
+        httptype = NOTSUPPORTED;
+        return;
+    }
+
     reqstr = (char *)calloc( MAX_REQUEST,  sizeof(char));
 
     tmp2 = reqstr;
@@ -95,6 +100,7 @@ void fbClient::parseHeaders()
     char * firstLinePtr = fgets( reqstr, MAX_REQUEST, clientfp );
     if (firstLinePtr == NULL) {
 	httptype = NOTSUPPORTED;
+	free(reqstr);
 	return;
     }
 
