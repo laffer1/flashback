@@ -107,16 +107,6 @@ void fbBackup::run()
 
 
     data->msg(NONE, "Backup complete: %s -> %s", backuppath.c_str(), tarfile.c_str());
-
-    /* fallback code */
-    /*
-	string cmd = "tar -cf ";
-	cmd += to;
-	cmd += " ";
-	cmd += to;
-
-	system(cmd.c_str());
-	*/
 }
 
 /* traverse a directory tree, and back up regular files and symlinks */
@@ -193,8 +183,8 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
 {
     data->debug(NONE, "addFile(\"%s\", struct stat *st)", pathname.c_str());
     struct archive_entry *entry = NULL;
-    int fd = 0;
-    int buff[1024 * 64];
+    int fd = -1;
+    char buff[1024 * 64];
     ssize_t len = 0;
     int resp;
     char *ent_path = strdup(pathname.c_str());
@@ -263,11 +253,13 @@ void fbBackup::addFile(const string& pathname, struct stat *st)
         data->debug(NONE, "Problem writing header for %s", pathname.c_str());
         archive_entry_free(entry);
         free(ent_path);
+        if (fd >= 0)
+            close(fd);
         return;
     }
 
     /* copy data to the archive for the file that was previously opened */
-    if (archive_entry_size(entry) > 0) {
+    if (fd >= 0 && archive_entry_size(entry) > 0) {
         len = read(fd, buff, sizeof(buff));
 
         while (len > 0) {
@@ -295,14 +287,14 @@ void fbBackup::fixPath(struct archive_entry *entry)
 
     /* trim off parts of name that correspond to original directory
      * tree. so, if we archive '/var/log', then '/var/log/messages'
-     * will be archived as just 'messages' */
-	while (name[0] == root[0])
-	{
-	    ++name;
-	    ++root;
-	}
+     * will be archived as just 'messages'.
+     * Strip exactly strlen(backuppath) bytes after verifying the prefix
+     * so that a name like '/var/logbackup' does not match '/var/log'. */
+	size_t rootlen = strlen(root);
+	if (strncmp(name, root, rootlen) == 0)
+	    name += rootlen;
 
-    /* strip leading slashes */
+    /* strip leading separators */
 	while (name[0] == PATH_NAME_SEPARATOR)
         ++name;
 

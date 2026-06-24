@@ -3,7 +3,7 @@
 #include "global.h"  /// < Holds Common Global Header Files
 void core();	     /// < flashback core running function 
 
-#ifdef Win32
+#ifdef _WIN32
 
 #define SVCNAME TEXT("FlashBack")
 
@@ -26,7 +26,7 @@ void __cdecl _tmain(int argc, TCHAR *argv[])
     // If command-line parameter is "install", install the service. 
     // Otherwise, the service is probably being started by the SCM.
 
-    if( lstrcmpi( argv[1], TEXT("install")) == 0 )
+    if( argc > 1 && lstrcmpi( argv[1], TEXT("install")) == 0 )
     {
         SvcInstall();
         return;
@@ -139,7 +139,7 @@ int main(int argc, char** args)
 			if (chdir("/") == -1) { // change wrkdir to root
 				return 1;
 			}
-			umask(0); // clear file mode creation mask
+			umask(027); // restrict file creation: owner rw, group r, others none
 
 			//Call Flashback Start
 			core();

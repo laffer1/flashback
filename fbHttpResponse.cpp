@@ -33,10 +33,27 @@
 #include "fbHttpServer.h"
 #include "fbHttpResponse.h"
 #include "fbSocket.h"
+#include "fbAuth.h"
 
 #define MIMECOUNT 12
 
-static const char * mime[][2] = { 
+static string htmlEscape(const char *s)
+{
+    string out;
+    for (; *s; s++) {
+        switch (*s) {
+            case '&':  out += "&amp;";  break;
+            case '<':  out += "&lt;";   break;
+            case '>':  out += "&gt;";   break;
+            case '"':  out += "&quot;"; break;
+            case '\'': out += "&#39;";  break;
+            default:   out += *s;
+        }
+    }
+    return out;
+}
+
+static const char * mime[][2] = {
     { ".html", "text/html" },
     { ".htm", "text/htm" },
     { ".png", "image/png" },
@@ -115,18 +132,14 @@ void fbHttpResponse::shutdown()
 */
 void fbHttpResponse::run()
 {
-    char *path;                     // the virtual path 
-    char *querystring;          // the ? part of the uri if it exists
+    char *path;                     // the virtual path
+    char *querystring;          // the ? part of the uri if it exists (modified by strsep)
+    char *querystring_base = NULL; // original malloc'd pointer; strsep advances querystring
     char *loc;                       // the location of a query string if any
     size_t pathlen;               // length of path
     char **ap, *argv[1024];  // an argument array generated from the querystring
     char *firstvar;               // the first variable in the query string
     char *secondvar;          // the second var in the query string
-    char *var3;
-    char *var4;
-    char *var5;
-    char *var6;
-    char *var7;
     size_t arglen;
 
     // no path and we have a big problem.
@@ -137,18 +150,42 @@ void fbHttpResponse::run()
     }
 
     data->debug(NONE, "fbHttpResponse.run");
-    data->msg(NONE, path); // log webserver request
+    /* Log the request path WITHOUT its query string, so that parameters such
+     * as /settings?password=... never reach the log file. */
+    {
+        const char *q = strchr(path, '?');
+        if (q != NULL)
+        {
+            string logpath(path, (size_t)(q - path));
+            data->msg(NONE, "%s", logpath.c_str());
+        }
+        else
+            data->msg(NONE, "%s", path);
+    }
+
+    /* Enforce the configured authentication policy before doing any work. */
+    if (!authorized())
+    {
+        unauthorized();
+        goto CLEANUP;
+    }
 
     /* deal with / and /index it should access our default index.html */
-    if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 ) 
+    if ( strcmp(path, "/") == 0 || strcmp( path, "/index" ) == 0 )
     {
         free(path);
         path = strdup("/index.html");
     }
 
     data->debug(NONE, "Test for querystring");
+    // Settings changes must use POST (not GET) so credentials never land in the
+    // URL/logs and to enable CSRF defenses; handled separately from the GET forms.
+    if ( client->getType() == POST && strcmp( path, "/settings" ) == 0 )
+    {
+        handleSettingsPost();
+    }
     // Is this a built in command.. ? for forms
-    if ( ( loc = strstr( path, "?" ) ) != NULL )
+    else if ( ( loc = strstr( path, "?" ) ) != NULL )
     {
         pathlen = strlen(path);
         querystring = (char *) malloc(pathlen + 1); // it's actually smaller than that.
@@ -158,6 +195,7 @@ void fbHttpResponse::run()
             internal();
             goto CLEANUP;
         }
+        querystring_base = querystring; // strsep will advance querystring; keep original for free()
         data->debug(NONE, "Copy the query");
         strncpy( querystring, loc, pathlen );
 	querystring[pathlen] = '\0';
@@ -166,7 +204,9 @@ void fbHttpResponse::run()
            // break it up into an argument vector.
 	   for (ap = argv; (*ap = strsep(&querystring, "&")) != NULL;)
                    if (**ap != '\0')
-                           if (++ap >= &argv[1024])
+                           /* guard: stop before writing argv[1023] so loop body can't
+                            * assign one past the array end at the top of the next iteration */
+                           if (++ap >= &argv[1023])
                                    break;
 
            data->debug(NONE, "query in argv array");
@@ -196,115 +236,124 @@ void fbHttpResponse::run()
                    {
                        fbDate *sdate = new fbDate();
                        fbTime *stime = new fbTime();
-                       
+
                        client->write("<form method=\"get\" >\n");
                        client->write("<fieldset>\n<p>Name: <input type=\"text\" name=\"name\" value=\"\" />\n");
                        client->write("<br />Path: <input type=\"text\" name=\"path\" value=\"\" />\n");
                        client->write("<br />Month/Day/Year: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"month\" value=\"");
-                       char *tmp;
-                       int bytes = asprintf(&tmp, "%d", sdate->getMonth());
-		       if (bytes != -1) {
-                       	client->write(tmp);
-                       	free(tmp);
-		       }
+                       char tmp[32];
+                       snprintf(tmp, sizeof(tmp), "%d", sdate->getMonth());
+                       client->write(tmp);
                        client->write("\" />/<input type=\"text\" size=\"2\" maxlength=\"2\" name=\"day\" value=\"\" />/<input type=\"text\" maxlength=\"4\" size=\"4\" name=\"year\" value=\"\" />\n");
                        client->write("<br />Time: <input type=\"text\" size=\"2\" maxlength=\"2\" name=\"hour\" value=\"\" />:<input size=\"2\" maxlength=\"2\" type=\"text\" name=\"min\" value=\"\" />\n");
                        client->write("</p></fieldset><p><input type=\"submit\" name=\"submit\" value=\"submit\" /></p>");
                        client->write("</form>\n");
-                       
+
                        delete sdate;
                        delete stime;
-                   } 
-                   else 
+                   }
+                   else
                    {
-                      if ( argv[1] != NULL)
+                      if ( argv[1] != NULL && argv[2] != NULL && argv[3] != NULL
+                           && argv[4] != NULL && argv[5] != NULL && argv[6] != NULL)
                       {
+                          /* Keep original calloc'd pointers so we can free them correctly.
+                           * strtok returns interior pointers into these buffers — never free those. */
+                          char *fv_buf, *sv_buf, *v3_buf, *v4_buf, *v5_buf, *v6_buf, *v7_buf;
+                          char *fv_val, *sv_val, *v3_val, *v4_val, *v5_val, *v6_val, *v7_val;
+
                           // name
 			  arglen = strlen(argv[0]);
-                          firstvar = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( firstvar, argv[0], arglen );
+                          fv_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( fv_buf, argv[0], arglen );
                           // path
 			  arglen = strlen(argv[1]);
-                          secondvar = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( secondvar, argv[1], arglen );
+                          sv_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( sv_buf, argv[1], arglen );
                           // Month
 			  arglen = strlen(argv[2]);
-                          var3 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var3, argv[2], arglen );
+                          v3_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v3_buf, argv[2], arglen );
                           // Day
 			  arglen = strlen(argv[3]);
-                          var4 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var4, argv[3], arglen );
+                          v4_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v4_buf, argv[3], arglen );
                           // Year
 			  arglen = strlen(argv[4]);
-                          var5 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var5, argv[4], arglen );
+                          v5_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v5_buf, argv[4], arglen );
                           // Hour
 			  arglen = strlen(argv[5]);
-                          var6 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var6, argv[5], arglen );
+                          v6_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v6_buf, argv[5], arglen );
                           // Minute
 			  arglen = strlen(argv[6]);
-                          var7 = (char *) calloc(arglen +1, sizeof(char));
-                          strncpy( var7, argv[6], arglen );
+                          v7_buf = (char *) calloc(arglen +1, sizeof(char));
+                          memcpy( v7_buf, argv[6], arglen );
 
                           // hack out the variable name and = so we can get to the values.
-                          strtok( firstvar, "=" );
-                          firstvar = strtok( NULL, "=" );
-                          strtok( secondvar, "=" );
-                          secondvar = strtok( NULL, "=" );
-                          strtok( var3, "=" );
-                          var3 = strtok( NULL, "=" );
-                          strtok( var4, "=" );
-                          var4 = strtok( NULL, "=" );
-                          strtok( var5, "=" );
-                          var5 = strtok( NULL, "=" );
-                          strtok( var6, "=" );
-                          var6 = strtok( NULL, "=" );
-                          strtok( var7, "=" );
-                          var7 = strtok( NULL, "=" );
-                          
-                          sanitizestr( firstvar );
-                          sanitizestr( secondvar );
-                          sanitizestr( var3 );
-                          sanitizestr( var4 );
-                          sanitizestr( var5 );
-                          sanitizestr( var6 );
-                          sanitizestr( var7 );
-                          
-                          client->write(firstvar);
-                          client->write("<br />\n");
-                          client->write(secondvar);
-                          client->write("<br />\n");
-                          data->msg( NONE, "Scheduling job %s on %s", firstvar, secondvar );
-                          
-                          fbDate *sdate = new fbDate ( // month, day, year
-                                                    (int)strtol(var3, (char **)NULL, 10), 
-                                                    (int)strtol(var4, (char **)NULL, 10),
-                                                    (int)strtol(var5, (char **)NULL, 10) );
-                          
-                          fbTime *stime = new fbTime( // hour : min : second
-                                                    (int)strtol(var6, (char **)NULL, 10),
-                                                    (int)strtol(var7, (char **)NULL, 10),
-                                                    0);
-                          
-                          // perform the backup.  firstvar is our name and secondvar is the path to backup
-                          data->addBackupJob(new string(firstvar), sdate, stime, new string(secondvar));
-                          
-                          delete sdate;
-                          delete stime;
-                          
-                          //free(firstvar);
-                          //free(secondvar);
-                          free(var3);
-                          free(var4);
-                          free(var5);
-                          free(var6);
-                          free(var7);
+                          strtok( fv_buf, "=" );
+                          fv_val = strtok( NULL, "=" );
+                          strtok( sv_buf, "=" );
+                          sv_val = strtok( NULL, "=" );
+                          strtok( v3_buf, "=" );
+                          v3_val = strtok( NULL, "=" );
+                          strtok( v4_buf, "=" );
+                          v4_val = strtok( NULL, "=" );
+                          strtok( v5_buf, "=" );
+                          v5_val = strtok( NULL, "=" );
+                          strtok( v6_buf, "=" );
+                          v6_val = strtok( NULL, "=" );
+                          strtok( v7_buf, "=" );
+                          v7_val = strtok( NULL, "=" );
+
+                          if (fv_val == NULL || sv_val == NULL || v3_val == NULL ||
+                              v4_val == NULL || v5_val == NULL || v6_val == NULL || v7_val == NULL)
+                          {
+                              client->write("Bad parameters");
+                          }
+                          else
+                          {
+                              sanitizestr( fv_val );
+                              sanitizestr( sv_val );
+                              sanitizestr( v3_val );
+                              sanitizestr( v4_val );
+                              sanitizestr( v5_val );
+                              sanitizestr( v6_val );
+                              sanitizestr( v7_val );
+
+                              client->write(htmlEscape(fv_val).c_str());
+                              client->write("<br />\n");
+                              client->write(htmlEscape(sv_val).c_str());
+                              client->write("<br />\n");
+                              data->msg( NONE, "Scheduling job %s on %s", fv_val, sv_val );
+
+                              fbDate *sdate = new fbDate ( // month, day, year
+                                                        (int)strtol(v3_val, (char **)NULL, 10),
+                                                        (int)strtol(v4_val, (char **)NULL, 10),
+                                                        (int)strtol(v5_val, (char **)NULL, 10) );
+
+                              fbTime *stime = new fbTime( // hour : min : second
+                                                        (int)strtol(v6_val, (char **)NULL, 10),
+                                                        (int)strtol(v7_val, (char **)NULL, 10),
+                                                        0);
+
+                              // addBackupJob takes ownership of sdate and stime and deletes them
+                              data->addBackupJob(new string(fv_val), sdate, stime, new string(sv_val));
+                          }
+
+                          // free the original calloc'd buffers (not the interior strtok pointers)
+                          free(fv_buf);
+                          free(sv_buf);
+                          free(v3_buf);
+                          free(v4_buf);
+                          free(v5_buf);
+                          free(v6_buf);
+                          free(v7_buf);
                       }
                       else
                       {
-                          client->write("Bad parameters"); 
+                          client->write("Bad parameters");
                      }
                  }
               }
@@ -323,7 +372,7 @@ void fbHttpResponse::run()
                        client->write("<form method=\"get\" >\n<fieldset>\n");
                        client->write("Extract to: <input type=\"text\" name=\"path\" value=\"\" />\n");
                        client->write("</fieldset>\n");
-			
+
                        bool ret;
                        string desc, path, tarfile, d, t;
                        fbDate date;
@@ -350,8 +399,8 @@ void fbHttpResponse::run()
                                client->write("\t<tr>\n");
 
                                client->write("\t\t<td>\n\t\t\t %d \n\t\t</td>\n", id);
-                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", desc.c_str());
-                               client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", path.c_str());
+                               client->write("\t\t<td>\n\t\t\t " + htmlEscape(desc.c_str()) + " \n\t\t</td>\n");
+                               client->write("\t\t<td>\n\t\t\t " + htmlEscape(path.c_str()) + " \n\t\t</td>\n");
 
                                d = "";
                                date.mdy(d);
@@ -361,46 +410,55 @@ void fbHttpResponse::run()
                                client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", d.c_str());
                                client->write("\t\t<td>\n\t\t\t %s \n\t\t</td>\n", t.c_str());
 
-                               client->write("\t\t<td>\n\t\t\t <input type=\"submit\" name=\"file\" value=\"%s\" /> \n\t\t</td>\n", tarfile.c_str());
+                               client->write("\t\t<td>\n\t\t\t <input type=\"submit\" name=\"file\" value=\"" + htmlEscape(tarfile.c_str()) + "\" /> \n\t\t</td>\n");
                                client->write("\t</tr>\n");
                            }
 
                        } while(ret);
                        client->write("</table>\n</form>\n");
                    }
-                   else 
+                   else
                    {
                        if ( argv[1] != NULL)
                        {
-                           firstvar = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
-                           strcpy( firstvar, argv[0] );
-                           secondvar = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
-                           strcpy( secondvar, argv[1] );
+                           /* Keep original calloc'd pointers for free(); strtok returns
+                            * interior pointers — never free those. */
+                           char *fv_buf = (char *) calloc(strlen(argv[0]) +1, sizeof(char));
+                           memcpy( fv_buf, argv[0], strlen(argv[0]) );
+                           char *sv_buf = (char *) calloc(strlen(argv[1]) +1, sizeof(char));
+                           memcpy( sv_buf, argv[1], strlen(argv[1]) );
 
                            // hack out the variable name and = so we can get to the values.
-                           strtok( firstvar, "=" );
+                           strtok( fv_buf, "=" );
                            firstvar = strtok( NULL, "=" );
-                           strtok( secondvar, "=" );
+                           strtok( sv_buf, "=" );
                            secondvar = strtok( NULL, "=" );
 
-                           sanitizestr( firstvar );
-                           sanitizestr( secondvar );
-          
-                           client->write(secondvar);
-                           client->write("<br />\n");
-                           client->write(firstvar);
-                           client->write("<br />\n");
+                           if (firstvar == NULL || secondvar == NULL)
+                           {
+                               client->write("Bad parameters");
+                           }
+                           else
+                           {
+                               sanitizestr( firstvar );
+                               sanitizestr( secondvar );
 
-                            data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
-                            // firstvar is our file name and secondvar is the path to restore to
-                            data->addRestoreJob( new string(secondvar), new string(firstvar) );
+                               client->write(htmlEscape(secondvar).c_str());
+                               client->write("<br />\n");
+                               client->write(htmlEscape(firstvar).c_str());
+                               client->write("<br />\n");
 
-                            //free(firstvar);
-                            //free(secondvar);
+                               data->msg( NONE, "Restore %s to %s", secondvar, firstvar);
+                               // firstvar is our file name and secondvar is the path to restore to
+                               data->addRestoreJob( new string(secondvar), new string(firstvar) );
+                           }
+
+                           free(fv_buf);
+                           free(sv_buf);
                        }
                        else
                        {
-                           client->write("Bad parameters"); 
+                           client->write("Bad parameters");
                        }
                  }
               }
@@ -409,16 +467,15 @@ void fbHttpResponse::run()
            }
            else if ( strcmp( path, "/settings" ) == 0 )
            {
-               dynamichead("FlashBack :: Settings");
-                client->write("<div id=\"container\">\n");
-               client->write("<h2>Settings</h2>\n");
-               client->write("</div>\n");
-               dynamicfoot();
+               settingspage(argv);
            }
-           free(querystring);
+           free(querystring_base);
         }
         else // can't be valid
+        {
+           free(querystring_base);
            internal();
+        }
     }
     else  // Must be a file on the file system!
     {
@@ -434,7 +491,288 @@ CLEANUP:
     data->debug(NONE, "fbHttpResponse.run() delete client");
     delete client;
 
-    shutdown();  // clean up 
+    shutdown();  // clean up
+}
+
+
+/**
+*	authorized
+*	Check the request against the configured authentication policy.
+*	@return true if the request may proceed (auth disabled, or valid Basic creds)
+*/
+bool fbHttpResponse::authorized()
+{
+    string mode, user, salt, hash;
+    int iters;
+
+    data->db->getAuthConfig(mode, user, salt, hash, iters);
+
+    if (mode != "basic")
+        return true;   // authentication disabled (the default)
+
+    const string& creds = client->getAuthorization();
+    if (creds.empty())
+        return false;
+
+    string u, p;
+    if (!fbAuthDecodeBasic(creds, u, p))
+        return false;
+    if (u != user)
+        return false;
+    if (hash.empty() || iters <= 0)
+        return false;
+
+    return fbAuthVerifyPassword(p, salt, hash, iters);
+}
+
+
+/**
+*	unauthorized
+*	Send a 401 challenge so the browser prompts for HTTP Basic credentials.
+*/
+void fbHttpResponse::unauthorized()
+{
+    data->debug(NONE, "fbHttpResponse.unauthorized");
+    status( "401", "Unauthorized" );
+    header( "Server", SERVERID );
+    headdate();
+    header( "WWW-Authenticate", "Basic realm=\"FlashBack\"" );
+    header( "Connection", "close" );
+    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    client->write("\r\n");
+    client->write("<html>\n<head>\n\t<title>401 Unauthorized</title>\n</head>\n");
+    client->write("<body>\n<h1>401 Unauthorized</h1>\n<p>Authentication is required to use FlashBack.</p>\n</body>\n</html>\n");
+}
+
+
+/**
+*	settingspage
+*	Render the /settings page and process authentication-settings submissions.
+*	The form uses GET; the request logger strips query strings so the password
+*	is not written to the log. Passwords are stored hashed, never in plaintext.
+*/
+/* Extract the host[:port] portion of a URL (strip scheme and any path). */
+static string urlHost(const string& url)
+{
+    size_t p = 0;
+    size_t s = url.find("://");
+    if (s != string::npos) p = s + 3;
+    size_t slash = url.find('/', p);
+    return (slash == string::npos) ? url.substr(p) : url.substr(p, slash - p);
+}
+
+/**
+*	sameOrigin
+*	CSRF defense: when the browser supplies an Origin or Referer header it must
+*	match the Host the request was sent to. A request with neither header (e.g.
+*	a non-browser client, which is not a CSRF vector) is allowed.
+*/
+bool fbHttpResponse::sameOrigin()
+{
+    const string& host = client->getHostHeader();
+    const string& origin = client->getOrigin();
+    const string& referer = client->getReferer();
+
+    if (!origin.empty())
+        return !host.empty() && urlHost(origin) == host;
+    if (!referer.empty())
+        return !host.empty() && urlHost(referer) == host;
+    return true;   // no Origin/Referer: not a browser CSRF vector
+}
+
+
+/**
+*	parseForm
+*	Parse an application/x-www-form-urlencoded body into the fields we use.
+*/
+void fbHttpResponse::parseForm( const string& bodydata, string& mode, string& username,
+                                string& password, string& current )
+{
+    size_t start = 0;
+    while (start < bodydata.size())
+    {
+        size_t amp = bodydata.find('&', start);
+        string pair = (amp == string::npos) ? bodydata.substr(start)
+                                            : bodydata.substr(start, amp - start);
+        start = (amp == string::npos) ? bodydata.size() : amp + 1;
+
+        size_t eq = pair.find('=');
+        if (eq == string::npos)
+            continue;
+
+        string name = pair.substr(0, eq);
+        char *vbuf = strdup(pair.substr(eq + 1).c_str());
+        if (vbuf == NULL)
+            continue;
+        sanitizestr(vbuf);          // '+' -> space and %xx decoding
+        string value(vbuf);
+        free(vbuf);
+
+        if (name == "mode") mode = value;
+        else if (name == "username") username = value;
+        else if (name == "password") password = value;
+        else if (name == "current") current = value;
+    }
+}
+
+
+/**
+*	settingspage
+*	GET handler: render the read-only settings form. State changes happen only
+*	through POST (handleSettingsPost) so credentials never appear in the URL.
+*/
+void fbHttpResponse::settingspage( char **argv )
+{
+    (void)argv;   // GET no longer carries credentials
+    renderSettingsForm("");
+}
+
+
+/**
+*	handleSettingsPost
+*	POST handler: apply authentication-settings changes with CSRF protection.
+*/
+void fbHttpResponse::handleSettingsPost()
+{
+    // CSRF: the Origin/Referer (when present) must match the Host header.
+    if (!sameOrigin())
+    {
+        forbidden("Request origin could not be verified.");
+        return;
+    }
+
+    string mode, username, password, current;
+    parseForm(client->getBody(), mode, username, password, current);
+
+    string curMode, curUser, curSalt, curHash;
+    int curIter = 0;
+    data->db->getAuthConfig(curMode, curUser, curSalt, curHash, curIter);
+
+    // Authorization to change settings:
+    //  - If Basic auth is already enabled, require the current password.
+    //  - If auth is disabled (bootstrap), only allow changes from a loopback
+    //    host, so an exposed instance cannot be hijacked before a password is set.
+    if (curMode == "basic" && !curHash.empty())
+    {
+        if (current.empty() || !fbAuthVerifyPassword(current, curSalt, curHash, curIter))
+        {
+            renderSettingsForm("The current password is required and must be correct to change settings.");
+            return;
+        }
+    }
+    else if (!client->isLocalPeer())
+    {
+        renderSettingsForm("For safety, authentication can only be configured from the local machine. Connect from 127.0.0.1 (loopback) to set a username and password.");
+        return;
+    }
+
+    string status_msg;
+
+    if (mode == "none")
+    {
+        status_msg = data->db->setAuthConfig("none", "", "", "", 0)
+                   ? "Authentication disabled." : "Failed to save settings.";
+    }
+    else if (mode == "basic")
+    {
+        if (!password.empty())
+        {
+            if (username.empty())
+                status_msg = "A username is required to enable Basic authentication.";
+            else
+            {
+                string salt, hash;
+                if (fbAuthHashPassword(password, FBAUTH_DEFAULT_ITERATIONS, salt, hash) &&
+                    data->db->setAuthConfig("basic", username, salt, hash, FBAUTH_DEFAULT_ITERATIONS))
+                    status_msg = "Basic authentication enabled.";
+                else
+                    status_msg = "Failed to hash or save the password.";
+            }
+        }
+        else if (curMode == "basic" && !curHash.empty())
+        {
+            string keepUser = username.empty() ? curUser : username;
+            status_msg = data->db->setAuthConfig("basic", keepUser, curSalt, curHash, curIter)
+                       ? "Basic authentication settings updated." : "Failed to save settings.";
+        }
+        else
+            status_msg = "A password is required to enable Basic authentication.";
+    }
+    else
+        status_msg = "Unknown authentication mode.";
+
+    renderSettingsForm(status_msg);
+}
+
+
+/**
+*	renderSettingsForm
+*	Emit the settings page with the (POST) authentication form, pre-filled from
+*	the current configuration. status_msg, if non-empty, is shown (escaped).
+*/
+void fbHttpResponse::renderSettingsForm( const string& status_msg )
+{
+    string curMode, curUser, curSalt, curHash;
+    int curIter = 0;
+    data->db->getAuthConfig(curMode, curUser, curSalt, curHash, curIter);
+
+    dynamichead("FlashBack :: Settings");
+    client->write("<div id=\"container\">\n");
+    client->write("<h2>Settings</h2>\n");
+
+    if (!status_msg.empty())
+    {
+        client->write("<p><strong>");
+        client->write(htmlEscape(status_msg.c_str()));
+        client->write("</strong></p>\n");
+    }
+
+    client->write("<h3>Authentication</h3>\n");
+    client->write("<form method=\"post\" action=\"/settings\">\n<fieldset>\n");
+    client->write("<p>Mode:\n<select name=\"mode\">\n");
+    client->write("<option value=\"none\"");
+    if (curMode != "basic") client->write(" selected=\"selected\"");
+    client->write(">None (no login; intended for localhost)</option>\n");
+    client->write("<option value=\"basic\"");
+    if (curMode == "basic") client->write(" selected=\"selected\"");
+    client->write(">HTTP Basic (username and password)</option>\n");
+    client->write("</select></p>\n");
+
+    client->write("<p>Username: <input type=\"text\" name=\"username\" value=\"");
+    client->write(htmlEscape(curUser.c_str()));
+    client->write("\" /></p>\n");
+
+    client->write("<p>New password: <input type=\"password\" name=\"password\" value=\"\" />\n");
+    client->write("<br /><small>Leave blank to keep the current password when Basic authentication is already enabled.</small></p>\n");
+
+    if (curMode == "basic")
+        client->write("<p>Current password (required to change settings): <input type=\"password\" name=\"current\" value=\"\" /></p>\n");
+
+    client->write("<p><input type=\"submit\" name=\"submit\" value=\"Save\" /></p>\n");
+    client->write("</fieldset>\n</form>\n");
+    client->write("<p><small>Credentials are sent over plain HTTP, so run FlashBack only on a trusted or localhost network. Passwords are stored hashed with PBKDF2-HMAC-SHA256.</small></p>\n");
+
+    client->write("</div>\n");
+    dynamicfoot();
+}
+
+
+/**
+*	forbidden
+*	403 response, used when the CSRF / same-origin check fails.
+*/
+void fbHttpResponse::forbidden( const char *reason )
+{
+    data->debug(NONE, "fbHttpResponse.forbidden");
+    status( "403", "Forbidden" );
+    header( "Server", SERVERID );
+    headdate();
+    header( "Connection", "close" );
+    header( "Content-Type", "text/html; charset=iso-8859-1" );
+    client->write("\r\n");
+    client->write("<html>\n<head>\n\t<title>403 Forbidden</title>\n</head>\n<body>\n<h1>403 Forbidden</h1>\n<p>");
+    client->write(htmlEscape(reason == NULL ? "Forbidden" : reason));
+    client->write("</p>\n</body>\n</html>\n");
 }
 
 
@@ -462,8 +800,14 @@ void fbHttpResponse::sanitizestr( char * str )
     }
 
     resultlen = len;
-    result = spc_decode_url(str, &resultlen);  
-    strncpy( str, result, len );
+    result = spc_decode_url(str, &resultlen);
+    if (result == NULL)
+        return;
+    /* resultlen <= len (percent-decoding shrinks or equals); copy only what was decoded
+     * and NUL-terminate within the original allocation (which is len+1 bytes). */
+    memcpy( str, result, resultlen );
+    str[resultlen] = '\0';
+    free(result);
 }
 
 
@@ -498,9 +842,12 @@ void fbHttpResponse::dynamichead( const char * title )
     header( "Connection", "close");
     header( "Content-Type", "text/html" );
     header( "Content-Language", "en-US" );
+    header( "Cache-Control", "no-store" );      // dynamic pages may contain sensitive data
+    header( "Referrer-Policy", "no-referrer" ); // don't leak URLs via the Referer header
     client->write("\r\n"); // end header section
 
-    client->write("<html>\n<head>\n\t<title>");
+    client->write("<!DOCTYPE html>\n");
+    client->write("<html lang=\"en\">\n<head>\n\t<meta charset=\"utf-8\" />\n\t<title>");
     if (title != NULL)
         client->write(title);
     client->write("</title>\n");
@@ -543,7 +890,6 @@ void fbHttpResponse::sendfile( const char * path )
 {
     FILE *fp;           // the file to send to the client
     string realp = data->getWebServerRootPath();
-    int c;                  // an individual character we're going to write to stream
     char *resolved;  // The path after it has been tested with realpath
     struct stat st;  // the information about a file from lstat call
 
@@ -572,11 +918,22 @@ void fbHttpResponse::sendfile( const char * path )
         return;
     }
 
-    if (strstr(resolved, data->getWebServerRootPath().c_str()) == NULL) 
+    if (strncmp(resolved, data->getWebServerRootPath().c_str(), data->getWebServerRootPath().length()) != 0)
     {
         free(resolved);
         notfound();
         return;
+    }
+    /* Require that the next character after the root prefix is '/' (subdirectory) or
+     * '\0' (exact match) so that "/webrootEVIL" cannot pass as a sibling of "/webroot". */
+    {
+        char next = resolved[data->getWebServerRootPath().length()];
+        if (next != '/' && next != '\0')
+        {
+            free(resolved);
+            notfound();
+            return;
+        }
     }
 
     /* Find out if it's a symlink */
@@ -590,7 +947,7 @@ void fbHttpResponse::sendfile( const char * path )
     else
     {
          if (S_ISLNK(st.st_mode) )
-         { 
+         {
              // this means it's a symlink which we don't support.
              // TODO: permissions error instead?
              free(resolved);
@@ -599,7 +956,7 @@ void fbHttpResponse::sendfile( const char * path )
          }
     }
 
-    if ( (fp = fopen( resolved, "r" ) ) == NULL ) {
+    if ( (fp = fopen( resolved, "rb" ) ) == NULL ) {
         //data->msg(NONE, "fbHttpResponse: Unable to open file");
         //data->msg(NONE, resolved);
         free(resolved);
@@ -615,10 +972,11 @@ void fbHttpResponse::sendfile( const char * path )
     header( "Content-Language", "en-US" );
     client->write("\r\n"); // end header section
 
-    while ( (c = fgetc(fp)) != EOF && !ferror(fp))
     {
-        if (c != EOF)
-            client->write(c);
+        char buf[65536];   // 64 KB read buffer
+        size_t n;
+        while ( (n = fread(buf, 1, sizeof(buf), fp)) > 0 )
+            client->write(string(buf, n));
     }
 
     fclose(fp);
@@ -658,7 +1016,7 @@ void fbHttpResponse::notfound()
     r.append( "<html>\n<head>\n\t<title>404 Not Found</title>\n</head>\n");
     r.append("<body>\n<h1>404 Not Found</h1>\n<p>The requested URL was not found on the server.</p>\n");
     r.append("<p>Invalid path: ");
-    r.append(path);
+    r.append(htmlEscape(path));
     r.append("</p>\n<hr><p>");
     r.append(SERVERID);
     r.append("</p>\n</body>\n</html>\n");
@@ -758,7 +1116,7 @@ const char * fbHttpResponse::matchmimetype( const char *filename )
     for ( int i = 0; i < MIMECOUNT; i++ )
     {
         extlen = strlen( mime[i][0] );
-        if (strcasecmp( mime[i][0], 
+        if (strcasecmp( mime[i][0],
                  filename + (len - extlen)) == 0)
             return mime[i][1];
     }

@@ -129,26 +129,48 @@ bool fbSQL::isConnected()
 *  exectues an command on the database
 *  @param command SQL command to send to DB
 */
-int fbSQL::exe(string& cmd)
+bool fbSQL::exe(string& cmd)
 {
-int ret = 0;
+	int ret = 0;
 	char* errmsg;
 	// lock so two commands can't be sent at once
 	fbLock lock(cs);
 
 	// send command
 	errlog->debug(NONE, cmd);
-	ret = sqlite3_exec(db, cmd.c_str(), NULL, 0 , &errmsg);
+	ret = sqlite3_exec(db, cmd.c_str(), NULL, 0, &errmsg);
 
 	// test if okay
 	if(ret != SQLITE_OK)
 	{
 		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3 error code: %s", errmsg);
 		sqlite3_free(errmsg);
+		return false;
 	}
 
-	//done, after return
-	return ret;
+	return true;
+}
+
+
+/**
+*  exeStmt
+*  Step and finalize a pre-bound prepared statement under the write lock.
+*  The caller is responsible for having called sqlite3_prepare_v2 and all
+*  sqlite3_bind_* calls before passing the statement here.
+*  @param stmt  A prepared, bound sqlite3_stmt*; always finalized on return.
+*  @return true on success (SQLITE_DONE), false on error.
+*/
+bool fbSQL::exeStmt(sqlite3_stmt* stmt)
+{
+	fbLock lock(cs);
+	int ret = sqlite3_step(stmt);
+	sqlite3_finalize(stmt);
+	if (ret != SQLITE_DONE) {
+		errlog->warn(SQLEXECERROR, "fbSQL: sqlite3_step failed: %s",
+		             sqlite3_errmsg(db));
+		return false;
+	}
+	return true;
 }
 
 

@@ -45,31 +45,22 @@ bugs:
     to it since accept() calls are not affected.
 */
 
-#define _POSIX_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <strings.h> /* bzero */
 #include <errno.h>
 #include <stdbool.h>
 
-#ifdef Win32
+#ifdef _WIN32
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #define socklen_t int
 #else
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-/* hack for Mac OS X which undefs herror with posix source on */
-#ifdef __APPLE__
-#define _DARWIN_C_SOURCE 1
-#endif
-#ifdef __linux__
-#define __USE_MISC 1
-#endif
 #include <netdb.h>
 #endif
 
@@ -139,7 +130,6 @@ void inittcp( void )
 */
 socketdesc opentcp( bool server, char * address, int port )
 {
-    struct hostent *he; /* for DNS/hostname/ip lookups */
     size_t addresslen;     /* length of address string param */
     int on; /* Should we use socket reuse */
 
@@ -160,8 +150,7 @@ socketdesc opentcp( bool server, char * address, int port )
     if ((cons[ncons].address = (char *) calloc( addresslen+1, sizeof(char) )) == NULL)
         return ETCPGENERIC;  /* could not allocate memory :( */
     
-    strncpy( cons[ncons].address, address, addresslen ); /* sizeof the buffer -1 */
-    cons[ncons].address[addresslen] = '\0';
+    memcpy( cons[ncons].address, address, addresslen );
 
     /* create an endpoint for communication */
     if ((cons[ncons].sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -171,15 +160,15 @@ socketdesc opentcp( bool server, char * address, int port )
     }
 
     /* clear socket param struct */
-#ifdef Win32
-	ZeroMemory(&(cons[ncons].sa), sizeof cons[ncons].sa); 
+#ifdef _WIN32
+    ZeroMemory(&(cons[ncons].sa), sizeof cons[ncons].sa);
 #else
-    bzero(&(cons[ncons].sa), sizeof cons[ncons].sa); 
+    memset(&(cons[ncons].sa), 0, sizeof cons[ncons].sa);
 #endif
 
     /* Enable address reuse */
     on = 1;
-    setsockopt( cons[ncons].sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) );
+    setsockopt( cons[ncons].sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof(on) );
 
     /* setup some defaults for a TCP ip4 connection with a BIG ENDIAN safe
        port number */
@@ -187,23 +176,25 @@ socketdesc opentcp( bool server, char * address, int port )
     cons[ncons].sa.sin_port = htons(cons[ncons].port);
 
     /* lookup the hostname or DNS name (or set the ip address) */
-    if ((he = gethostbyname(cons[ncons].address)) == NULL) {
-#ifdef Win32
-		//not sure what herror is doing?
-		WSAGetLastError();  /// < gets the last error code as int
-#else
-        herror(cons[ncons].address);
-#endif
-        free(cons[ncons].address); /* dont leak */
-        return ETCPBADADDRESS;
-    }
+    {
+        struct addrinfo hints, *res;
+        int gai_err;
 
-    /* copy the ip found or listed in BIG ENDIAN SAFE byte order */
-#ifdef Win32
-	memcpy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
-#else
-    bcopy(he->h_addr_list[0],&(cons[ncons].sa).sin_addr, he->h_length);
-#endif
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+
+        if ((gai_err = getaddrinfo(cons[ncons].address, NULL, &hints, &res)) != 0) {
+            fprintf(stderr, "%s: %s\n", cons[ncons].address, gai_strerror(gai_err));
+            free(cons[ncons].address);
+            return ETCPBADADDRESS;
+        }
+
+        memcpy(&(cons[ncons].sa).sin_addr,
+               &((struct sockaddr_in *)res->ai_addr)->sin_addr,
+               sizeof(struct in_addr));
+        freeaddrinfo(res);
+    }
 
     /* for servers, we need to bind and listen for later use */
     if ( server == true )
@@ -260,16 +251,16 @@ socketdesc opentcp( bool server, char * address, int port )
 void closetcp( socketdesc sd )
 {
     /* disconnect socket */
-#ifdef Win32
+#ifdef _WIN32
     closesocket(cons[sd].sockfd);
-#else 
+#else
     (void) close(cons[sd].sockfd);
 #endif
     /* as a hint this is dead.  Maybe we can recycle them? */
     cons[sd].sockfd = -1; 
 
     /* free the address memory storage */
-    (void) free(cons[ncons].address);
+    (void) free(cons[sd].address);
 }
 
 
@@ -307,7 +298,11 @@ char * readntcp( socketdesc sd, int size )
 
     if ( cons[sd].server == false )
     {
+#ifdef _WIN32
+        if ((bytes = recv(cons[sd].sockfd, buf, size, 0)) < 1)
+#else
         if ((bytes = read(cons[sd].sockfd, buf, size)) < 1)
+#endif
             return NULL;
     }
     else
@@ -453,10 +448,15 @@ int writetcp( socketdesc sd, char * str )
 */
 int writentcp( socketdesc sd, char * str, int len )
 {
-    if (cons[sd].server == false)
+    if (cons[sd].server == false) {
+#ifdef _WIN32
+        return send( cons[sd].sockfd, str, len, 0 );
+#else
         return write( cons[sd].sockfd, str, len );
-    else
+#endif
+    } else {
         return ETCPGENERIC;
+    }
 }
 
 

@@ -27,7 +27,7 @@ public:
 private:
 	bool _locked;			/// < True if Cs is locked
 
-#ifdef Win32
+#ifdef _WIN32
 	CRITICAL_SECTION hCriticalSection;
 #else
 	pthread_mutex_t	 hMutex;

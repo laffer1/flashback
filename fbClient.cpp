@@ -23,6 +23,9 @@
  * SUCH DAMAGE.
  */
 
+#include <strings.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include "fbClient.h"
 
 /**
@@ -47,7 +50,7 @@ fbClient::fbClient(fbData* _data, int sock ):data(_data), clientfp(NULL), host(N
     } 
     else
     {
-        if ( ( clientfp = fdopen( sock, "a+" ) ) == NULL )
+        if ( ( clientfp = fdopen( sock, "r+" ) ) == NULL )
         {
             /* log/handle */
             data->debug(NONE, "fbClient.this  Could not convert file descriptor to FILE *");
@@ -93,6 +96,8 @@ void fbClient::parseHeaders()
     }
 
     reqstr = (char *)calloc( MAX_REQUEST,  sizeof(char));
+    httptype = NOTSUPPORTED;
+    contentLength = 0;
 
     tmp2 = reqstr;
 
@@ -139,6 +144,54 @@ void fbClient::parseHeaders()
     }   
 
     // TODO: figure out HTTP version.  Not important for now.
+
+    /* Drain the remaining request headers (previously left unread, which could
+     * deadlock writes while the client was still sending). We retain the headers
+     * needed for authentication (Authorization) and CSRF defense (Host, Origin,
+     * Referer) plus Content-Length so a POST body can be read. */
+    {
+        char hdr[MAX_REQUEST];
+        int guard = 0;
+        while (guard++ < 200 && fgets(hdr, MAX_REQUEST, clientfp) != NULL)
+        {
+            // a blank line (just CR/LF) terminates the header section
+            if (hdr[0] == '\r' || hdr[0] == '\n')
+                break;
+
+            char *colon = strchr(hdr, ':');
+            if (colon == NULL)
+                continue;
+            size_t namelen = (size_t)(colon - hdr);
+
+            char *val = colon + 1;
+            while (*val == ' ' || *val == '\t')
+                val++;
+            size_t vl = strlen(val);
+            while (vl > 0 && (val[vl-1] == '\r' || val[vl-1] == '\n' ||
+                              val[vl-1] == ' '  || val[vl-1] == '\t'))
+                val[--vl] = '\0';
+
+            if (namelen == 13 && strncasecmp(hdr, "authorization", 13) == 0)
+                authorization = val;
+            else if (namelen == 4 && strncasecmp(hdr, "host", 4) == 0)
+                hostHeader = val;
+            else if (namelen == 6 && strncasecmp(hdr, "origin", 6) == 0)
+                origin = val;
+            else if (namelen == 7 && strncasecmp(hdr, "referer", 7) == 0)
+                referer = val;
+            else if (namelen == 14 && strncasecmp(hdr, "content-length", 14) == 0)
+                contentLength = atol(val);
+        }
+    }
+
+    /* Read the request body for POST submissions (bounded to avoid abuse). */
+    if (httptype == POST && contentLength > 0 && contentLength <= 65536)
+    {
+        vector<char> buf((size_t)contentLength);
+        size_t got = fread(buf.data(), 1, (size_t)contentLength, clientfp);
+        body.assign(buf.data(), got);
+    }
+
     free(reqstr);
 }
 
@@ -176,6 +229,8 @@ int fbClient::begins_with( const char * str1, const char * str2 )
 */
 char * fbClient::getHost()
 {
+    if (host == NULL)
+        return NULL;
     return strdup(host->c_str());
 }
 
@@ -187,7 +242,65 @@ char * fbClient::getHost()
 */
 char * fbClient::getPath()
 {
+    if (path == NULL)
+        return NULL;
     return strdup(path->c_str());
+}
+
+
+/**
+*	getAuthorization
+*	the value of the Authorization request header, or "" if none was sent
+*/
+const string& fbClient::getAuthorization()
+{
+    return authorization;
+}
+
+
+/**
+*	header / body / method accessors
+*/
+const string& fbClient::getHostHeader() { return hostHeader; }
+const string& fbClient::getOrigin()     { return origin; }
+const string& fbClient::getReferer()    { return referer; }
+const string& fbClient::getBody()       { return body; }
+enum HTTP_TYPE fbClient::getType()      { return httptype; }
+
+
+/**
+*	isLocalPeer
+*	True if the connected peer is a loopback address (127.0.0.0/8 or ::1),
+*	determined from the transport layer (getpeername) rather than any
+*	client-supplied header, so it is safe to use as an authorization signal.
+*/
+bool fbClient::isLocalPeer()
+{
+    if (clientfp == NULL)
+        return false;
+
+    int fd = fileno(clientfp);
+    struct sockaddr_storage ss;
+    socklen_t len = sizeof(ss);
+    if (getpeername(fd, (struct sockaddr *)&ss, &len) != 0)
+        return false;
+
+    if (ss.ss_family == AF_INET)
+    {
+        struct sockaddr_in *s4 = (struct sockaddr_in *)&ss;
+        unsigned int a = ntohl(s4->sin_addr.s_addr);
+        return (a >> 24) == 127;                       // 127.0.0.0/8
+    }
+    if (ss.ss_family == AF_INET6)
+    {
+        struct sockaddr_in6 *s6 = (struct sockaddr_in6 *)&ss;
+        if (IN6_IS_ADDR_LOOPBACK(&s6->sin6_addr))
+            return true;
+        if (IN6_IS_ADDR_V4MAPPED(&s6->sin6_addr))      // ::ffff:127.x.x.x
+            return s6->sin6_addr.s6_addr[12] == 127;
+        return false;
+    }
+    return false;
 }
 
 

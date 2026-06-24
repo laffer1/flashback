@@ -25,7 +25,7 @@ public:
 	fbDatabase(fbErrorLogger* log, const char* path);
 	~fbDatabase();
 
-	string & getBackupList(); /// Get a list of pending and current backups.
+	string getBackupList(); /// Get a list of pending and current backups.
 
 	/// Backup SQL
 	bool addBackupJob(string& desc, fbDate& date, fbTime& time, string& path, Repeat_type rt = ONCE, int rv = 0);
@@ -47,7 +47,14 @@ public:
 	/// Generic SQL
 	bool deleteRow(const char* table, int id);
 
+	/// Authentication settings (single-row 'auth' table)
+	/// getAuthConfig fills defaults (mode "none") and returns false when no row exists.
+	bool getAuthConfig(string& mode, string& username, string& saltHex, string& hashHex, int& iterations);
+	bool setAuthConfig(const string& mode, const string& username, const string& saltHex, const string& hashHex, int iterations);
+
 private:
+	void ensureAuthSchema();   /// create the 'auth' table if it does not exist
+
 	fbErrorLogger* errlog;
 	fbCriticalSection cs;
 	fbSQL db;

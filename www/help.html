@@ -3,14 +3,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>FlashBack :: Help</title>
 		<link rel="stylesheet" type="text/css" href="main.css">
 		<link rel="stylesheet" type="text/css" href="buttons.css">
 		<link rel="stylesheet" type="text/css" href="forms.css">
 		<style type="text/css">
-		#goodies-bar { width: 780px; height: auto; margin: 1em auto; padding: 1em;}
-		#thebar { padding: 0px; width: 780px; margin: -10px auto 0 auto; border: 1px dotted #e3ebf1; background: #e3ebf1; text-align: center; float: left; -moz-border-radius: 7px; -webkit-border-radius: 7px; }
-		#thebar a { padding: 32px 0 0 0; background-repeat: no-repeat; overflow: hidden; height: 0px !important; height: /**/:32px; display: block; float: left; margin: 10px; }
+		#goodies-bar { max-width: 780px; width: 100%; height: auto; margin: 1em auto; padding: 1em; box-sizing: border-box; }
+		#thebar { padding: 0; max-width: 780px; width: 100%; margin: -10px auto 0 auto; border: 1px dotted #e3ebf1; background: #e3ebf1; text-align: center; float: left; -moz-border-radius: 7px; -webkit-border-radius: 7px; border-radius: 7px; }
+		#thebar a { padding: 32px 0 0 0; background-repeat: no-repeat; overflow: hidden; height: 32px; display: block; float: left; margin: 10px; }
 		#current a { background-image: url("current32.png"); width: 141px; }
 		#schedule a { background-image: url("schedule32.png"); width: 153px; }
 		#restore a { background-image: url("restore32.png"); width: 137px; }
@@ -35,26 +36,51 @@
 	<div class="clear"></div>
 	<div id="container">
 	<h2>Help</h2>
-	
-	<h3>Schedule a backup job</h3>
-	
-	<p>To begin backing up files, click &quot;Schedule&quot; and then type a name for the backup
-	and a path to backup.  This can be a file or folder.</p>
-	
-	<p>Future versions will allow you to set the time and date</p>
-	
-	<h3>Restore from backup</h3>
-	
-	<p>Click on the job with the name you selected.</p>
-	
-	<h3>Current</h3>
-	
-	<p>The current option shows you the jobs pending or active</p>
-	
+
+	<h3>Current jobs</h3>
+
+	<p>The <strong>Current</strong> section lists all backup jobs that are scheduled or
+	active. Each entry shows the job name, the path being backed up, and the
+	scheduled date and time. If no jobs have been scheduled yet, the list will
+	be empty.</p>
+
+	<h3>Schedule a backup</h3>
+
+	<p>Click <strong>Schedule</strong> to create a new backup job. Fill in the
+	following fields:</p>
+
+	<ul>
+		<li><strong>Name</strong> &mdash; a short label for the backup job (for
+		example, &ldquo;Home directory&rdquo; or &ldquo;Project files&rdquo;).</li>
+		<li><strong>Path</strong> &mdash; the full path to the file or directory
+		you want to back up (for example, <code>/home/user/documents</code>).</li>
+		<li><strong>Date</strong> &mdash; the month, day, and year on which the
+		backup should run.</li>
+		<li><strong>Time</strong> &mdash; the hour and minute at which the backup
+		should start.</li>
+	</ul>
+
+	<p>Click the submit button to add the job. The new job will then appear in
+	the <strong>Current</strong> list.</p>
+
+	<h3>Restore from a previous backup</h3>
+
+	<p>Click <strong>Restore</strong> to see a table of completed backup jobs.
+	Each row shows the job ID, name, path, date, time, and the backup archive
+	file. Select the job you want to restore and submit the form. FlashBack will
+	unpack the archive and restore the files to their original location.</p>
+
 	<h3>Settings</h3>
-	
-	<p>Todo</p>
-	
+
+	<p>Application settings are configured in the FlashBack configuration file
+	(typically <code>/etc/flashback/flashback.conf</code>). Restart the
+	FlashBack daemon after making changes for them to take effect.</p>
+
+	<h3>Help</h3>
+
+	<p>You are reading the FlashBack help page. Use the navigation bar at the
+	top to move between sections of the application.</p>
+
 	</div>
 	
 	<div class="clear"></div>
