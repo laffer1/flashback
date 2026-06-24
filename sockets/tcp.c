@@ -80,7 +80,6 @@ typedef struct {
 
 /* module level globals */
 static tcpconn cons[TCPMAXCONS]; /* socketdesc table.. each is a connection */
-static int ncons;  /* number of connections used, an index into cons */
 
 
 /*
@@ -98,7 +97,11 @@ static int ncons;  /* number of connections used, an index into cons */
 */
 void inittcp( void )
 {
-    ncons = -1;
+    int i;
+    for (i = 0; i < TCPMAXCONS; i++) {
+        cons[i].sockfd = -1;
+        cons[i].address = NULL;
+    }
 }
 
 
@@ -132,48 +135,56 @@ socketdesc opentcp( bool server, char * address, int port )
 {
     size_t addresslen;     /* length of address string param */
     int on; /* Should we use socket reuse */
-
-    if ( ncons < TCPMAXCONS -1 )
-        ncons++; /* increment the table cons for each connection */
-    else
-        return ETCPMAXCONS;  /* error to many connections */
+    int idx = -1;
+    int i;
 
     if ( address == NULL )
         return ETCPGENERIC;
- 
+
+    for (i = 0; i < TCPMAXCONS; i++) {
+        if (cons[i].sockfd == -1) {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx == -1)
+        return ETCPMAXCONS;  /* error to many connections */
+
     addresslen = strlen( address );
 
-    cons[ncons].server = server; /* hostname or ip as stated above */
-    cons[ncons].port = port;     /* port to bind to or connect to */
+    cons[idx].server = server; /* hostname or ip as stated above */
+    cons[idx].port = port;     /* port to bind to or connect to */
 
     /* allocate space to store the original address before doing a lookup */
-    if ((cons[ncons].address = (char *) calloc( addresslen+1, sizeof(char) )) == NULL)
+    if ((cons[idx].address = (char *) calloc( addresslen+1, sizeof(char) )) == NULL)
         return ETCPGENERIC;  /* could not allocate memory :( */
     
-    memcpy( cons[ncons].address, address, addresslen );
+    memcpy( cons[idx].address, address, addresslen );
 
     /* create an endpoint for communication */
-    if ((cons[ncons].sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((cons[idx].sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket");
-        free(cons[ncons].address); /* don´t leak */
+        free(cons[idx].address); /* don´t leak */
+        cons[idx].address = NULL;
         return ETCPGENERIC;
     }
 
     /* clear socket param struct */
 #ifdef _WIN32
-    ZeroMemory(&(cons[ncons].sa), sizeof cons[ncons].sa);
+    ZeroMemory(&(cons[idx].sa), sizeof cons[idx].sa);
 #else
-    memset(&(cons[ncons].sa), 0, sizeof cons[ncons].sa);
+    memset(&(cons[idx].sa), 0, sizeof cons[idx].sa);
 #endif
 
     /* Enable address reuse */
     on = 1;
-    setsockopt( cons[ncons].sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof(on) );
+    setsockopt( cons[idx].sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof(on) );
 
     /* setup some defaults for a TCP ip4 connection with a BIG ENDIAN safe
        port number */
-    cons[ncons].sa.sin_family = AF_INET;
-    cons[ncons].sa.sin_port = htons(cons[ncons].port);
+    cons[idx].sa.sin_family = AF_INET;
+    cons[idx].sa.sin_port = htons(cons[idx].port);
 
     /* lookup the hostname or DNS name (or set the ip address) */
     {
@@ -184,13 +195,14 @@ socketdesc opentcp( bool server, char * address, int port )
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
 
-        if ((gai_err = getaddrinfo(cons[ncons].address, NULL, &hints, &res)) != 0) {
-            fprintf(stderr, "%s: %s\n", cons[ncons].address, gai_strerror(gai_err));
-            free(cons[ncons].address);
+        if ((gai_err = getaddrinfo(cons[idx].address, NULL, &hints, &res)) != 0) {
+            fprintf(stderr, "%s: %s\n", cons[idx].address, gai_strerror(gai_err));
+            free(cons[idx].address);
+            cons[idx].address = NULL;
             return ETCPBADADDRESS;
         }
 
-        memcpy(&(cons[ncons].sa).sin_addr,
+        memcpy(&(cons[idx].sa).sin_addr,
                &((struct sockaddr_in *)res->ai_addr)->sin_addr,
                sizeof(struct in_addr));
         freeaddrinfo(res);
@@ -200,37 +212,40 @@ socketdesc opentcp( bool server, char * address, int port )
     if ( server == true )
     {
         /* bind the socket for use */
-        if (bind( cons[ncons].sockfd, 
-                  (struct sockaddr *)&(cons[ncons].sa), 
-                  sizeof cons[ncons].sa) < 0) 
+        if (bind( cons[idx].sockfd, 
+                  (struct sockaddr *)&(cons[idx].sa), 
+                  sizeof cons[idx].sa) < 0) 
         {
             perror("bind");
-            free(cons[ncons].address); /* dont leak */
+            free(cons[idx].address); /* dont leak */
+            cons[idx].address = NULL;
             return ETCPBINDFAIL;
         }
 
         /* listen for incoming connections. */
-        if (listen( cons[ncons].sockfd, BACKLOG) < 0)
+        if (listen( cons[idx].sockfd, BACKLOG) < 0)
         {
             perror("listen");
-            free( cons[ncons].address );
+            free( cons[idx].address );
+            cons[idx].address = NULL;
             return ETCPLISTENFAIL;
         }
     }
     else
     {
         /* must be client! connect but dont do anything else :) */
-        if (connect( cons[ncons].sockfd, 
-                     (struct sockaddr *)&(cons[ncons].sa), 
-                     sizeof cons[ncons].sa) < 0) 
+        if (connect( cons[idx].sockfd, 
+                     (struct sockaddr *)&(cons[idx].sa), 
+                     sizeof cons[idx].sa) < 0) 
         {
             perror("connect");
-            free( cons[ncons].address );
+            free( cons[idx].address );
+            cons[idx].address = NULL;
             return ETCPCONNFAIL;
         }
     }
 
-    return ncons;  /* socketdesc.. aka the index in the interal 
+    return idx;  /* socketdesc.. aka the index in the interal 
                       array*/
 }
 
@@ -250,6 +265,9 @@ socketdesc opentcp( bool server, char * address, int port )
 */
 void closetcp( socketdesc sd )
 {
+    if (sd < 0 || sd >= TCPMAXCONS || cons[sd].sockfd == -1)
+        return;
+
     /* disconnect socket */
 #ifdef _WIN32
     closesocket(cons[sd].sockfd);
@@ -261,6 +279,7 @@ void closetcp( socketdesc sd )
 
     /* free the address memory storage */
     (void) free(cons[sd].address);
+    cons[sd].address = NULL;
 }
 
 
@@ -291,6 +310,9 @@ char * readntcp( socketdesc sd, int size )
     ssize_t bytes;  /* bytes read.. could be up to size in length */
 
     if ( size < 1 )
+        return NULL;
+
+    if (sd < 0 || sd >= TCPMAXCONS || cons[sd].sockfd == -1)
         return NULL;
 
     if ( (buf = (char *) malloc( (size+1) * sizeof(char) ) ) == NULL )
@@ -370,6 +392,9 @@ char * readtcp( socketdesc sd )
 */
 int tcpclientfd( socketdesc sd )
 {
+    if (sd < 0 || sd >= TCPMAXCONS || cons[sd].sockfd == -1)
+        return ETCPGENERIC;
+
     if ( cons[sd].server == false )
         return cons[sd].sockfd;
     else
@@ -399,6 +424,9 @@ int tcpserverclient( socketdesc sd )
 {
      int clientfd; /* fd representing the first socket in the backlog queue */
      socklen_t b; /* size of sa struct so we can pass it as a mem addr */
+
+     if (sd < 0 || sd >= TCPMAXCONS || cons[sd].sockfd == -1)
+         return ETCPACCEPTFAIL;
 
      b = (socklen_t) sizeof cons[sd].sa;
 
@@ -454,6 +482,9 @@ int writetcp( socketdesc sd, char * str )
 */
 int writentcp( socketdesc sd, char * str, int len )
 {
+    if (sd < 0 || sd >= TCPMAXCONS || cons[sd].sockfd == -1)
+        return ETCPGENERIC;
+
     if (cons[sd].server == false) {
 #ifdef _WIN32
         return send( cons[sd].sockfd, str, len, 0 );
