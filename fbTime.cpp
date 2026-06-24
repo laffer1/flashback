@@ -49,12 +49,7 @@ fbTime::fbTime(tm& time):ticks(0), hour(0), min(0), sec(0)
 	setTicks(time.tm_hour, time.tm_min, time.tm_sec);
 }
 
-/*
- *  fbTime
- *   constructor, copies an existing time structures tick value
- *  @param time, fbTime to copy
- */
-fbTime::fbTime(fbTime& time):ticks(time.ticks), hour(0), min(0), sec(0)
+fbTime::fbTime(const fbTime& time):ticks(time.ticks), hour(0), min(0), sec(0)
 {
 	update();
 }

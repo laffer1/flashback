@@ -18,7 +18,7 @@ public:
 	fbTime(int h, int m, int s);
 	fbTime(long _ticks);
 	fbTime(tm& time);
-	fbTime(fbTime& time);
+	fbTime(const fbTime& time);
 
 	~fbTime(){};
 
@@ -44,16 +44,16 @@ public:
 	bool operator<(fbTime& rhs) {return ticks < rhs.ticks;};
 
 	//simple add secounds
-	fbTime& operator+(const int s){ticks+= s; update(); return *this;};
+	fbTime operator+(const int s) const {fbTime result(*this); result+= s; return result;};
 	fbTime& operator+=(const int s){ticks+= s; update(); return *this;};
 	fbTime& operator++(){++ticks; update(); return *this;};
-	fbTime& operator++(const int s){++ticks; update(); return *this;};
+	fbTime operator++(int){fbTime result(*this); ++ticks; update(); return result;};
 	
 	//remove secs
-	fbTime& operator-(const int s){ticks-= s; update(); return *this;};
+	fbTime operator-(const int s) const {fbTime result(*this); result-= s; return result;};
 	fbTime& operator-=(const int s){ticks-= s; update(); return *this;};
 	fbTime& operator--(){--ticks; update(); return *this;};
-	fbTime& operator--(const int s){--ticks; update(); return *this;};
+	fbTime operator--(int){fbTime result(*this); --ticks; update(); return result;};
 
 	void addSec(const int s = 1){*this += s;};
 	long addMin(const int m = 1);   ///< add minutes; returns number of days carried over midnight

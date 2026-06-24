@@ -299,14 +299,20 @@ char * readntcp( socketdesc sd, int size )
     if ( cons[sd].server == false )
     {
 #ifdef _WIN32
-        if ((bytes = recv(cons[sd].sockfd, buf, size, 0)) < 1)
-#else
-        if ((bytes = read(cons[sd].sockfd, buf, size)) < 1)
-#endif
+        if ((bytes = recv(cons[sd].sockfd, buf, size, 0)) < 1) {
+            free(buf);
             return NULL;
+        }
+#else
+        if ((bytes = read(cons[sd].sockfd, buf, size)) < 1) {
+            free(buf);
+            return NULL;
+        }
+#endif
     }
     else
     {
+        free(buf);
         return NULL;
     }
 

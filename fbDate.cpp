@@ -17,7 +17,7 @@ fbDate::fbDate(void): julian(0), year(0), mon(0), day(0)
 	setJulianLocal();
 }
 
-fbDate::fbDate(fbDate& date): julian(0), year(0), mon(0), day(0)
+fbDate::fbDate(const fbDate& date): julian(0), year(0), mon(0), day(0)
 {
 	julian = date.getJulian();
 	update();

@@ -181,15 +181,17 @@ string fbDatabase::getBackupList()
 		 int index =  db.cols() * i;
 		out.append(db.table[index++].c_str()); // id
 		out.append("\t");
-		out.append(db.table[index++].c_str()); //date
+		out.append(db.table[index++].c_str()); // desc
+		out.append("\t");
+		out.append(db.table[index++].c_str()); // date
 		out.append("\t");
 		out.append(db.table[index++].c_str()); // time
 		out.append("\t");
-		out.append(db.table[index++].c_str()); // rt
+		out.append(db.table[index++].c_str()); // repeatmode
 		out.append("\t");
-		out.append(db.table[index++].c_str()); // rv
+		out.append(db.table[index++].c_str()); // repeatval
 		out.append("\t");
-		out.append(db.table[index++].c_str()); // path
+		out.append(db.table[index++].c_str()); // disk (path)
 		out.append("\n");
 	}
 	db.queryDone();

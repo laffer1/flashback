@@ -17,7 +17,7 @@ class fbDate
 public:
 
 	fbDate(void);  /// < seeds with localtime
-	fbDate(fbDate& date);  /// < copies julian
+	fbDate(const fbDate& date);  /// < copies julian
 	fbDate(tm& time);      /// < convert from tm structure
 	fbDate(const int _month, const int _day, const int _year);   /// < manual input
 	fbDate(unsigned long _julian);   /// < julian values... from file anyone?
@@ -39,16 +39,16 @@ public:
 	fbDate& operator=(const fbDate& right);  /// < assignment operator
 	
 	/// add day to julian
-	fbDate& operator+(const int right){julian+= right; update();return *this;};
+	fbDate operator+(const int right) const {fbDate result(*this); result+= right; return result;};
 	fbDate& operator+=(const int right){julian+= right; update();return *this;};
 	fbDate& operator++(){++julian; update();return *this;};
-	fbDate& operator++(const int right){++julian; update();return *this;};
+	fbDate operator++(int){fbDate result(*this); ++julian; update();return result;};
 
 	//subtract day from julian
-	fbDate& operator-(const int right){julian-= right; update();return *this;};
+	fbDate operator-(const int right) const {fbDate result(*this); result-= right; return result;};
 	fbDate& operator-=(const int right){julian-= right; update();return *this;};
 	fbDate& operator--(){--julian; update();return *this;};
-	fbDate& operator--(const int right){--julian; update();return *this;};
+	fbDate operator--(int){fbDate result(*this); --julian; update();return result;};
 
 	void addDay(const int num = 1){*this += num;};   /// < add a day or more
 	void addWeek(const int num = 1){*this += 7 * num;};  /// < add a week or more

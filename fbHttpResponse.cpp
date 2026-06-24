@@ -914,6 +914,7 @@ void fbHttpResponse::sendfile( const char * path )
    /* The file is not there */
     if (pathptr == NULL || !*resolved)
     {
+        free(resolved);
         notfound();
         return;
     }
